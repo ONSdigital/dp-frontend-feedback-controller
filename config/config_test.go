@@ -27,7 +27,6 @@ func TestConfig(t *testing.T) {
 				So(cfg.MailPassword, ShouldEqual, "")
 				So(cfg.FeedbackTo, ShouldEqual, "")
 				So(cfg.FeedbackFrom, ShouldEqual, "")
-
 			})
 
 			Convey("Then a second call to config should return the same config", func() {
