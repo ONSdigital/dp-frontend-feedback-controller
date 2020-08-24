@@ -13,6 +13,12 @@ type Config struct {
 	HealthCheckInterval        time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
 	HealthCheckCriticalTimeout time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
 	HelloWorldEmphasise        bool          `envconfig:"HELLO_WORLD_EMPHASISE"`
+	MailHost                   string        `envconfig:"MAIL_HOST"`
+	MailUser                   string        `envconfig:"MAIL_USER"`
+	MailPassword               string        `envconfig:"MAIL_PASSWORD" json:"-"`
+	MailPort                   string        `envconfig:"MAIL_PORT"`
+	FeedbackTo                 string        `envconfig:"FEEDBACK_TO"`
+	FeedbackFrom               string        `envconfig:"FEEDBACK_FROM"`
 }
 
 var cfg *Config
@@ -30,6 +36,12 @@ func Get() (*Config, error) {
 		HealthCheckInterval:        30 * time.Second,
 		HealthCheckCriticalTimeout: 90 * time.Second,
 		HelloWorldEmphasise:        true,
+		MailHost:                   "localhost",
+		MailPort:                   "1025",
+		MailUser:                   "",
+		MailPassword:               "",
+		FeedbackTo:                 "",
+		FeedbackFrom:               "",
 	}
 
 	return cfg, envconfig.Process("", cfg)
