@@ -19,6 +19,7 @@ type Config struct {
 	MailPort                   string        `envconfig:"MAIL_PORT"`
 	FeedbackTo                 string        `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom               string        `envconfig:"FEEDBACK_FROM"`
+	RendererURL                string        `envconfig:"RENDERER_URL"`
 }
 
 var cfg *Config
