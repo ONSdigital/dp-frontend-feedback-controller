@@ -43,6 +43,7 @@ func Get() (*Config, error) {
 		MailPassword:               "",
 		FeedbackTo:                 "",
 		FeedbackFrom:               "",
+		RendererURL:                "http://localhost:20010",
 	}
 
 	return cfg, envconfig.Process("", cfg)
