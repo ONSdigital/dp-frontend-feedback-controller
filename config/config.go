@@ -41,8 +41,8 @@ func Get() (*Config, error) {
 		MailPort:                   "1025",
 		MailUser:                   "",
 		MailPassword:               "",
-		FeedbackTo:                 "",
-		FeedbackFrom:               "",
+		FeedbackTo:                 "to@gmail.com",
+		FeedbackFrom:               "from@gmail.com",
 		RendererURL:                "http://localhost:20010",
 	}
 

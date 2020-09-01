@@ -25,8 +25,8 @@ func TestConfig(t *testing.T) {
 				So(cfg.MailPort, ShouldEqual, "1025")
 				So(cfg.MailUser, ShouldEqual, "")
 				So(cfg.MailPassword, ShouldEqual, "")
-				So(cfg.FeedbackTo, ShouldEqual, "")
-				So(cfg.FeedbackFrom, ShouldEqual, "")
+				So(cfg.FeedbackTo, ShouldEqual, "to@gmail.com")
+				So(cfg.FeedbackFrom, ShouldEqual, "from@gmail.com")
 			})
 
 			Convey("Then a second call to config should return the same config", func() {
