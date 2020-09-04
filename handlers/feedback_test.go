@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
 	"github.com/ONSdigital/dp-frontend-models/model/feedback"
 	"net/http"
@@ -111,6 +112,47 @@ func Test_getFeedback(t *testing.T) {
 
 			Convey("Then a 500 internal server error response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusInternalServerError)
+			})
+		})
+	})
+}
+
+func Test_addFeedback(t *testing.T) {
+
+	Convey("Given a valid request", t, func() {
+
+		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
+		w := httptest.NewRecorder()
+		isPositive := false
+		from := ""
+		to := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, nil
+			},
+		}
+
+		mockSender := &emailtest.SenderMock{
+			SendFunc: func(from string, to []string, msg []byte) error {
+				return nil
+			},
+		}
+
+		Convey("When addFeedback is called", func() {
+
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+
+			Convey("Then the renderer is not called", func() {
+				So(len(mockRenderer.DoCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the email sender is called", func() {
+				So(len(mockSender.SendCalls()), ShouldEqual, 1)
+			})
+
+			Convey("Then a 200 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusMovedPermanently)
 			})
 		})
 	})

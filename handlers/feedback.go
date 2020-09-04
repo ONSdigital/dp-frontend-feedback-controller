@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/smtp"
 	"regexp"
 
 	"github.com/ONSdigital/dp-frontend-models/model"
@@ -119,13 +119,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpo
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(auth smtp.Auth, mailAddr, to, from string, isPositive bool, renderer interfaces.Renderer) http.HandlerFunc {
+func AddFeedback(to, from string, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		addFeedback(w, req, isPositive, renderer, mailAddr, auth, from, to)
+		addFeedback(w, req, isPositive, renderer, emailSender, from, to)
 	}
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, renderer interfaces.Renderer, mailAddr string, auth smtp.Auth, from string, to string) {
+func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender, from string, to string) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Event(ctx, "unable to parse request form", log.ERROR, log.Error(err))
@@ -163,9 +163,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		f.URL = "Whole site"
 	}
 
-	if err := smtp.SendMail(
-		mailAddr,
-		auth,
+	if err := emailSender.Send(
 		from,
 		[]string{to},
 		generateFeedbackMessage(f, from, to, isPositive),
