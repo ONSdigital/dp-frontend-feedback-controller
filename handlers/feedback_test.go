@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"errors"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,18 +14,23 @@ func Test_getFeedback(t *testing.T) {
 
 	Convey("Given a request without a query string", t, func() {
 
+		req := httptest.NewRequest("GET", "http://localhost", nil)
+		w := httptest.NewRecorder()
+
+		url := "whatever"
+		errorType := ""
+		purpose := ""
+		description := ""
+		name := ""
+		email := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, nil
+			},
+		}
+
 		Convey("When getFeedback is called", func() {
-			req := httptest.NewRequest("GET", "http://localhost", nil)
-			w := httptest.NewRecorder()
-
-			url := "whatever"
-			errorType := ""
-			purpose := ""
-			description := ""
-			name := ""
-			email := ""
-
-			mockRenderer := MockRenderer{}
 
 			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
 
@@ -35,18 +42,23 @@ func Test_getFeedback(t *testing.T) {
 
 	Convey("Given a valid request", t, func() {
 
+		req := httptest.NewRequest("GET", "http://localhost?service=dev", nil)
+		w := httptest.NewRecorder()
+
+		url := "whatever"
+		errorType := ""
+		purpose := ""
+		description := ""
+		name := ""
+		email := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, nil
+			},
+		}
+
 		Convey("When getFeedback is called", func() {
-			req := httptest.NewRequest("GET", "http://localhost?service=dev", nil)
-			w := httptest.NewRecorder()
-
-			url := "whatever"
-			errorType := ""
-			purpose := ""
-			description := ""
-			name := ""
-			email := ""
-
-			mockRenderer := MockRenderer{}
 
 			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
 
@@ -56,11 +68,31 @@ func Test_getFeedback(t *testing.T) {
 		})
 	})
 
-}
+	Convey("Given an error returned from the renderer", t, func() {
 
-type MockRenderer struct {
-}
+		req := httptest.NewRequest("GET", "http://localhost?service=dev", nil)
+		w := httptest.NewRecorder()
 
-func (r MockRenderer) Do(path string, b []byte) ([]byte, error) {
-	return nil, nil
+		url := "whatever"
+		errorType := ""
+		purpose := ""
+		description := ""
+		name := ""
+		email := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, errors.New("renderer is broken")
+			},
+		}
+
+		Convey("When getFeedback is called", func() {
+
+			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
+
+			Convey("Then a 500 internal server error response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusInternalServerError)
+			})
+		})
+	})
 }

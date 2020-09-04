@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -28,12 +29,8 @@ type Feedback struct {
 	FeedbackFormType string `schema:"feedback-form-type"`
 }
 
-type Renderer interface {
-	Do(path string, b []byte) ([]byte, error)
-}
-
 // FeedbackThanks loads the Feedback Thank you page
-func FeedbackThanks(renderer Renderer) http.HandlerFunc {
+func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var p model.Page
 		ctx := req.Context()
@@ -65,13 +62,13 @@ func FeedbackThanks(renderer Renderer) http.HandlerFunc {
 }
 
 // GetFeedback handles the loading of a feedback page
-func GetFeedback(renderer Renderer) http.HandlerFunc {
+func GetFeedback(renderer interfaces.Renderer) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		getFeedback(w, req, req.Referer(), "", "", "", "", "", renderer)
 	}
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpose, description, name, email string, renderer Renderer) {
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpose, description, name, email string, renderer interfaces.Renderer) {
 	var p feedback.Page
 
 	var services = make(map[string]string)
@@ -118,7 +115,7 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpo
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(auth smtp.Auth, mailAddr, to, from string, isPositive bool, renderer Renderer) http.HandlerFunc {
+func AddFeedback(auth smtp.Auth, mailAddr, to, from string, isPositive bool, renderer interfaces.Renderer) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 		if err := req.ParseForm(); err != nil {
