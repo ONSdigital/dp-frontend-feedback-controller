@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
+	"github.com/ONSdigital/dp-frontend-models/model/feedback"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -47,7 +49,7 @@ func Test_getFeedback(t *testing.T) {
 
 		url := "whatever"
 		errorType := ""
-		purpose := ""
+		purpose := "the purpose"
 		description := ""
 		name := ""
 		email := ""
@@ -62,9 +64,26 @@ func Test_getFeedback(t *testing.T) {
 
 			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
 
+			Convey("Then the expected JSON is sent to the renderer", func() {
+
+				var expectedPage feedback.Page
+				expectedPage.Purpose = purpose
+				expectedPage.Metadata.Title = "Feedback"
+				expectedPage.PreviousURL = url
+				expectedPage.Metadata.Description = url
+				expectedPage.ServiceDescription = "ONS developer website"
+				expectedJSON, _ := json.Marshal(expectedPage)
+
+				actualJSON := string(mockRenderer.DoCalls()[0].B)
+
+				So(mockRenderer.DoCalls()[0].Path, ShouldEqual, "feedback")
+				So(actualJSON, ShouldEqual, string(expectedJSON))
+			})
+
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
+
 		})
 	})
 
