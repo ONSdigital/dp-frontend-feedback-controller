@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
@@ -152,12 +153,94 @@ func Test_addFeedback(t *testing.T) {
 				So(len(mockSender.SendCalls()), ShouldEqual, 1)
 			})
 
-			Convey("Then a 200 response is returned", func() {
+			Convey("Then a 301 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusMovedPermanently)
 			})
 		})
 	})
 
+	Convey("Given a request with invalid form data", t, func() {
+
+		req := httptest.NewRequest("POST", "http://localhost?!@£$@$£%£$%^^&^&*", nil)
+
+		w := httptest.NewRecorder()
+		isPositive := false
+		from := ""
+		to := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, nil
+			},
+		}
+
+		mockSender := &emailtest.SenderMock{
+			SendFunc: func(from string, to []string, msg []byte) error {
+				return nil
+			},
+		}
+
+		Convey("When addFeedback is called", func() {
+
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+
+			Convey("Then the renderer is not called", func() {
+				So(len(mockRenderer.DoCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the email sender is called", func() {
+				So(len(mockSender.SendCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then a 500 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusInternalServerError)
+			})
+		})
+	})
+
+	Convey("Given a request for page specific feedback with an empty purpose value", t, func() {
+
+		body := strings.NewReader("feedback-form-type=page")
+		req := httptest.NewRequest("POST", "http://localhost?service=dev", body)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		w := httptest.NewRecorder()
+		isPositive := false
+		from := ""
+		to := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, nil
+			},
+		}
+
+		mockSender := &emailtest.SenderMock{
+			SendFunc: func(from string, to []string, msg []byte) error {
+				return nil
+			},
+		}
+
+		Convey("When addFeedback is called", func() {
+
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+
+			Convey("Then the renderer is called to render the feedback page", func() {
+				So(len(mockRenderer.DoCalls()), ShouldEqual, 1)
+				So(mockRenderer.DoCalls()[0].Path, ShouldEqual, "feedback")
+				rendererRequest := string(mockRenderer.DoCalls()[0].B)
+				So(strings.Contains(rendererRequest, `"error_type":"purpose"`), ShouldBeTrue)
+			})
+
+			Convey("Then the email sender is called", func() {
+				So(len(mockSender.SendCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then a 200 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusOK)
+			})
+		})
+	})
 }
 
 func Test_feedbackThanks(t *testing.T) {

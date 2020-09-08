@@ -134,6 +134,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	decoder := schema.NewDecoder()
+	decoder.IgnoreUnknownKeys(true)
 
 	var f Feedback
 	if err := decoder.Decode(&f, req.Form); err != nil {
