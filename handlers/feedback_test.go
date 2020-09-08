@@ -3,12 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
-	"github.com/ONSdigital/dp-frontend-models/model/feedback"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
+	"github.com/ONSdigital/dp-frontend-models/model/feedback"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -153,6 +154,56 @@ func Test_addFeedback(t *testing.T) {
 
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusMovedPermanently)
+			})
+		})
+	})
+
+}
+
+func Test_feedbackThanks(t *testing.T) {
+
+	Convey("Given a valid request", t, func() {
+
+		req := httptest.NewRequest("GET", "http://localhost", nil)
+		w := httptest.NewRecorder()
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, nil
+			},
+		}
+
+		Convey("When feedbackThanks is called", func() {
+
+			feedbackThanks(w, req, mockRenderer)
+
+			Convey("Then the renderer is called", func() {
+				So(len(mockRenderer.DoCalls()), ShouldEqual, 1)
+			})
+
+			Convey("Then a 200 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusOK)
+			})
+		})
+	})
+
+	Convey("Given an error returned from the renderer", t, func() {
+
+		req := httptest.NewRequest("GET", "http://localhost", nil)
+		w := httptest.NewRecorder()
+
+		mockRenderer := &interfacestest.RendererMock{
+			DoFunc: func(path string, b []byte) ([]byte, error) {
+				return nil, errors.New("renderer is broken")
+			},
+		}
+
+		Convey("When feedbackThanks is called", func() {
+
+			feedbackThanks(w, req, mockRenderer)
+
+			Convey("Then a 500 internal server error response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusInternalServerError)
 			})
 		})
 	})
