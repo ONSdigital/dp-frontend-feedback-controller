@@ -3,6 +3,8 @@ package routes
 import (
 	"context"
 	"fmt"
+	"github.com/ONSdigital/dp-api-clients-go/renderer"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"net/smtp"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
@@ -22,19 +24,24 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, hc health.Hea
 		cfg.MailPassword,
 		cfg.MailHost,
 	)
-
 	if cfg.MailHost == "localhost" {
 		auth = unencryptedAuth{auth}
 	}
-
 	mailAddr := fmt.Sprintf("%s:%s", cfg.MailHost, cfg.MailPort)
+
+	emailSender := email.SMTPSender{
+		Addr: mailAddr,
+		Auth: auth,
+	}
+
+	renderer := renderer.New(cfg.RendererURL)
 
 	log.Event(ctx, "adding routes")
 	r.StrictSlash(true).Path("/health").HandlerFunc(hc.Handler)
-	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(auth, mailAddr, cfg.FeedbackTo, cfg.FeedbackFrom, cfg.RendererURL, false))
-	r.StrictSlash(true).Path("/feedback/positive").Methods("POST").HandlerFunc(handlers.AddFeedback(auth, mailAddr, cfg.FeedbackTo, cfg.FeedbackFrom, cfg.RendererURL, false))
-	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(cfg.RendererURL))
-	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(handlers.FeedbackThanks(cfg.RendererURL))
+	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))
+	r.StrictSlash(true).Path("/feedback/positive").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))
+	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(renderer))
+	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(handlers.FeedbackThanks(renderer))
 
 }
 
