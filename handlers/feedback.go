@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 
+	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-models/model"
 	"github.com/ONSdigital/dp-frontend-models/model/feedback"
+	dphandlers "github.com/ONSdigital/dp-net/handlers"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/schema"
 )
@@ -31,9 +32,9 @@ type Feedback struct {
 
 // FeedbackThanks loads the Feedback Thank you page
 func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
 		feedbackThanks(w, req, renderer)
-	}
+	})
 }
 
 func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interfaces.Renderer) {
@@ -67,9 +68,9 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interface
 
 // GetFeedback handles the loading of a feedback page
 func GetFeedback(renderer interfaces.Renderer) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
 		getFeedback(w, req, req.Referer(), "", "", "", "", "", renderer)
-	}
+	})
 }
 
 func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpose, description, name, email string, renderer interfaces.Renderer) {
@@ -120,9 +121,9 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpo
 
 // AddFeedback handles a users feedback request and sends a message to slack
 func AddFeedback(to, from string, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
 		addFeedback(w, req, isPositive, renderer, emailSender, from, to)
-	}
+	})
 }
 
 func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender, from string, to string) {
