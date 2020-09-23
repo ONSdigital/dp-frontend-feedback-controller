@@ -39,8 +39,8 @@ func Test_getFeedback(t *testing.T) {
 
 			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
 
-			Convey("Then a 400 bad request is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusBadRequest)
+			Convey("Then a 200 request is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 	})
