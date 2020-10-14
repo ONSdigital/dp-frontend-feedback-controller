@@ -12,7 +12,6 @@ type Config struct {
 	GracefulShutdownTimeout    time.Duration `envconfig:"GRACEFUL_SHUTDOWN_TIMEOUT"`
 	HealthCheckInterval        time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
 	HealthCheckCriticalTimeout time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
-	HelloWorldEmphasise        bool          `envconfig:"HELLO_WORLD_EMPHASISE"`
 	MailHost                   string        `envconfig:"MAIL_HOST"`
 	MailUser                   string        `envconfig:"MAIL_USER"`
 	MailPassword               string        `envconfig:"MAIL_PASSWORD" json:"-"`
@@ -36,7 +35,6 @@ func Get() (*Config, error) {
 		GracefulShutdownTimeout:    5 * time.Second,
 		HealthCheckInterval:        30 * time.Second,
 		HealthCheckCriticalTimeout: 90 * time.Second,
-		HelloWorldEmphasise:        true,
 		MailHost:                   "localhost",
 		MailPort:                   "1025",
 		MailUser:                   "",
