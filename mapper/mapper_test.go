@@ -18,7 +18,6 @@ func TestUnitMapper(t *testing.T) {
 			GracefulShutdownTimeout:    0,
 			HealthCheckInterval:        0,
 			HealthCheckCriticalTimeout: 0,
-			HelloWorldEmphasise:        true,
 		}
 
 		hm := HelloModel{
