@@ -18,7 +18,13 @@ To allow users to provide feedback about the ONS website
 | GRACEFUL_SHUTDOWN_TIMEOUT    | 5s        | The graceful shutdown timeout in seconds (`time.Duration` format)
 | HEALTHCHECK_INTERVAL         | 30s       | Time between self-healthchecks (`time.Duration` format)
 | HEALTHCHECK_CRITICAL_TIMEOUT | 90s       | Time to wait until an unhealthy dependent propagates its state to make this app unhealthy (`time.Duration` format)
-| HELLO_WORLD_EMPHASISE        | true      | Example boolean flag to control whether the 'Hello World' greeting should be emphasised with "!"
+| RENDERER_URL                 | http://localhost:20010  | The URL of [dp-frontend-renderer](https://www.github.com/ONSdigital/dp-frontend-renderer).
+| MAIL_HOST                    | ""                      | The host for the mail server.
+| MAIL_PORT                    | ""                      | The port for the mail server.
+| MAIL_USER                    | ""                      | A user on the mail server.
+| MAIL_PASSWORD                | ""                      | The password for the mail server user.
+| FEEDBACK_TO                  | ""                      | Receiver email address for feedback.
+| FEEDBACK_FROM                | ""                      | Sender email address for feedback.
 
 ### Contributing
 
