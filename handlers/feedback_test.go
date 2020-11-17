@@ -70,6 +70,7 @@ func Test_getFeedback(t *testing.T) {
 			Convey("Then the expected JSON is sent to the renderer", func() {
 
 				var expectedPage feedback.Page
+				expectedPage.Language = "en"
 				expectedPage.Purpose = purpose
 				expectedPage.Metadata.Title = "Feedback"
 				expectedPage.PreviousURL = url
