@@ -28,7 +28,7 @@ func Test_getFeedback(t *testing.T) {
 		description := ""
 		name := ""
 		email := ""
-
+		lang := "en"
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
 				return nil, nil
@@ -37,7 +37,7 @@ func Test_getFeedback(t *testing.T) {
 
 		Convey("When getFeedback is called", func() {
 
-			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
+			getFeedback(w, req, url, errorType, purpose, description, name, email, lang, mockRenderer)
 
 			Convey("Then a 200 request is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
@@ -56,7 +56,7 @@ func Test_getFeedback(t *testing.T) {
 		description := ""
 		name := ""
 		email := ""
-
+		lang := "en"
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
 				return nil, nil
@@ -65,7 +65,7 @@ func Test_getFeedback(t *testing.T) {
 
 		Convey("When getFeedback is called", func() {
 
-			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
+			getFeedback(w, req, url, errorType, purpose, description, name, email, lang, mockRenderer)
 
 			Convey("Then the expected JSON is sent to the renderer", func() {
 
@@ -101,7 +101,7 @@ func Test_getFeedback(t *testing.T) {
 		description := ""
 		name := ""
 		email := ""
-
+		lang := "en"
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
 				return nil, errors.New("renderer is broken")
@@ -110,7 +110,7 @@ func Test_getFeedback(t *testing.T) {
 
 		Convey("When getFeedback is called", func() {
 
-			getFeedback(w, req, url, errorType, purpose, description, name, email, mockRenderer)
+			getFeedback(w, req, url, errorType, purpose, description, name, email, lang, mockRenderer)
 
 			Convey("Then a 500 internal server error response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusInternalServerError)
@@ -128,6 +128,7 @@ func Test_addFeedback(t *testing.T) {
 		isPositive := false
 		from := ""
 		to := ""
+		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
@@ -143,7 +144,7 @@ func Test_addFeedback(t *testing.T) {
 
 		Convey("When addFeedback is called", func() {
 
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
 
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.DoCalls()), ShouldEqual, 0)
@@ -166,6 +167,7 @@ func Test_addFeedback(t *testing.T) {
 		isPositive := false
 		from := ""
 		to := ""
+		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
@@ -181,7 +183,7 @@ func Test_addFeedback(t *testing.T) {
 
 		Convey("When addFeedback is called", func() {
 
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
 
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.DoCalls()), ShouldEqual, 0)
@@ -205,6 +207,7 @@ func Test_addFeedback(t *testing.T) {
 		isPositive := false
 		from := ""
 		to := ""
+		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
@@ -220,7 +223,7 @@ func Test_addFeedback(t *testing.T) {
 
 		Convey("When addFeedback is called", func() {
 
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
 
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.DoCalls()), ShouldEqual, 0)
@@ -246,6 +249,7 @@ func Test_addFeedback(t *testing.T) {
 		isPositive := false
 		from := ""
 		to := ""
+		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
@@ -261,7 +265,7 @@ func Test_addFeedback(t *testing.T) {
 
 		Convey("When addFeedback is called", func() {
 
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
 
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.DoCalls()), ShouldEqual, 1)
@@ -289,6 +293,7 @@ func Test_addFeedback(t *testing.T) {
 		isPositive := false
 		from := ""
 		to := ""
+		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
@@ -304,7 +309,7 @@ func Test_addFeedback(t *testing.T) {
 
 		Convey("When addFeedback is called", func() {
 
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
 
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.DoCalls()), ShouldEqual, 1)
@@ -335,6 +340,7 @@ func Test_addFeedback(t *testing.T) {
 		isPositive := false
 		from := ""
 		to := ""
+		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			DoFunc: func(path string, b []byte) ([]byte, error) {
@@ -350,7 +356,7 @@ func Test_addFeedback(t *testing.T) {
 
 		Convey("When addFeedback is called", func() {
 
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
 
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.DoCalls()), ShouldEqual, 1)
