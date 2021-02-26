@@ -67,11 +67,11 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interface
 // GetFeedback handles the loading of a feedback page
 func GetFeedback(renderer interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		getFeedback(w, req, req.Referer(), "", "", "", "", "", renderer)
+		getFeedback(w, req, req.Referer(), "", "", "", "", "", lang, renderer)
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpose, description, name, email string, renderer interfaces.Renderer) {
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpose, description, name, email, lang string, renderer interfaces.Renderer) {
 	var p feedback.Page
 
 	var services = make(map[string]string)
@@ -79,6 +79,8 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpo
 	services["dev"] = "ONS developer website"
 
 	p.ServiceDescription = services[req.URL.Query().Get("service")]
+
+	p.Language = lang
 
 	p.Metadata.Title = "Feedback"
 	p.Metadata.Description = url
@@ -114,11 +116,11 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpo
 // AddFeedback handles a users feedback request and sends a message to slack
 func AddFeedback(to, from string, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, isPositive, renderer, emailSender, from, to)
+		addFeedback(w, req, isPositive, renderer, emailSender, from, to, lang)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender, from string, to string) {
+func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender, from, to, lang string) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Event(ctx, "unable to parse request form", log.ERROR, log.Error(err))
@@ -137,18 +139,18 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	if f.FeedbackFormType == "page" && f.Purpose == "" && !isPositive {
-		getFeedback(w, req, f.URL, "purpose", f.Purpose, f.Description, f.Name, f.Email, renderer)
+		getFeedback(w, req, f.URL, "purpose", f.Purpose, f.Description, f.Name, f.Email, lang, renderer)
 		return
 	}
 
 	if f.Description == "" && !isPositive {
-		getFeedback(w, req, f.URL, "description", f.Purpose, f.Description, f.Name, f.Email, renderer)
+		getFeedback(w, req, f.URL, "description", f.Purpose, f.Description, f.Name, f.Email, lang, renderer)
 		return
 	}
 
 	if len(f.Email) > 0 && !isPositive {
 		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, f.Email); !ok || err != nil {
-			getFeedback(w, req, f.URL, "email", f.Purpose, f.Description, f.Name, f.Email, renderer)
+			getFeedback(w, req, f.URL, "email", f.Purpose, f.Description, f.Name, f.Email, lang, renderer)
 			return
 		}
 	}
