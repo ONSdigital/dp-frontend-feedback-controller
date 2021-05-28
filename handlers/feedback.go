@@ -18,7 +18,6 @@ import (
 
 // Feedback represents a user's feedback
 type Feedback struct {
-	Purpose          string `schema:"purpose"`
 	Type             string `schema:"type"`
 	URI              string `schema:":uri"`
 	URL              string `schema:"url"`
@@ -42,7 +41,7 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interface
 	p.Metadata.Title = "Thank you"
 	returnTo := req.URL.Query().Get("returnTo")
 
-	if returnTo == "Whole site" {
+	if returnTo == "Whole site" || returnTo == "" {
 		returnTo = "https://www.ons.gov.uk"
 	}
 	p.Metadata.Description = returnTo
@@ -67,11 +66,11 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interface
 // GetFeedback handles the loading of a feedback page
 func GetFeedback(renderer interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		getFeedback(w, req, req.Referer(), "", "", "", "", "", lang, renderer)
+		getFeedback(w, req, req.Referer(), "", "", "", "", lang, renderer)
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpose, description, name, email, lang string, renderer interfaces.Renderer) {
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, email, lang string, renderer interfaces.Renderer) {
 	var p feedback.Page
 
 	var services = make(map[string]string)
@@ -90,7 +89,6 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, purpo
 	}
 
 	p.ErrorType = errorType
-	p.Purpose = purpose
 	p.Feedback = description
 	p.Name = name
 	p.Email = email
@@ -138,19 +136,14 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		return
 	}
 
-	if f.FeedbackFormType == "page" && f.Purpose == "" && !isPositive {
-		getFeedback(w, req, f.URL, "purpose", f.Purpose, f.Description, f.Name, f.Email, lang, renderer)
-		return
-	}
-
 	if f.Description == "" && !isPositive {
-		getFeedback(w, req, f.URL, "description", f.Purpose, f.Description, f.Name, f.Email, lang, renderer)
+		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, renderer)
 		return
 	}
 
 	if len(f.Email) > 0 && !isPositive {
 		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, f.Email); !ok || err != nil {
-			getFeedback(w, req, f.URL, "email", f.Purpose, f.Description, f.Name, f.Email, lang, renderer)
+			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, renderer)
 			return
 		}
 	}
@@ -170,7 +163,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	redirectURL := "/feedback/thanks?returnTo=" + f.URL
-	http.Redirect(w, req, redirectURL, 301)
+	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 
 func generateFeedbackMessage(f Feedback, from, to string, isPositive bool) []byte {
@@ -193,9 +186,6 @@ func generateFeedbackMessage(f Feedback, from, to string, isPositive bool) []byt
 
 	b.WriteString(fmt.Sprintf("Page URL: %s\n", f.URL))
 	b.WriteString(fmt.Sprintf("Description: %s\n", description))
-	if len(f.Purpose) > 0 {
-		b.WriteString(fmt.Sprintf("Purpose: %s\n", f.Purpose))
-	}
 
 	if len(f.Name) > 0 {
 		b.WriteString(fmt.Sprintf("Name: %s\n", f.Name))
