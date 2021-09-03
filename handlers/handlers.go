@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 )
 
 // ClientError is an interface that can be used to retrieve the status code if a client has errored
@@ -19,6 +19,6 @@ func setStatusCode(req *http.Request, w http.ResponseWriter, err error) {
 			status = err.Code()
 		}
 	}
-	log.Event(req.Context(), "setting-response-status", log.Error(err))
+	log.Error(req.Context(), "setting-response-status", err)
 	w.WriteHeader(status)
 }
