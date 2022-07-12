@@ -80,7 +80,7 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p.ServiceDescription = services[req.URL.Query().Get("service")]
 
 	p.Language = lang
-
+	p.Type = "feedback"
 	p.Metadata.Title = "Feedback"
 	p.Metadata.Description = url
 
