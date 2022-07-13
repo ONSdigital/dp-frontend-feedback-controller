@@ -73,6 +73,7 @@ func Test_getFeedback(t *testing.T) {
 				expectedPage.PreviousURL = url
 				expectedPage.Metadata.Description = url
 				expectedPage.ServiceDescription = "ONS developer website"
+				expectedPage.Type = "feedback"
 				expectedJSON, _ := json.Marshal(expectedPage)
 
 				actualJSON := string(mockRenderer.DoCalls()[0].B)
