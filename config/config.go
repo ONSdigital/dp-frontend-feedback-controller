@@ -18,7 +18,10 @@ type Config struct {
 	MailPort                   string        `envconfig:"MAIL_PORT"`
 	FeedbackTo                 string        `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom               string        `envconfig:"FEEDBACK_FROM"`
-	RendererURL                string        `envconfig:"RENDERER_URL"`
+	PatternLibraryAssetsPath   string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
+	SiteDomain                 string        `envconfig:"SITE_DOMAIN"`
+	Debug                      bool          `envconfig:"DEBUG"`
+	SupportedLanguages         []string      `envconfig:"SUPPORTED_LANGUAGES"`
 }
 
 var cfg *Config
@@ -26,6 +29,20 @@ var cfg *Config
 // Get returns the default config with any modifications through environment
 // variables
 func Get() (*Config, error) {
+	cfg, err := get()
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.Debug {
+		cfg.PatternLibraryAssetsPath = "http://localhost:9000/dist"
+	} else {
+		cfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/sixteens/67f6982"
+	}
+	return cfg, nil
+}
+
+func get() (*Config, error) {
 	if cfg != nil {
 		return cfg, nil
 	}
@@ -41,7 +58,9 @@ func Get() (*Config, error) {
 		MailPassword:               "",
 		FeedbackTo:                 "to@gmail.com",
 		FeedbackFrom:               "from@gmail.com",
-		RendererURL:                "http://localhost:20010",
+		SiteDomain:                 "localhost",
+		Debug:                      false,
+		SupportedLanguages:         []string{"en", "cy"},
 	}
 
 	return cfg, envconfig.Process("", cfg)
