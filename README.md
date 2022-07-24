@@ -1,16 +1,16 @@
-dp-frontend-feedback-controller
-================
+# dp-frontend-feedback-controller
+
 To allow users to provide feedback about the ONS website
 
-### Getting started
+## Getting started
 
 * Run `make debug`
 
-### Dependencies
+## Dependencies
 
 * No further dependencies other than those defined in `go.mod`
 
-### Configuration
+## Configuration
 
 | Environment variable         | Default   | Description
 | ---------------------------- | --------- | -----------
@@ -26,11 +26,11 @@ To allow users to provide feedback about the ONS website
 | FEEDBACK_TO                  | ""                      | Receiver email address for feedback.
 | FEEDBACK_FROM                | ""                      | Sender email address for feedback.
 
-### Contributing
+## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-### License
+## License
 
 Copyright © 2021, Office for National Statistics (https://www.ons.gov.uk)
 
