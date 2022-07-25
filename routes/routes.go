@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"net/smtp"
 
-	"github.com/ONSdigital/dp-api-clients-go/renderer"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/handlers"
+
+	render "github.com/ONSdigital/dp-renderer"
 
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
 	"github.com/ONSdigital/log.go/v2/log"
@@ -17,7 +18,7 @@ import (
 )
 
 // Setup registers routes for the service
-func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, hc health.HealthCheck) {
+func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, rend *render.Render, hc health.HealthCheck) {
 
 	auth := smtp.PlainAuth(
 		"",
@@ -35,14 +36,12 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, hc health.Hea
 		Auth: auth,
 	}
 
-	renderer := renderer.New(cfg.RendererURL)
-
 	log.Info(ctx, "adding routes")
 	r.StrictSlash(true).Path("/health").HandlerFunc(hc.Handler)
-	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))
-	r.StrictSlash(true).Path("/feedback/positive").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))
-	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(renderer))
-	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(handlers.FeedbackThanks(renderer))
+	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, rend, emailSender))
+	r.StrictSlash(true).Path("/feedback/positive").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, rend, emailSender))
+	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(rend))
+	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(handlers.FeedbackThanks(rend))
 
 }
 
