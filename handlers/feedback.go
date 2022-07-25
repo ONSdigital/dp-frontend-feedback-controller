@@ -2,16 +2,14 @@ package handlers
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
-	"github.com/ONSdigital/dp-frontend-models/model"
-	"github.com/ONSdigital/dp-frontend-models/model/feedback"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/handlers"
+	render "github.com/ONSdigital/dp-renderer"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/schema"
 )
@@ -28,15 +26,17 @@ type Feedback struct {
 }
 
 // FeedbackThanks loads the Feedback Thank you page
-func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
+func FeedbackThanks(rend *render.Render) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, renderer)
+		feedbackThanks(w, req, rend)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interfaces.Renderer) {
-	var p model.Page
-	ctx := req.Context()
+func feedbackThanks(w http.ResponseWriter, req *http.Request, rend *render.Render) {
+	basePage := rend.NewBasePageModel()
+	p := model.Feedback{
+		Page: basePage,
+	}
 
 	p.Metadata.Title = "Thank you"
 	returnTo := req.URL.Query().Get("returnTo")
@@ -46,32 +46,21 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interface
 	}
 	p.Metadata.Description = returnTo
 
-	b, err := json.Marshal(p)
-	if err != nil {
-		log.Error(ctx, "unable to marshal page data", err, log.Data{"setting-response-status": http.StatusInternalServerError})
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	templateHTML, err := renderer.Do("feedback-thanks", b)
-	if err != nil {
-		log.Error(ctx, "failed to render feedback-thanks template", err, log.Data{"setting-response-status": http.StatusInternalServerError})
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Write(templateHTML)
+	rend.BuildPage(w, p, "feedback-thank-you")
 }
 
 // GetFeedback handles the loading of a feedback page
-func GetFeedback(renderer interfaces.Renderer) http.HandlerFunc {
+func GetFeedback(rend *render.Render) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		getFeedback(w, req, req.Referer(), "", "", "", "", lang, renderer)
+		getFeedback(w, req, req.Referer(), "", "", "", "", lang, rend)
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, email, lang string, renderer interfaces.Renderer) {
-	var p feedback.Page
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, email, lang string, rend *render.Render) {
+	basePage := rend.NewBasePageModel()
+	p := model.Feedback{
+		Page: basePage,
+	}
 
 	var services = make(map[string]string)
 	services["cmd"] = "Customising data by applying filters"
@@ -94,31 +83,17 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p.Email = email
 	p.PreviousURL = url
 
-	b, err := json.Marshal(p)
-	if err != nil {
-		log.Error(req.Context(), "unable to marshal feedback page data", err, log.Data{"setting-response-status": http.StatusInternalServerError})
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	templateHTML, err := renderer.Do("feedback", b)
-	if err != nil {
-		log.Error(req.Context(), "failed to render feedback template", err, log.Data{"setting-response-status": http.StatusInternalServerError})
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Write(templateHTML)
+	rend.BuildPage(w, p, "feedback")
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(to, from string, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender) http.HandlerFunc {
+func AddFeedback(to, from string, isPositive bool, rend *render.Render, emailSender email.Sender) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, isPositive, renderer, emailSender, from, to, lang)
+		addFeedback(w, req, isPositive, rend, emailSender, from, to, lang)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender, from, to, lang string) {
+func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend *render.Render, emailSender email.Sender, from, to, lang string) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -137,13 +112,13 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	if f.Description == "" && !isPositive {
-		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, renderer)
+		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, rend)
 		return
 	}
 
 	if len(f.Email) > 0 && !isPositive {
 		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, f.Email); !ok || err != nil {
-			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, renderer)
+			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, rend)
 			return
 		}
 	}
