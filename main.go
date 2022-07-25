@@ -9,6 +9,7 @@ import (
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
 	render "github.com/ONSdigital/dp-renderer"
 
+	"github.com/ONSdigital/dp-frontend-feedback-controller/assets"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/routes"
 	"github.com/ONSdigital/go-ns/server"
