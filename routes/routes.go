@@ -3,15 +3,16 @@ package routes
 import (
 	"context"
 	"fmt"
+	"net/smtp"
+
 	"github.com/ONSdigital/dp-api-clients-go/renderer"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
-	"net/smtp"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/handlers"
 
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
 )
 
@@ -36,7 +37,7 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, hc health.Hea
 
 	renderer := renderer.New(cfg.RendererURL)
 
-	log.Event(ctx, "adding routes")
+	log.Info(ctx, "adding routes")
 	r.StrictSlash(true).Path("/health").HandlerFunc(hc.Handler)
 	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))
 	r.StrictSlash(true).Path("/feedback/positive").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))

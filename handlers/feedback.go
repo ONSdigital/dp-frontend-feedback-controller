@@ -12,7 +12,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-models/model"
 	"github.com/ONSdigital/dp-frontend-models/model/feedback"
 	dphandlers "github.com/ONSdigital/dp-net/handlers"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/schema"
 )
 
@@ -48,14 +48,14 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interface
 
 	b, err := json.Marshal(p)
 	if err != nil {
-		log.Event(ctx, "unable to marshal page data", log.ERROR, log.Error(err), log.Data{"setting-response-status": http.StatusInternalServerError})
+		log.Error(ctx, "unable to marshal page data", err, log.Data{"setting-response-status": http.StatusInternalServerError})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	templateHTML, err := renderer.Do("feedback-thanks", b)
 	if err != nil {
-		log.Event(ctx, "failed to render feedback-thanks template", log.ERROR, log.Error(err), log.Data{"setting-response-status": http.StatusInternalServerError})
+		log.Error(ctx, "failed to render feedback-thanks template", err, log.Data{"setting-response-status": http.StatusInternalServerError})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -80,7 +80,7 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p.ServiceDescription = services[req.URL.Query().Get("service")]
 
 	p.Language = lang
-
+	p.Type = "feedback"
 	p.Metadata.Title = "Feedback"
 	p.Metadata.Description = url
 
@@ -96,14 +96,14 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 
 	b, err := json.Marshal(p)
 	if err != nil {
-		log.Event(req.Context(), "unable to marshal feedback page data", log.ERROR, log.Error(err), log.Data{"setting-response-status": http.StatusInternalServerError})
+		log.Error(req.Context(), "unable to marshal feedback page data", err, log.Data{"setting-response-status": http.StatusInternalServerError})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	templateHTML, err := renderer.Do("feedback", b)
 	if err != nil {
-		log.Event(req.Context(), "failed to render feedback template", log.ERROR, log.Error(err), log.Data{"setting-response-status": http.StatusInternalServerError})
+		log.Error(req.Context(), "failed to render feedback template", err, log.Data{"setting-response-status": http.StatusInternalServerError})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -121,7 +121,7 @@ func AddFeedback(to, from string, isPositive bool, renderer interfaces.Renderer,
 func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, renderer interfaces.Renderer, emailSender email.Sender, from, to, lang string) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
-		log.Event(ctx, "unable to parse request form", log.ERROR, log.Error(err))
+		log.Error(ctx, "unable to parse request form", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -131,7 +131,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 
 	var f Feedback
 	if err := decoder.Decode(&f, req.Form); err != nil {
-		log.Event(ctx, "unable to decode request form", log.ERROR, log.Error(err))
+		log.Error(ctx, "unable to decode request form", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -157,7 +157,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		[]string{to},
 		generateFeedbackMessage(f, from, to, isPositive),
 	); err != nil {
-		log.Event(ctx, "failed to send message", log.ERROR, log.Error(err))
+		log.Error(ctx, "failed to send message", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
