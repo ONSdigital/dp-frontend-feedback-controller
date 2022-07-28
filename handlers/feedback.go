@@ -7,9 +7,9 @@ import (
 	"regexp"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/handlers"
-	render "github.com/ONSdigital/dp-renderer"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/schema"
 )
@@ -26,13 +26,13 @@ type Feedback struct {
 }
 
 // FeedbackThanks loads the Feedback Thank you page
-func FeedbackThanks(rend *render.Render) http.HandlerFunc {
+func FeedbackThanks(rend interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
 		feedbackThanks(w, req, rend)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, rend *render.Render) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
@@ -50,13 +50,13 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, rend *render.Rende
 }
 
 // GetFeedback handles the loading of a feedback page
-func GetFeedback(rend *render.Render) http.HandlerFunc {
+func GetFeedback(rend interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
 		getFeedback(w, req, req.Referer(), "", "", "", "", lang, rend)
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, email, lang string, rend *render.Render) {
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, email, lang string, rend interfaces.Renderer) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
@@ -87,13 +87,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(to, from string, isPositive bool, rend *render.Render, emailSender email.Sender) http.HandlerFunc {
+func AddFeedback(to, from string, isPositive bool, rend interfaces.Renderer, emailSender email.Sender) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
 		addFeedback(w, req, isPositive, rend, emailSender, from, to, lang)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend *render.Render, emailSender email.Sender, from, to, lang string) {
+func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, from, to, lang string) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
