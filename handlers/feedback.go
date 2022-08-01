@@ -34,35 +34,6 @@ func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, renderer interfaces.Renderer) {
-	var p model.Page
-	ctx := req.Context()
-
-	p.Metadata.Title = "Thank you"
-	returnTo := req.URL.Query().Get("returnTo")
-
-	if returnTo == "Whole site" || returnTo == "" {
-		returnTo = "https://www.ons.gov.uk"
-	}
-	p.Metadata.Description = returnTo
-
-	b, err := json.Marshal(p)
-	if err != nil {
-		log.Error(ctx, "unable to marshal page data", err, log.Data{"setting-response-status": http.StatusInternalServerError})
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	templateHTML, err := renderer.Do("feedback-thanks", b)
-	if err != nil {
-		log.Error(ctx, "failed to render feedback-thanks template", err, log.Data{"setting-response-status": http.StatusInternalServerError})
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Write(templateHTML)
-}
-
 // GetFeedback handles the loading of a feedback page
 func GetFeedback(renderer interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
@@ -162,7 +133,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		return
 	}
 
-	redirectURL := "/feedback/thanks?returnTo=" + f.URL
+	redirectURL := "/feedback?returnTo=" + f.URL
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 

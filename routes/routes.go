@@ -42,8 +42,6 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, hc health.Hea
 	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))
 	r.StrictSlash(true).Path("/feedback/positive").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, renderer, emailSender))
 	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(renderer))
-	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(handlers.FeedbackThanks(renderer))
-
 }
 
 type unencryptedAuth struct {
