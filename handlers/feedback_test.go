@@ -242,9 +242,6 @@ func Test_addFeedback(t *testing.T) {
 
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
-				// So(mockRenderer.DoCalls()[0].Path, ShouldEqual, "feedback")
-				// rendererRequest := string(mockRenderer.DoCalls()[0].B)
-				// So(strings.Contains(rendererRequest, `"error_type":"description"`), ShouldBeTrue)
 			})
 
 			Convey("Then the email sender is called", func() {
@@ -290,9 +287,6 @@ func Test_addFeedback(t *testing.T) {
 
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
-				//So(mockRenderer.DoCalls()[0].Path, ShouldEqual, "feedback")
-				//rendererRequest := string(mockRenderer.DoCalls()[0].B)
-				//So(strings.Contains(rendererRequest, `"error_type":"email"`), ShouldBeTrue)
 			})
 
 			Convey("Then the email sender is called", func() {
