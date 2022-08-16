@@ -5,14 +5,17 @@ package interfacestest
 
 import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
+	"github.com/ONSdigital/dp-renderer/model"
+	"io"
 	"sync"
 )
 
 var (
-	lockRendererMockDo sync.RWMutex
+	lockRendererMockBuildPage        sync.RWMutex
+	lockRendererMockNewBasePageModel sync.RWMutex
 )
 
-// Ensure, that RendererMock does implement Renderer.
+// Ensure, that RendererMock does implement interfaces.Renderer.
 // If this is not the case, regenerate this file with moq.
 var _ interfaces.Renderer = &RendererMock{}
 
@@ -22,8 +25,11 @@ var _ interfaces.Renderer = &RendererMock{}
 //
 //         // make and configure a mocked interfaces.Renderer
 //         mockedRenderer := &RendererMock{
-//             DoFunc: func(path string, b []byte) ([]byte, error) {
-// 	               panic("mock out the Do method")
+//             BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string)  {
+// 	               panic("mock out the BuildPage method")
+//             },
+//             NewBasePageModelFunc: func() model.Page {
+// 	               panic("mock out the NewBasePageModel method")
 //             },
 //         }
 //
@@ -32,52 +38,90 @@ var _ interfaces.Renderer = &RendererMock{}
 //
 //     }
 type RendererMock struct {
-	// DoFunc mocks the Do method.
-	DoFunc func(path string, b []byte) ([]byte, error)
+	// BuildPageFunc mocks the BuildPage method.
+	BuildPageFunc func(w io.Writer, pageModel interface{}, templateName string)
+
+	// NewBasePageModelFunc mocks the NewBasePageModel method.
+	NewBasePageModelFunc func() model.Page
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// Do holds details about calls to the Do method.
-		Do []struct {
-			// Path is the path argument value.
-			Path string
-			// B is the b argument value.
-			B []byte
+		// BuildPage holds details about calls to the BuildPage method.
+		BuildPage []struct {
+			// W is the w argument value.
+			W io.Writer
+			// PageModel is the pageModel argument value.
+			PageModel interface{}
+			// TemplateName is the templateName argument value.
+			TemplateName string
+		}
+		// NewBasePageModel holds details about calls to the NewBasePageModel method.
+		NewBasePageModel []struct {
 		}
 	}
 }
 
-// Do calls DoFunc.
-func (mock *RendererMock) Do(path string, b []byte) ([]byte, error) {
-	if mock.DoFunc == nil {
-		panic("RendererMock.DoFunc: method is nil but Renderer.Do was just called")
+// BuildPage calls BuildPageFunc.
+func (mock *RendererMock) BuildPage(w io.Writer, pageModel interface{}, templateName string) {
+	if mock.BuildPageFunc == nil {
+		panic("RendererMock.BuildPageFunc: method is nil but Renderer.BuildPage was just called")
 	}
 	callInfo := struct {
-		Path string
-		B    []byte
+		W            io.Writer
+		PageModel    interface{}
+		TemplateName string
 	}{
-		Path: path,
-		B:    b,
+		W:            w,
+		PageModel:    pageModel,
+		TemplateName: templateName,
 	}
-	lockRendererMockDo.Lock()
-	mock.calls.Do = append(mock.calls.Do, callInfo)
-	lockRendererMockDo.Unlock()
-	return mock.DoFunc(path, b)
+	lockRendererMockBuildPage.Lock()
+	mock.calls.BuildPage = append(mock.calls.BuildPage, callInfo)
+	lockRendererMockBuildPage.Unlock()
+	mock.BuildPageFunc(w, pageModel, templateName)
 }
 
-// DoCalls gets all the calls that were made to Do.
+// BuildPageCalls gets all the calls that were made to BuildPage.
 // Check the length with:
-//     len(mockedRenderer.DoCalls())
-func (mock *RendererMock) DoCalls() []struct {
-	Path string
-	B    []byte
+//     len(mockedRenderer.BuildPageCalls())
+func (mock *RendererMock) BuildPageCalls() []struct {
+	W            io.Writer
+	PageModel    interface{}
+	TemplateName string
 } {
 	var calls []struct {
-		Path string
-		B    []byte
+		W            io.Writer
+		PageModel    interface{}
+		TemplateName string
 	}
-	lockRendererMockDo.RLock()
-	calls = mock.calls.Do
-	lockRendererMockDo.RUnlock()
+	lockRendererMockBuildPage.RLock()
+	calls = mock.calls.BuildPage
+	lockRendererMockBuildPage.RUnlock()
+	return calls
+}
+
+// NewBasePageModel calls NewBasePageModelFunc.
+func (mock *RendererMock) NewBasePageModel() model.Page {
+	if mock.NewBasePageModelFunc == nil {
+		panic("RendererMock.NewBasePageModelFunc: method is nil but Renderer.NewBasePageModel was just called")
+	}
+	callInfo := struct {
+	}{}
+	lockRendererMockNewBasePageModel.Lock()
+	mock.calls.NewBasePageModel = append(mock.calls.NewBasePageModel, callInfo)
+	lockRendererMockNewBasePageModel.Unlock()
+	return mock.NewBasePageModelFunc()
+}
+
+// NewBasePageModelCalls gets all the calls that were made to NewBasePageModel.
+// Check the length with:
+//     len(mockedRenderer.NewBasePageModelCalls())
+func (mock *RendererMock) NewBasePageModelCalls() []struct {
+} {
+	var calls []struct {
+	}
+	lockRendererMockNewBasePageModel.RLock()
+	calls = mock.calls.NewBasePageModel
+	lockRendererMockNewBasePageModel.RUnlock()
 	return calls
 }
