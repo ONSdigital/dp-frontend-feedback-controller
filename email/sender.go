@@ -13,10 +13,10 @@ type SMTPSender struct {
 	Auth smtp.Auth
 }
 
-func (S SMTPSender) Send(from string, to []string, msg []byte) error {
+func (s SMTPSender) Send(from string, to []string, msg []byte) error {
 	return smtp.SendMail(
-		S.Addr,
-		S.Auth,
+		s.Addr,
+		s.Auth,
 		from,
 		to,
 		msg)

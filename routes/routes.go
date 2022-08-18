@@ -19,7 +19,6 @@ import (
 
 // Setup registers routes for the service
 func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, rend *render.Render, hc health.HealthCheck) {
-
 	auth := smtp.PlainAuth(
 		"",
 		cfg.MailUser,
@@ -41,14 +40,13 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, rend *render.
 	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, rend, emailSender))
 	r.StrictSlash(true).Path("/feedback/positive").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, rend, emailSender))
 	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(rend))
-
 }
 
 type unencryptedAuth struct {
 	smtp.Auth
 }
 
-func (a unencryptedAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+func (a unencryptedAuth) Start(server *smtp.ServerInfo) (proto string, toServer []byte, err error) {
 	s := *server
 	s.TLS = true
 	return a.Auth.Start(&s)
