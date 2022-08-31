@@ -1,16 +1,22 @@
 {{$Language := .Language}}
-<div class="ons-page__container ons-container">
-    <div class="ons-grid">
-    <div class="ons-grid__col ons-col-12@m">
-        {{ template "partials/breadcrumb" . }}
-         <h1 class="ons-page__main ons-u-fs-xxl">
-         {{ localise "FeedbackTitle" $Language 1 $.Metadata.Title }}
-         </h1>
+<div class="page-intro background--gallery">
+    <div class="wrapper">
+        <div class="col-wrap">
+            <div class="col margin-top--1">
+                {{ template "partials/breadcrumb" . }}
+                <h1 class="page-intro__title margin-bottom--4">
+                    <strong>{{ localise "FeedbackTitle" $Language 1 $.Metadata.Title }}</strong>
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper">
     <div class="col-wrap margin-bottom--4">
         <div class="col col--lg-two-thirds col--md-two-thirds">
             {{if eq .Metadata.Title "Feedback"}}
             <div id="feedback-description">
-                <p>{{ localise "FeedbackDesc" $Language 1}}</p>
+                <p class="font-size--18 margin-top--5 margin-bottom--0">{{ localise "FeedbackDesc" $Language 1}}</p>
             </div>
             <div class="margin--top-4">
                 <form id="feedback-form-container" action="/feedback" method="post">
@@ -43,10 +49,9 @@
                                 <div class="multiple-choice__content height--0">
                                     <div class="margin-left--1">
                                         <div class="clearfix">
-                                            <div class="ons-field">
-                                                <label class="ons-label" for="page-url-field">{{ localise "FeedbackWhatEnterURL" $Language 1 }}</label>
-                                                <input type="url" id="page-url-field" value="{{.PreviousURL}}" class="form-control ons-input ons-input--text ons-input-type__input" name="url">
-                                           </div>
+                                            <div class="col--sm-12 col--md-28 col--lg-36 margin-left--1">
+                                                <label class="font-size--18" for="page-url-field">{{ localise "FeedbackWhatEnterURL" $Language 1 }}</label>
+                                                <input type="url" id="page-url-field" value="{{.PreviousURL}}" class="form-control" name="url">
                                             </div>
                                         </div>
                                     </div>
@@ -62,9 +67,9 @@
                                 <div class="multiple-choice__content height--0">
                                     <div>
                                         <div class="clearfix">
-                                            <div class="ons-field">
-                                                <label class="ons-label" for="page-url-field">{{ localise "FeedbackWhatEnterURL" $Language 1 }}</label>
-                                                <input type="url" id="page-url-field" value="{{.PreviousURL}}" class="form-control ons-input ons-input--text ons-input-type__input" name="url">
+                                            <div class="col--sm-12 col--md-28 col--lg-36 margin-left--1">
+                                                <label class="font-size--18" for="page-url-field">{{ localise "FeedbackWhatEnterURL" $Language 1 }}</label>
+                                                <input type="url" id="page-url-field" class="form-control" name="url">
                                             </div>
                                         </div>
                                     </div>
