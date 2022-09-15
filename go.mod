@@ -15,8 +15,6 @@ require (
 	github.com/smartystreets/goconvey v1.7.2
 )
 
-replace github.com/ONSdigital/dp-renderer => /Users/noellelegrain/MethodsProjects/ONS_Accessibility/dp-renderer
-
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/ONSdigital/dp-api-clients-go v1.43.0 // indirect
@@ -30,7 +28,6 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/justinas/alice v1.2.0 // indirect
-	github.com/kevinburke/go-bindata v3.23.0+incompatible // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.1.2 // indirect

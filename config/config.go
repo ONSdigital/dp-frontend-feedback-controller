@@ -29,7 +29,7 @@ var cfg *Config
 // Get returns the default config with any modifications through environment
 // variables
 func Get() (*Config, error) {
-	cfg, err := get()
+	envCfg, err := get()
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func Get() (*Config, error) {
 	} else {
 		cfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/efc4b51"
 	}
-	return cfg, nil
+	return envCfg, nil
 }
 
 func get() (*Config, error) {

@@ -37,11 +37,15 @@ func main() {
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
-	versionInfo, err := health.NewVersionInfo(
+	versionInfo, healthErr := health.NewVersionInfo(
 		BuildTime,
 		GitCommit,
 		Version,
 	)
+	if healthErr != nil {
+		log.Error(ctx, "failed to retrieve healt check version", healthErr)
+		return
+	}
 
 	r := mux.NewRouter()
 
