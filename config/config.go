@@ -34,10 +34,10 @@ func Get() (*Config, error) {
 		return nil, err
 	}
 
-	if cfg.Debug {
-		cfg.PatternLibraryAssetsPath = "http://localhost:9002/dist/assets"
+	if envCfg.Debug {
+		envCfg.PatternLibraryAssetsPath = "http://localhost:9002/dist/assets"
 	} else {
-		cfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/efc4b51"
+		envCfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/efc4b51"
 	}
 	return envCfg, nil
 }
