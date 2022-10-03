@@ -8,6 +8,7 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
+
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/handlers"
 	"github.com/ONSdigital/log.go/v2/log"
@@ -23,6 +24,13 @@ type Feedback struct {
 	Name             string `schema:"name"`
 	Email            string `schema:"email"`
 	FeedbackFormType string `schema:"feedback-form-type"`
+}
+
+// FeedbackThanks loads the Feedback Thank you page
+func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
+		feedbackThanks(w, req, renderer)
+	})
 }
 
 // GetFeedback handles the loading of a feedback page
