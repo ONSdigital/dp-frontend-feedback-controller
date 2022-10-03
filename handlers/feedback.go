@@ -29,8 +29,26 @@ type Feedback struct {
 // FeedbackThanks loads the Feedback Thank you page
 func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, renderer)
+		feedbackThanks(w, req, lang, renderer)
 	})
+}
+
+func feedbackThanks(w http.ResponseWriter, req *http.Request, lang string, rend interfaces.Renderer) {
+	basePage := rend.NewBasePageModel()
+	p := model.Feedback{
+		Page: basePage,
+	}
+
+	p.Metadata.Title = "Thank you"
+	p.Language = lang
+	returnTo := req.URL.Query().Get("returnTo")
+
+	if returnTo == "Whole site" || returnTo == "" {
+		returnTo = "https://www.ons.gov.uk"
+	}
+	p.Metadata.Description = returnTo
+
+	rend.BuildPage(w, p, "feedback-thanks")
 }
 
 // GetFeedback handles the loading of a feedback page
@@ -121,7 +139,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		return
 	}
 
-	redirectURL := "/feedback?returnTo=" + f.URL
+	redirectURL := "/feedback/thanks?returnTo=" + f.URL
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 
