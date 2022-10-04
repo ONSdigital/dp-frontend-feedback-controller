@@ -29,18 +29,17 @@ type Feedback struct {
 // FeedbackThanks loads the Feedback Thank you page
 func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, lang, renderer)
+		feedbackThanks(w, req, renderer)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, lang string, rend interfaces.Renderer) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
 	}
 
 	p.Metadata.Title = "Thank you"
-	p.Language = lang
 	returnTo := req.URL.Query().Get("returnTo")
 
 	if returnTo == "Whole site" || returnTo == "" {

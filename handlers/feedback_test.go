@@ -268,8 +268,9 @@ func Test_feedbackThanks(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		mockRenderer := &interfacestest.RendererMock{
-			DoFunc: func(path string, b []byte) ([]byte, error) {
-				return nil, nil
+			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
+			NewBasePageModelFunc: func() coreModel.Page {
+				return coreModel.Page{}
 			},
 		}
 
@@ -278,32 +279,11 @@ func Test_feedbackThanks(t *testing.T) {
 			feedbackThanks(w, req, mockRenderer)
 
 			Convey("Then the renderer is called", func() {
-				So(len(mockRenderer.DoCalls()), ShouldEqual, 1)
+				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
 
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
-			})
-		})
-	})
-
-	Convey("Given an error returned from the renderer", t, func() {
-
-		req := httptest.NewRequest("GET", "http://localhost", nil)
-		w := httptest.NewRecorder()
-
-		mockRenderer := &interfacestest.RendererMock{
-			DoFunc: func(path string, b []byte) ([]byte, error) {
-				return nil, errors.New("renderer is broken")
-			},
-		}
-
-		Convey("When feedbackThanks is called", func() {
-
-			feedbackThanks(w, req, mockRenderer)
-
-			Convey("Then a 500 internal server error response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusInternalServerError)
 			})
 		})
 	})
