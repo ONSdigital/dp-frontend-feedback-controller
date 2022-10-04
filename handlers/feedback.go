@@ -26,21 +26,21 @@ type Feedback struct {
 	FeedbackFormType string `schema:"feedback-form-type"`
 }
 
-// FeedbackThanks loads the Feedback Thank you page
+//FeedbackThanks loads the Feedback Thank you page
 func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, lang, renderer)
+		feedbackThanks(w, req, renderer)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, lang string, rend interfaces.Renderer) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
 	}
 
+	p.Type = "feedback"
 	p.Metadata.Title = "Thank you"
-	p.Language = lang
 	returnTo := req.URL.Query().Get("returnTo")
 
 	if returnTo == "Whole site" || returnTo == "" {
@@ -137,6 +137,12 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		log.Error(ctx, "failed to send message", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	returnTo := f.URL
+
+	if returnTo == "Whole site" || returnTo == "" {
+		returnTo = "https://www.ons.gov.uk"
 	}
 
 	redirectURL := "/feedback/thanks?returnTo=" + f.URL
