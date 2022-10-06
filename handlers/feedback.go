@@ -39,7 +39,7 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, rend interfaces.Re
 	p := model.Feedback{
 		Page: basePage,
 	}
-
+	p.Type = "feedback"
 	p.Metadata.Title = "Thank you"
 	returnTo := req.URL.Query().Get("returnTo")
 	spew.Dump(returnTo)
