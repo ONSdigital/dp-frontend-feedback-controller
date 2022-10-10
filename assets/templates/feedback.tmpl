@@ -1,10 +1,10 @@
 {{$Language := .Language}}
-<div class="page-intro background--gallery">
+<div class="feedback-page-intro background--gallery">
     <div class="wrapper">
         <div class="col-wrap">
             <div class="col margin-top--1">
                 {{ template "partials/breadcrumb" . }}
-                <h1 class="page-intro__title margin-bottom--4">
+                <h1 class="feedback-thanks feedback-page-intro__title margin-bottom--4" aria-live="polite">
                     <strong>{{ localise "FeedbackTitle" $Language 1 $.Metadata.Title }}</strong>
                 </h1>
             </div>
@@ -16,60 +16,60 @@
         <div class="col col--lg-two-thirds col--md-two-thirds">
             {{if eq .Metadata.Title "Feedback"}}
             <div id="feedback-description">
-                <p class="font-size--18 margin-top--5 margin-bottom--0">{{ localise "FeedbackDesc" $Language 1}}</p>
+                <p class="font-size--18 margin-top--5">{{ localise "FeedbackDesc" $Language 1}}</p>
             </div>
             <div class="margin--top-4">
-                <form id="feedback-form-container" action="/feedback" method="post">
+                <form id="feedback-form-page-container" action="/feedback" method="post">
                     <input type="hidden" name="feedback-form-type" value="page">
                     <fieldset>
                         <legend><h2 class="margin-bottom--4 font-size--30"><strong>{{ localise "FeedbackTitleWhat" $Language 1 }}</strong></h2></legend>
                         <div class="margin-top--2 margin-bottom--4">
-                            <div class="multiple-choice margin-top--1 padding-left--2">
-                                <input type="radio" class="multiple-choice__input" id="whole-site" name="type" value="The whole website">
-                                <label class="multiple-choice__label font-size--18 padding-left--1" for="whole-site">
+                            <div class="feedback-multiple-choice margin-top--1 padding-left--2">
+                                <input type="radio" class="feedback-multiple-choice__input" id="whole-site" name="type" value="The whole website">
+                                <label class="feedback-multiple-choice__label font-size--18 padding-left--1" for="whole-site">
                                     {{ localise "FeedbackWholeWebsite" $Language 1 }}
                                 </label>
                             </div>
                             {{if .ServiceDescription}}
-                            <div class="multiple-choice margin-top--1 padding-left--2">
-                                <input type="radio" class="multiple-choice__input" id="new-service" name="type" value="The new service">
-                                <label class="multiple-choice__label font-size--18 padding-left--1" for="new-service">
+                            <div class="feedback-multiple-choice margin-top--1 padding-left--2">
+                                <input type="radio" class="feedback-multiple-choice__input" id="new-service" name="type" value="The new service">
+                                <label class="feedback-multiple-choice__label font-size--18 padding-left--1" for="new-service">
                                     {{ localise "FeedbackWhatOptNewService" $Language 1 }}
                                         &nbsp; &nbsp;<span class="form-helper">({{.ServiceDescription}})</span>
                                 </label>
                             </div>
                             {{end}}
                             {{ if .PreviousURL }} 
-                            <div class="multiple-choice margin-top--1 padding-left--2">
-                                <input type="radio" class="multiple-choice__input" id="specific-page" name="type" value="A specific page" checked>
-                                <label class="multiple-choice__label font-size--18 " for="specific-page">
+                            <div class="feedback-multiple-choice margin-top--1 padding-left--2">
+                                <input type="radio" class="feedback-multiple-choice__input" id="specific-page" name="type" value="A specific page" checked>
+                                <label class="feedback-multiple-choice__label font-size--18 " for="specific-page">
                                     {{ localise "FeedbackWhatOptSpecificPage" $Language 1 }}
                                     <input type="hidden" value="{{.PreviousURL}}" name="url">
                                 </label>
-                                <div class="multiple-choice__content height--0">
+                                <div class="feedback-multiple-choice__content height--0">
                                     <div class="margin-left--1">
                                         <div class="clearfix">
                                             <div class="col--sm-12 col--md-28 col--lg-36 margin-left--1">
                                                 <label class="font-size--18" for="page-url-field">{{ localise "FeedbackWhatEnterURL" $Language 1 }}</label>
-                                                <input type="url" id="page-url-field" value="{{.PreviousURL}}" class="form-control" name="url">
+                                                <input type="url" id="page-url-field" value="{{.PreviousURL}}" class="feedback-form-control" name="url">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             {{ else }} 
-                            <div class="multiple-choice margin-top--1 padding-left--2">
-                                <input type="radio" class="multiple-choice__input" id="specific-page" name="type" value="A specific page" checked>
-                                <label class="multiple-choice__label font-size--18 padding-left--1" for="specific-page">
+                            <div class="feedback-multiple-choice margin-top--1 padding-left--2">
+                                <input type="radio" class="feedback-multiple-choice__input" id="specific-page" name="type" value="A specific page" checked>
+                                <label class="feedback-multiple-choice__label font-size--18 padding-left--1" for="specific-page">
                                     {{ localise "FeedbackASpecificPage" $Language 1 }}
                                     <input type="hidden" value="{{.PreviousURL}}" name="url">
                                 </label>
-                                <div class="multiple-choice__content height--0">
+                                <div class="feedback-multiple-choice__content height--0">
                                     <div>
                                         <div class="clearfix">
                                             <div class="col--sm-12 col--md-28 col--lg-36 margin-left--1">
                                                 <label class="font-size--18" for="page-url-field">{{ localise "FeedbackWhatEnterURL" $Language 1 }}</label>
-                                                <input type="url" id="page-url-field" class="form-control" name="url">
+                                                <input type="url" id="page-url-field" class="feedback-form-control" name="url">
                                             </div>
                                         </div>
                                     </div>
@@ -78,13 +78,13 @@
                             {{ end }}  
                         </div>
                     </fieldset>
-                    <div>
+                    <div id="feedback-description-field">
                         <label id="description-field-label" for="description-field">
                             <h2 class="margin-top--0 margin-bottom--4 font-size--30"><strong>{{ localise "FeedbackTitleEntry" $Language 1 }}</strong></h2>
                             <span class="font-size--18 margin-bottom--3">{{ localise "FeedbackHintEntry" $Language 1 }}</span>
                         </label>
                         {{if eq .ErrorType "description"}}<span class="form-error">{{ localise "FeedbackAlertEntry" $Language 1 }}</span>{{end}}
-                        <textarea id="description-field" class="form-control  {{if eq .ErrorType "description"}}form-control__error{{end}}" name="description" rows="5">{{.Feedback}}</textarea>
+                        <textarea id="description-field" class="feedback-form-control  {{if eq .ErrorType "description"}}feedback-form-control__error{{end}}" name="description" rows="5">{{.Feedback}}</textarea>
                     </div>
                     <section>
                         <fieldset id="reply-request">
@@ -95,17 +95,17 @@
                             <label id="name-field-label" for="name-field">
                                 <strong><span class="font-size--18">{{ localise "FeedbackTitleName" $Language 1 }}</span></strong>
                             </label>
-                            <input id="name-field" class="form-control" type="text" name="name"  value={{.Name}}>
+                            <input id="name-field" class="feedback-form-control" type="text" name="name"  value={{.Name}}>
                             <label id="email-field-label" for="email-field">
                                 <strong><span class="font-size--18">{{ localise "FeedbackTitleEmail" $Language 1 }}</span></strong>
                             </label>
                             {{if eq .ErrorType "email"}}<span class="form-error">{{ localise "FeedbackAlertEmail" $Language 1 }}</span>{{end}}
-                            <input id="email-field" class="form-control {{if eq .ErrorType "email"}}form-control__error{{end}}" type="text" name="email"  value={{.Email}}>
+                            <input id="email-field" class="feedback-form-control {{if eq .ErrorType "email"}}feedback-form-control__error{{end}}" type="text" name="email"  value={{.Email}}>
                             <div class="font-size--18 form-helper margin-bottom--4">{{ localise "FeedbackReplyDisclaimer" $Language 1 }}</div>
                         </fieldset>
                     </section>
                     <div>
-                        <input class="btn btn--primary font-weight-700 font-size--18" type="submit" value="{{ localise "FeedbackSubmit" $Language 1 }}">
+                        <input class="feedback-btn btn btn--primary font-weight-700 font-size--18" type="submit" value="{{ localise "FeedbackSubmit" $Language 1 }}">
                     </div>
                 </form>
             </div>
@@ -117,3 +117,4 @@
         </div>
     </div>
 </div>
+
