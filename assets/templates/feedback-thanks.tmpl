@@ -1,0 +1,22 @@
+{{$Language := .Language}}
+<div class="feedback-page-intro background--gallery">
+    <div class="wrapper">
+        <div class="col-wrap">
+            <div class="col margin-top--1">
+                {{ template "partials/breadcrumb" . }}
+                <h1 class="feedback-thanks feedback-page-intro__title margin-bottom--4" aria-live="polite">
+                    <strong>{{ localise "FeedbackThanks" $Language 1 $.Metadata.Title }}</strong>
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper">
+    <div class="col-wrap margin-bottom--4">
+        <div class="col col--lg-two-thirds col--md-two-thirds">
+            <div class="font-size--16 margin-top--4">
+                {{ localise "FeedbackFinished" $Language 1 .Metadata.Description .Metadata.Description | safeHTML }}
+            </div>
+        </div>
+    </div>
+</div>

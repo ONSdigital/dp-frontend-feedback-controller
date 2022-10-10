@@ -17,12 +17,9 @@ import (
 )
 
 func Test_getFeedback(t *testing.T) {
-
 	Convey("Given a request without a query string", t, func() {
-
 		req := httptest.NewRequest("GET", "http://localhost", nil)
 		w := httptest.NewRecorder()
-
 		url := "whatever"
 		errorType := ""
 		description := ""
@@ -37,9 +34,7 @@ func Test_getFeedback(t *testing.T) {
 		}
 
 		Convey("When getFeedback is called", func() {
-
 			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer)
-
 			Convey("Then a 200 request is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
@@ -47,10 +42,8 @@ func Test_getFeedback(t *testing.T) {
 	})
 
 	Convey("Given a valid request", t, func() {
-
 		req := httptest.NewRequest("GET", "http://localhost?service=dev", nil)
 		w := httptest.NewRecorder()
-
 		url := "whatever"
 		errorType := ""
 		description := ""
@@ -65,11 +58,8 @@ func Test_getFeedback(t *testing.T) {
 		}
 
 		Convey("When getFeedback is called", func() {
-
 			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer)
-
 			Convey("Then the page model is sent to the renderer", func() {
-
 				var expectedPage feedback.Page
 				expectedPage.Language = "en"
 				expectedPage.Metadata.Title = "Feedback"
@@ -80,19 +70,15 @@ func Test_getFeedback(t *testing.T) {
 
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
-
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
-
 		})
 	})
 }
 
 func Test_addFeedback(t *testing.T) {
-
 	Convey("Given a valid request", t, func() {
-
 		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
 		w := httptest.NewRecorder()
 		isPositive := false
@@ -114,17 +100,13 @@ func Test_addFeedback(t *testing.T) {
 		}
 
 		Convey("When addFeedback is called", func() {
-
 			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
-
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the email sender is called", func() {
 				So(len(mockSender.SendCalls()), ShouldEqual, 1)
 			})
-
 			Convey("Then a 301 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusMovedPermanently)
 			})
@@ -132,7 +114,6 @@ func Test_addFeedback(t *testing.T) {
 	})
 
 	Convey("Given an error returned from the sender", t, func() {
-
 		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
 		w := httptest.NewRecorder()
 		isPositive := false
@@ -154,9 +135,7 @@ func Test_addFeedback(t *testing.T) {
 		}
 
 		Convey("When addFeedback is called", func() {
-
 			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
-
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -172,9 +151,7 @@ func Test_addFeedback(t *testing.T) {
 	})
 
 	Convey("Given a request with invalid form data", t, func() {
-
 		req := httptest.NewRequest("POST", "http://localhost?!@£$@$£%£$%^^&^&*", nil)
-
 		w := httptest.NewRecorder()
 		isPositive := false
 		from := ""
@@ -195,9 +172,7 @@ func Test_addFeedback(t *testing.T) {
 		}
 
 		Convey("When addFeedback is called", func() {
-
 			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
-
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -213,10 +188,8 @@ func Test_addFeedback(t *testing.T) {
 	})
 
 	Convey("Given a request for feedback with an empty description value", t, func() {
-
 		req := httptest.NewRequest("POST", "http://localhost?service=dev", nil)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
 		w := httptest.NewRecorder()
 		isPositive := false
 		from := ""
@@ -235,29 +208,20 @@ func Test_addFeedback(t *testing.T) {
 				return nil
 			},
 		}
-
 		Convey("When addFeedback is called", func() {
-
 			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
-
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
-
 			Convey("Then the email sender is called", func() {
 				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 	})
-
-	//email
-
 	Convey("Given a request for feedback with an invalid email address", t, func() {
-
 		body := strings.NewReader("email=hello&description=hfjkshk")
 		req := httptest.NewRequest("POST", "http://localhost?service=dev", body)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -282,17 +246,13 @@ func Test_addFeedback(t *testing.T) {
 		}
 
 		Convey("When addFeedback is called", func() {
-
 			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
-
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
-
 			Convey("Then the email sender is called", func() {
 				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})

@@ -29,17 +29,17 @@ var cfg *Config
 // Get returns the default config with any modifications through environment
 // variables
 func Get() (*Config, error) {
-	cfg, err := get()
+	envCfg, err := get()
 	if err != nil {
 		return nil, err
 	}
 
-	if cfg.Debug {
-		cfg.PatternLibraryAssetsPath = "http://localhost:9000/dist"
+	if envCfg.Debug {
+		envCfg.PatternLibraryAssetsPath = "http://localhost:9002/dist/assets"
 	} else {
-		cfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/sixteens/67f6982"
+		envCfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/2bd1840"
 	}
-	return cfg, nil
+	return envCfg, nil
 }
 
 func get() (*Config, error) {

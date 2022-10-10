@@ -96,3 +96,7 @@ one = "The whole ONS website or general feedback"
 [FeedbackASpecificPage]
 description = "A specific page"
 one = "A specific page"
+
+[FeedbackThanks]
+description = "Thank you"
+one = "Thank you"
