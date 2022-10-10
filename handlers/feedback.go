@@ -58,7 +58,7 @@ func GetFeedback(rend interfaces.Renderer) http.HandlerFunc {
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, useremail, lang string, rend interfaces.Renderer) {
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, userEmail, lang string, rend interfaces.Renderer) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
@@ -82,7 +82,7 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p.ErrorType = errorType
 	p.Feedback = description
 	p.Name = name
-	p.Email = useremail
+	p.Email = userEmail
 	p.PreviousURL = url
 
 	rend.BuildPage(w, p, "feedback")
