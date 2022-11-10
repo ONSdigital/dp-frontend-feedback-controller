@@ -3,6 +3,8 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
+	"github.com/davecgh/go-spew/spew"
 	"net/http"
 	"regexp"
 
@@ -26,26 +28,40 @@ type Feedback struct {
 	FeedbackFormType string `schema:"feedback-form-type"`
 }
 
-//FeedbackThanks loads the Feedback Thank you page
-func FeedbackThanks(renderer interfaces.Renderer) http.HandlerFunc {
+// FeedbackThanks loads the Feedback Thank you page
+func FeedbackThanks(rend interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, renderer)
+		feedbackThanks(w, req, req.Referer(), "", lang, rend)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType, lang string, rend interfaces.Renderer) {
+	ctx := req.Context()
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
 	}
 
+	var wholeSite string
+	cfg, err := config.Get()
+	if err != nil {
+		log.Warn(ctx, "Unable to retrieve configuration", log.FormatErrors([]error{err}))
+	} else {
+		wholeSite = cfg.SiteDomain
+	}
+
 	p.Type = "feedback"
 	p.Metadata.Title = "Thank you"
-	returnTo := req.URL.Query().Get("returnTo")
+	p.ErrorType = errorType
+	p.PreviousURL = url
 
-	if returnTo == "Whole site" || returnTo == "" {
-		returnTo = "https://www.ons.gov.uk"
+	returnTo := req.URL.Query().Get("returnTo")
+	if returnTo == "Whole site" {
+		returnTo = wholeSite
+	} else if returnTo == "" {
+		returnTo = url
 	}
+
 	p.Metadata.Description = returnTo
 
 	rend.BuildPage(w, p, "feedback-thanks")
@@ -140,6 +156,8 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	returnTo := f.URL
+	f.Description = returnTo
+	spew.Dump(returnTo, "POST")
 
 	if returnTo == "Whole site" || returnTo == "" {
 		returnTo = "https://www.ons.gov.uk"
