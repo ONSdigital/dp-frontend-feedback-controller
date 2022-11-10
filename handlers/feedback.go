@@ -155,7 +155,6 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	returnTo := f.URL
-	f.Description = returnTo
 
 	if returnTo == "Whole site" || returnTo == "" {
 		returnTo = "https://www.ons.gov.uk"
