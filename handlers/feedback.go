@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
-	"github.com/davecgh/go-spew/spew"
 	"net/http"
 	"regexp"
 
@@ -31,11 +30,11 @@ type Feedback struct {
 // FeedbackThanks loads the Feedback Thank you page
 func FeedbackThanks(rend interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, req.Referer(), "", lang, rend)
+		feedbackThanks(w, req, req.Referer(), "", rend)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType, lang string, rend interfaces.Renderer) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType string, rend interfaces.Renderer) {
 	ctx := req.Context()
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
@@ -157,7 +156,6 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 
 	returnTo := f.URL
 	f.Description = returnTo
-	spew.Dump(returnTo, "POST")
 
 	if returnTo == "Whole site" || returnTo == "" {
 		returnTo = "https://www.ons.gov.uk"
