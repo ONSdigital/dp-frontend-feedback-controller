@@ -43,7 +43,7 @@ func main() {
 		Version,
 	)
 	if healthErr != nil {
-		log.Error(ctx, "failed to retrieve healt check version", healthErr)
+		log.Error(ctx, "failed to retrieve health check version", healthErr)
 		return
 	}
 

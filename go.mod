@@ -9,6 +9,7 @@ require (
 	github.com/ONSdigital/dp-renderer v1.49.0
 	github.com/ONSdigital/go-ns v0.0.0-20210831102424-ebdecc20fe9e
 	github.com/ONSdigital/log.go/v2 v2.0.9
+	github.com/davecgh/go-spew v1.1.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -38,6 +39,6 @@ require (
 	github.com/smartystreets/assertions v1.2.0 // indirect
 	github.com/unrolled/render v1.4.0 // indirect
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d // indirect
-	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
+	golang.org/x/text v0.4.0 // indirect
 )

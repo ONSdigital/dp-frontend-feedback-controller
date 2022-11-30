@@ -3,11 +3,13 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"net/http"
 	"regexp"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
+
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/handlers"
 	"github.com/ONSdigital/log.go/v2/log"
@@ -25,6 +27,45 @@ type Feedback struct {
 	FeedbackFormType string `schema:"feedback-form-type"`
 }
 
+// FeedbackThanks loads the Feedback Thank you page
+func FeedbackThanks(rend interfaces.Renderer) http.HandlerFunc {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
+		feedbackThanks(w, req, req.Referer(), "", rend)
+	})
+}
+
+func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType string, rend interfaces.Renderer) {
+	ctx := req.Context()
+	basePage := rend.NewBasePageModel()
+	p := model.Feedback{
+		Page: basePage,
+	}
+
+	var wholeSite string
+	cfg, err := config.Get()
+	if err != nil {
+		log.Warn(ctx, "Unable to retrieve configuration", log.FormatErrors([]error{err}))
+	} else {
+		wholeSite = cfg.SiteDomain
+	}
+
+	p.Type = "feedback"
+	p.Metadata.Title = "Thank you"
+	p.ErrorType = errorType
+	p.PreviousURL = url
+
+	returnTo := req.URL.Query().Get("returnTo")
+	if returnTo == "Whole site" {
+		returnTo = wholeSite
+	} else if returnTo == "" {
+		returnTo = url
+	}
+
+	p.Metadata.Description = returnTo
+
+	rend.BuildPage(w, p, "feedback-thanks")
+}
+
 // GetFeedback handles the loading of a feedback page
 func GetFeedback(rend interfaces.Renderer) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
@@ -32,7 +73,7 @@ func GetFeedback(rend interfaces.Renderer) http.HandlerFunc {
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, useremail, lang string, rend interfaces.Renderer) {
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, userEmail, lang string, rend interfaces.Renderer) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
@@ -56,7 +97,7 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p.ErrorType = errorType
 	p.Feedback = description
 	p.Name = name
-	p.Email = useremail
+	p.Email = userEmail
 	p.PreviousURL = url
 
 	rend.BuildPage(w, p, "feedback")
@@ -113,7 +154,13 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		return
 	}
 
-	redirectURL := "/feedback?returnTo=" + f.URL
+	returnTo := f.URL
+
+	if returnTo == "Whole site" || returnTo == "" {
+		returnTo = "https://www.ons.gov.uk"
+	}
+
+	redirectURL := "/feedback/thanks?returnTo=" + f.URL
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 

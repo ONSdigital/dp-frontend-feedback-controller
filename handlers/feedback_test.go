@@ -259,3 +259,34 @@ func Test_addFeedback(t *testing.T) {
 		})
 	})
 }
+
+func Test_feedbackThanks(t *testing.T) {
+
+	Convey("Given a valid request", t, func() {
+
+		req := httptest.NewRequest("GET", "http://localhost", nil)
+		w := httptest.NewRecorder()
+		url := "www.test.com"
+		errorType := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
+			NewBasePageModelFunc: func() coreModel.Page {
+				return coreModel.Page{}
+			},
+		}
+
+		Convey("When feedbackThanks is called", func() {
+
+			feedbackThanks(w, req, url, errorType, mockRenderer)
+
+			Convey("Then the renderer is called", func() {
+				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
+			})
+
+			Convey("Then a 200 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusOK)
+			})
+		})
+	})
+}
