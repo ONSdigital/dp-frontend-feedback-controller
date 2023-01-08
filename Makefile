@@ -31,6 +31,10 @@ debug: generate-debug
 test: generate-prod
 	go test -race -cover -tags 'production' ./...
 
+.PHONY: test-component
+test-component:
+	exit
+
 .PHONY: convey
 convey:
 	goconvey ./...
