@@ -6,13 +6,10 @@ image_resource:
   type: docker-image
   source:
     repository: golang
-    tag: 1.19.2
+    tag: 1.18.6
 
 inputs:
   - name: dp-frontend-feedback-controller
 
-caches:
-  - path: go/
-
 run:
-  path: dp-frontend-feedback-controller/ci/scripts/unit.sh
+  path:  dp-frontend-feedback-controller/ci/scripts/component.sh

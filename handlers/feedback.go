@@ -3,13 +3,12 @@ package handlers
 import (
 	"bytes"
 	"fmt"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"net/http"
 	"regexp"
 
+	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
-
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/handlers"
 	"github.com/ONSdigital/log.go/v2/log"
@@ -160,7 +159,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		returnTo = "https://www.ons.gov.uk"
 	}
 
-	redirectURL := "/feedback/thanks?returnTo=" + f.URL
+	redirectURL := "/feedback/thanks?returnTo=" + returnTo
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 
