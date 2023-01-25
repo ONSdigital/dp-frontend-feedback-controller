@@ -8,20 +8,28 @@ import (
 
 // Config represents service configuration for dp-frontend-feedback-controller
 type Config struct {
-	BindAddr                   string        `envconfig:"BIND_ADDR"`
-	GracefulShutdownTimeout    time.Duration `envconfig:"GRACEFUL_SHUTDOWN_TIMEOUT"`
-	HealthCheckInterval        time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
-	HealthCheckCriticalTimeout time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
-	MailHost                   string        `envconfig:"MAIL_HOST"`
-	MailUser                   string        `envconfig:"MAIL_USER"`
-	MailPassword               string        `envconfig:"MAIL_PASSWORD" json:"-"`
-	MailPort                   string        `envconfig:"MAIL_PORT"`
-	FeedbackTo                 string        `envconfig:"FEEDBACK_TO"`
-	FeedbackFrom               string        `envconfig:"FEEDBACK_FROM"`
-	PatternLibraryAssetsPath   string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
-	SiteDomain                 string        `envconfig:"SITE_DOMAIN"`
-	Debug                      bool          `envconfig:"DEBUG"`
-	SupportedLanguages         []string      `envconfig:"SUPPORTED_LANGUAGES"`
+	APIRouterURL                string         `envconfig:"API_ROUTER_URL"`
+	BindAddr                    string         `envconfig:"BIND_ADDR"`
+	CacheUpdateInterval         *time.Duration `envconfig:"CACHE_UPDATE_INTERVAL"`
+	CensusTopicID               string         `envconfig:"CENSUS_TOPIC_ID"`
+	Debug                       bool           `envconfig:"DEBUG"`
+	EnableCensusTopicSubsection bool           `envconfig:"ENABLE_CENSUS_TOPIC_SUBSECTION"`
+	EnableNewNavBar             bool           `envconfig:"ENABLE_NEW_NAVBAR"`
+	GracefulShutdownTimeout     time.Duration  `envconfig:"GRACEFUL_SHUTDOWN_TIMEOUT"`
+	HealthCheckInterval         time.Duration  `envconfig:"HEALTHCHECK_INTERVAL"`
+	HealthCheckCriticalTimeout  time.Duration  `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
+	MailHost                    string         `envconfig:"MAIL_HOST"`
+	MailUser                    string         `envconfig:"MAIL_USER"`
+	MailPassword                string         `envconfig:"MAIL_PASSWORD" json:"-"`
+	MailPort                    string         `envconfig:"MAIL_PORT"`
+	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
+	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
+	IsPublishingMode            bool           `envconfig:"IS_PUBLISHING_MODE"`
+	Languages                   string         `envconfig:"LANGUAGES"`
+	PatternLibraryAssetsPath    string         `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
+	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
+	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
+	SupportedLanguages          []string       `envconfig:"SUPPORTED_LANGUAGES"`
 }
 
 var cfg *Config
@@ -48,19 +56,25 @@ func get() (*Config, error) {
 	}
 
 	cfg := &Config{
-		BindAddr:                   "localhost:25200",
-		GracefulShutdownTimeout:    5 * time.Second,
-		HealthCheckInterval:        30 * time.Second,
-		HealthCheckCriticalTimeout: 90 * time.Second,
-		MailHost:                   "localhost",
-		MailPort:                   "1025",
-		MailUser:                   "",
-		MailPassword:               "",
-		FeedbackTo:                 "to@gmail.com",
-		FeedbackFrom:               "from@gmail.com",
-		SiteDomain:                 "localhost",
-		Debug:                      false,
-		SupportedLanguages:         []string{"en", "cy"},
+		APIRouterURL:                "http://localhost:23200/v1",
+		BindAddr:                    "localhost:25200",
+		CensusTopicID:               "4445",
+		Debug:                       false,
+		EnableCensusTopicSubsection: false,
+		EnableNewNavBar:             false,
+		GracefulShutdownTimeout:     5 * time.Second,
+		HealthCheckInterval:         30 * time.Second,
+		HealthCheckCriticalTimeout:  90 * time.Second,
+		MailHost:                    "localhost",
+		MailPort:                    "1025",
+		MailUser:                    "",
+		MailPassword:                "",
+		FeedbackTo:                  "to@gmail.com",
+		FeedbackFrom:                "from@gmail.com",
+		IsPublishingMode:            false,
+		ServiceAuthToken:            "",
+		SiteDomain:                  "localhost",
+		SupportedLanguages:          []string{"en", "cy"},
 	}
 
 	return cfg, envconfig.Process("", cfg)

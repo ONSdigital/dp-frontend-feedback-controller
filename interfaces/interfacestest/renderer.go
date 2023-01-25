@@ -21,22 +21,22 @@ var _ interfaces.Renderer = &RendererMock{}
 
 // RendererMock is a mock implementation of interfaces.Renderer.
 //
-//     func TestSomethingThatUsesRenderer(t *testing.T) {
+//	    func TestSomethingThatUsesRenderer(t *testing.T) {
 //
-//         // make and configure a mocked interfaces.Renderer
-//         mockedRenderer := &RendererMock{
-//             BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string)  {
-// 	               panic("mock out the BuildPage method")
-//             },
-//             NewBasePageModelFunc: func() model.Page {
-// 	               panic("mock out the NewBasePageModel method")
-//             },
-//         }
+//	        // make and configure a mocked interfaces.Renderer
+//	        mockedRenderer := &RendererMock{
+//	            BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string)  {
+//		               panic("mock out the BuildPage method")
+//	            },
+//	            NewBasePageModelFunc: func() model.Page {
+//		               panic("mock out the NewBasePageModel method")
+//	            },
+//	        }
 //
-//         // use mockedRenderer in code that requires interfaces.Renderer
-//         // and then make assertions.
+//	        // use mockedRenderer in code that requires interfaces.Renderer
+//	        // and then make assertions.
 //
-//     }
+//	    }
 type RendererMock struct {
 	// BuildPageFunc mocks the BuildPage method.
 	BuildPageFunc func(w io.Writer, pageModel interface{}, templateName string)
@@ -83,7 +83,8 @@ func (mock *RendererMock) BuildPage(w io.Writer, pageModel interface{}, template
 
 // BuildPageCalls gets all the calls that were made to BuildPage.
 // Check the length with:
-//     len(mockedRenderer.BuildPageCalls())
+//
+//	len(mockedRenderer.BuildPageCalls())
 func (mock *RendererMock) BuildPageCalls() []struct {
 	W            io.Writer
 	PageModel    interface{}
@@ -115,7 +116,8 @@ func (mock *RendererMock) NewBasePageModel() model.Page {
 
 // NewBasePageModelCalls gets all the calls that were made to NewBasePageModel.
 // Check the length with:
-//     len(mockedRenderer.NewBasePageModelCalls())
+//
+//	len(mockedRenderer.NewBasePageModelCalls())
 func (mock *RendererMock) NewBasePageModelCalls() []struct {
 } {
 	var calls []struct {

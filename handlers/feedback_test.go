@@ -1,18 +1,23 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
+	cacheClient "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/client"
+	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	"github.com/ONSdigital/dp-frontend-models/model/feedback"
 	coreModel "github.com/ONSdigital/dp-renderer/model"
+	topicModel "github.com/ONSdigital/dp-topic-api/models"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -34,8 +39,21 @@ func Test_getFeedback(t *testing.T) {
 			},
 		}
 
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When getFeedback is called", func() {
-			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer)
+			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer, mockNagivationCache)
 			Convey("Then a 200 request is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
@@ -57,9 +75,22 @@ func Test_getFeedback(t *testing.T) {
 				return coreModel.Page{}
 			},
 		}
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 
 		Convey("When getFeedback is called", func() {
-			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer)
+			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer, mockNagivationCache)
 			Convey("Then the page model is sent to the renderer", func() {
 				var expectedPage feedback.Page
 				expectedPage.Language = "en"
@@ -99,9 +130,21 @@ func Test_addFeedback(t *testing.T) {
 				return nil
 			},
 		}
-
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -134,9 +177,21 @@ func Test_addFeedback(t *testing.T) {
 				return errors.New("email is broken")
 			},
 		}
-
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -171,9 +226,21 @@ func Test_addFeedback(t *testing.T) {
 				return nil
 			},
 		}
-
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -209,8 +276,21 @@ func Test_addFeedback(t *testing.T) {
 				return nil
 			},
 		}
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
@@ -245,9 +325,21 @@ func Test_addFeedback(t *testing.T) {
 				return nil
 			},
 		}
-
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang)
+			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
@@ -262,6 +354,7 @@ func Test_addFeedback(t *testing.T) {
 }
 
 func Test_feedbackThanks(t *testing.T) {
+	lang := "en"
 	Convey("Given a valid request", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost", nil)
 		w := httptest.NewRecorder()
@@ -274,8 +367,21 @@ func Test_feedbackThanks(t *testing.T) {
 				return coreModel.Page{}
 			},
 		}
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When feedbackThanks is called", func() {
-			feedbackThanks(w, req, url, errorType, mockRenderer)
+			feedbackThanks(w, req, url, errorType, mockRenderer, mockNagivationCache, lang)
 			Convey("Then the renderer is called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
@@ -290,15 +396,27 @@ func Test_feedbackThanks(t *testing.T) {
 		w := httptest.NewRecorder()
 		url := "www.test.com"
 		errorType := ""
-
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
 			NewBasePageModelFunc: func() coreModel.Page {
 				return coreModel.Page{}
 			},
 		}
+		mockNagivationCache := &cacheHelper.Helper{
+			Clienter: &cacheClient.ClienterMock{
+				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
+					return nil
+				},
+				CloseFunc: func() {
+				},
+				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
+					return &topicModel.Navigation{}, nil
+				},
+				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
+				},
+			}}
 		Convey("When feedbackThanks is called", func() {
-			feedbackThanks(w, req, url, errorType, mockRenderer)
+			feedbackThanks(w, req, url, errorType, mockRenderer, mockNagivationCache, lang)
 			Convey("Then the handler sanitises the request text", func() {
 				dataSentToRender := mockRenderer.BuildPageCalls()[0].PageModel.(model.Feedback)
 				returnToUrl := dataSentToRender.Metadata.Description

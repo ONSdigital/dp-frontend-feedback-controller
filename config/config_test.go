@@ -15,6 +15,7 @@ func TestConfig(t *testing.T) {
 				So(err, ShouldBeNil)
 			})
 			Convey("Then the values should be set to the expected defaults", func() {
+				So(cfg.EnableNewNavBar, ShouldEqual, false)
 				So(cfg.GracefulShutdownTimeout, ShouldEqual, 5*time.Second)
 				So(cfg.HealthCheckInterval, ShouldEqual, 30*time.Second)
 				So(cfg.HealthCheckCriticalTimeout, ShouldEqual, 90*time.Second)
@@ -27,6 +28,8 @@ func TestConfig(t *testing.T) {
 				So(cfg.SiteDomain, ShouldEqual, "localhost")
 				So(cfg.Debug, ShouldEqual, false)
 				So(cfg.SupportedLanguages, ShouldResemble, []string{"en", "cy"})
+				So(cfg.IsPublishingMode, ShouldEqual, false)
+				So(cfg.EnableCensusTopicSubsection, ShouldEqual, false)
 			})
 
 			Convey("Then a second call to config should return the same config", func() {

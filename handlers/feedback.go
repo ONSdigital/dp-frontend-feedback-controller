@@ -2,16 +2,18 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html"
 	"net/http"
 	"regexp"
 
+	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
-	dphandlers "github.com/ONSdigital/dp-net/handlers"
+	dphandlers "github.com/ONSdigital/dp-net/v2/handlers"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/schema"
 )
@@ -28,13 +30,13 @@ type Feedback struct {
 }
 
 // FeedbackThanks loads the Feedback Thank you page
-func FeedbackThanks(rend interfaces.Renderer) http.HandlerFunc {
+func FeedbackThanks(rend interfaces.Renderer, cacheService *cacheHelper.Helper) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, req.Referer(), "", rend)
+		feedbackThanks(w, req, req.Referer(), "", rend, cacheService, lang)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType string, rend interfaces.Renderer) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, lang string) {
 	ctx := req.Context()
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
@@ -48,7 +50,12 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 	} else {
 		wholeSite = cfg.SiteDomain
 	}
-
+	if cfg.EnableNewNavBar {
+		mappedNavContent, err := cacheHelperService.GetMappedNavigationContent(ctx, lang)
+		if err == nil {
+			p.NavigationContent = mappedNavContent
+		}
+	}
 	p.Type = "feedback"
 	p.Metadata.Title = "Thank you"
 	p.ErrorType = errorType
@@ -68,13 +75,13 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 }
 
 // GetFeedback handles the loading of a feedback page
-func GetFeedback(rend interfaces.Renderer) http.HandlerFunc {
+func GetFeedback(rend interfaces.Renderer, cacheService *cacheHelper.Helper) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		getFeedback(w, req, req.Referer(), "", "", "", "", lang, rend)
+		getFeedback(w, req, req.Referer(), "", "", "", "", lang, rend, cacheService)
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, userEmail, lang string, rend interfaces.Renderer) {
+func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, userEmail, lang string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
@@ -90,6 +97,17 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p.Type = "feedback"
 	p.Metadata.Title = "Feedback"
 	p.Metadata.Description = url
+	ctx := context.Background()
+	cfg, err := config.Get()
+	if err != nil {
+		log.Warn(ctx, "Unable to retrieve configuration", log.FormatErrors([]error{err}))
+	}
+	if cfg.EnableNewNavBar {
+		mappedNavContent, err := cacheHelperService.GetMappedNavigationContent(ctx, lang)
+		if err == nil {
+			p.NavigationContent = mappedNavContent
+		}
+	}
 
 	if len(p.Metadata.Description) > 50 {
 		p.Metadata.Description = p.Metadata.Description[len(p.Metadata.Description)-50 : len(p.Metadata.Description)]
@@ -105,13 +123,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(to, from string, isPositive bool, rend interfaces.Renderer, emailSender email.Sender) http.HandlerFunc {
+func AddFeedback(to, from string, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, cacheService *cacheHelper.Helper) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, isPositive, rend, emailSender, from, to, lang)
+		addFeedback(w, req, isPositive, rend, emailSender, from, to, lang, cacheService)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, from, to, lang string) {
+func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, from, to, lang string, cacheService *cacheHelper.Helper) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -130,13 +148,13 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	if f.Description == "" && !isPositive {
-		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, rend)
+		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, rend, cacheService)
 		return
 	}
 
 	if len(f.Email) > 0 && !isPositive {
 		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, f.Email); !ok || err != nil {
-			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, rend)
+			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, rend, cacheService)
 			return
 		}
 	}

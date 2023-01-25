@@ -18,19 +18,19 @@ var _ email.Sender = &SenderMock{}
 
 // SenderMock is a mock implementation of email.Sender.
 //
-//     func TestSomethingThatUsesSender(t *testing.T) {
+//	    func TestSomethingThatUsesSender(t *testing.T) {
 //
-//         // make and configure a mocked email.Sender
-//         mockedSender := &SenderMock{
-//             SendFunc: func(from string, to []string, msg []byte) error {
-// 	               panic("mock out the Send method")
-//             },
-//         }
+//	        // make and configure a mocked email.Sender
+//	        mockedSender := &SenderMock{
+//	            SendFunc: func(from string, to []string, msg []byte) error {
+//		               panic("mock out the Send method")
+//	            },
+//	        }
 //
-//         // use mockedSender in code that requires email.Sender
-//         // and then make assertions.
+//	        // use mockedSender in code that requires email.Sender
+//	        // and then make assertions.
 //
-//     }
+//	    }
 type SenderMock struct {
 	// SendFunc mocks the Send method.
 	SendFunc func(from string, to []string, msg []byte) error
@@ -71,7 +71,8 @@ func (mock *SenderMock) Send(from string, to []string, msg []byte) error {
 
 // SendCalls gets all the calls that were made to Send.
 // Check the length with:
-//     len(mockedSender.SendCalls())
+//
+//	len(mockedSender.SendCalls())
 func (mock *SenderMock) SendCalls() []struct {
 	From string
 	To   []string

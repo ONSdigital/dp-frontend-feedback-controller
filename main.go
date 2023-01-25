@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"time"
 
+	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/assets"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/routes"
@@ -53,10 +54,25 @@ func main() {
 		os.Exit(1)
 	}
 
+	cacheConfig := cacheHelper.Config{
+		APIRouterURL:                cfg.APIRouterURL,
+		CacheUpdateInterval:         cfg.CacheUpdateInterval,
+		EnableNewNavBar:             cfg.EnableNewNavBar,
+		EnableCensusTopicSubsection: cfg.EnableCensusTopicSubsection,
+		CensusTopicID:               cfg.CensusTopicID,
+		IsPublishingMode:            cfg.IsPublishingMode,
+		Languages:                   cfg.SupportedLanguages,
+		ServiceAuthToken:            cfg.ServiceAuthToken,
+	}
+
+	svcErrors := make(chan error, 0)
+	cacheService, err := cacheHelper.Init(ctx, cacheConfig)
+	cacheService.RunUpdates(ctx, svcErrors)
+
 	// nolint: typecheck
 	rend := render.NewWithDefaultClient(assets.Asset, assets.AssetNames, cfg.PatternLibraryAssetsPath, cfg.SiteDomain)
 
-	routes.Setup(ctx, r, cfg, rend, healthcheck)
+	routes.Setup(ctx, r, cfg, rend, healthcheck, cacheService)
 
 	healthcheck.Start(ctx)
 
