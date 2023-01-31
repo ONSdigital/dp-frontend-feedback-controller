@@ -10,6 +10,7 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	"github.com/ONSdigital/dp-frontend-models/model/feedback"
 	coreModel "github.com/ONSdigital/dp-renderer/model"
 
@@ -280,6 +281,28 @@ func Test_feedbackThanks(t *testing.T) {
 			})
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
+			})
+		})
+	})
+
+	Convey("Given a reflective XSS request", t, func() {
+		req := httptest.NewRequest("GET", "http://localhost?returnTo=<script>alert(1)</script>", nil)
+		w := httptest.NewRecorder()
+		url := "www.test.com"
+		errorType := ""
+
+		mockRenderer := &interfacestest.RendererMock{
+			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
+			NewBasePageModelFunc: func() coreModel.Page {
+				return coreModel.Page{}
+			},
+		}
+		Convey("When feedbackThanks is called", func() {
+			feedbackThanks(w, req, url, errorType, mockRenderer)
+			Convey("Then the handler sanitises the request text", func() {
+				dataSentToRender := mockRenderer.BuildPageCalls()[0].PageModel.(model.Feedback)
+				returnToUrl := dataSentToRender.Metadata.Description
+				So(returnToUrl, ShouldEqual, "&lt;script&gt;alert(1)&lt;/script&gt;")
 			})
 		})
 	})

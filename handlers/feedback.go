@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"html"
 	"net/http"
 	"regexp"
 
@@ -53,7 +54,8 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 	p.ErrorType = errorType
 	p.PreviousURL = url
 
-	returnTo := req.URL.Query().Get("returnTo")
+	// returnTo is redered on page so needs XSS protection
+	returnTo := html.EscapeString(req.URL.Query().Get("returnTo"))
 	if returnTo == "Whole site" {
 		returnTo = wholeSite
 	} else if returnTo == "" {
