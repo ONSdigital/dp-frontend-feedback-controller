@@ -4,18 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/ONSdigital/dp-feedback-api/api"
-	dfac "github.com/ONSdigital/dp-feedback-api/config"
 	"github.com/ONSdigital/dp-feedback-api/models"
-	"github.com/go-chi/chi/v5"
+	"github.com/ONSdigital/dp-feedback-api/sdk"
 	"html"
-	"io"
 	"net/http"
 	"regexp"
 
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/v2/handlers"
@@ -128,13 +124,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(to, from string, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, cacheService *cacheHelper.Helper) http.HandlerFunc {
+func AddFeedback(to, from string, isPositive bool, rend interfaces.Renderer, cacheService *cacheHelper.Helper, feedbackCfg *config.FeedbackConfig) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, isPositive, rend, emailSender, from, to, lang, cacheService)
+		addFeedback(w, req, isPositive, rend, lang, cacheService, feedbackCfg)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, from, to, lang string, cacheService *cacheHelper.Helper) {
+func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, lang string, cacheService *cacheHelper.Helper, feedbackCfg *config.FeedbackConfig) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -168,39 +164,33 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		f.URL = "Whole site"
 	}
 
-	//if err := emailSender.Send(
-	//	from,
-	//	[]string{to},
-	//	generateFeedbackMessage(f, from, to, isPositive),
-	//); err != nil {
-	//	log.Error(ctx, "failed to send message", err)
-	//	w.WriteHeader(http.StatusInternalServerError)
-	//	return
-	//}
-
+	var isGeneralFeedback bool
 	// Use the Feedback API instead of emailing
-	r := chi.NewRouter()
-	cfg := &dfac.Config{
-		OnsDomain: "localhost",
-	}
-	a := api.Setup(ctx, cfg, r, nil)
-	var isGeneralFeedback = false
-	fm := api.GenerateFeedbackMessage(&models.Feedback{
+	apiFeedback := &models.Feedback{
 		IsPageUseful:      &isPositive,
 		IsGeneralFeedback: &isGeneralFeedback,
 		OnsURL:            f.URL,
 		Feedback:          f.Description,
 		Name:              f.Name,
 		EmailAddress:      f.Email,
-	}, from, to)
-	buff := bytes.NewBufferString(string(fm))
-	fr, err := http.NewRequest(http.MethodPost, "/feedback", io.NopCloser(buff))
-	if err != nil {
-		log.Error(ctx, "failed to send message", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
 	}
-	a.PostFeedback(w, fr)
+
+	// Call PostFeedback to send the POST request to the feedback API
+	err := feedbackCfg.Client.PostFeedback(ctx, apiFeedback, sdk.Options{AuthToken: feedbackCfg.ServiceAuthToken})
+	if err != nil {
+		log.Error(ctx, "unable to post feedback", err)
+
+		// handle error
+		//Bad data (400) - Missing mandatory fields, sanitisation and validation of data
+		//Unauthorised (401) - frontend service not authorised to make request to API - this shouldn't happen as long as you send the Feedback API service token as a header; you can retrieve this from the Feedback API configuration file
+		//Internal server error (500) - Unable to handle request (e.g. API fails to send data to mail server)
+		switch err.Status() {
+		case 400, 401, 500:
+			// post back an error
+			w.WriteHeader(err.Status())
+			return
+		}
+	}
 
 	returnTo := f.URL
 

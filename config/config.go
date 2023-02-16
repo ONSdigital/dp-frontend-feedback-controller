@@ -1,10 +1,18 @@
 package config
 
 import (
+	"github.com/ONSdigital/dp-feedback-api/sdk"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
 )
+
+// Config for feedback sdk
+type FeedbackConfig struct {
+	BindAddr         string
+	ServiceAuthToken string
+	Client           *sdk.Client
+}
 
 // Config represents service configuration for dp-frontend-feedback-controller
 type Config struct {
