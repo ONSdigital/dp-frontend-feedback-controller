@@ -4,7 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/ONSdigital/dp-feedback-api/api"
+	dfac "github.com/ONSdigital/dp-feedback-api/config"
+	"github.com/ONSdigital/dp-feedback-api/models"
+	"github.com/go-chi/chi/v5"
 	"html"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -163,15 +168,39 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		f.URL = "Whole site"
 	}
 
-	if err := emailSender.Send(
-		from,
-		[]string{to},
-		generateFeedbackMessage(f, from, to, isPositive),
-	); err != nil {
+	//if err := emailSender.Send(
+	//	from,
+	//	[]string{to},
+	//	generateFeedbackMessage(f, from, to, isPositive),
+	//); err != nil {
+	//	log.Error(ctx, "failed to send message", err)
+	//	w.WriteHeader(http.StatusInternalServerError)
+	//	return
+	//}
+
+	// Use the Feedback API instead of emailing
+	r := chi.NewRouter()
+	cfg := &dfac.Config{
+		OnsDomain: "localhost",
+	}
+	a := api.Setup(ctx, cfg, r, nil)
+	var isGeneralFeedback = false
+	fm := api.GenerateFeedbackMessage(&models.Feedback{
+		IsPageUseful:      &isPositive,
+		IsGeneralFeedback: &isGeneralFeedback,
+		OnsURL:            f.URL,
+		Feedback:          f.Description,
+		Name:              f.Name,
+		EmailAddress:      f.Email,
+	}, from, to)
+	buff := bytes.NewBufferString(string(fm))
+	fr, err := http.NewRequest(http.MethodPost, "/feedback", io.NopCloser(buff))
+	if err != nil {
 		log.Error(ctx, "failed to send message", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	a.PostFeedback(w, fr)
 
 	returnTo := f.URL
 
