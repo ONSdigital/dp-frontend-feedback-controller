@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/ONSdigital/dp-feedback-api/sdk"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -9,9 +8,8 @@ import (
 
 // Config for feedback sdk
 type FeedbackConfig struct {
-	BindAddr         string
+	APIURL           string `envconfig:"FEEDBACK_API_URL"`
 	ServiceAuthToken string
-	Client           *sdk.Client
 }
 
 // Config represents service configuration for dp-frontend-feedback-controller
@@ -38,6 +36,7 @@ type Config struct {
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
 	SupportedLanguages          []string       `envconfig:"SUPPORTED_LANGUAGES"`
+	FeedbackAPI                 *FeedbackConfig
 }
 
 var cfg *Config

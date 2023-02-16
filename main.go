@@ -72,6 +72,11 @@ func main() {
 	// nolint: typecheck
 	rend := render.NewWithDefaultClient(assets.Asset, assets.AssetNames, cfg.PatternLibraryAssetsPath, cfg.SiteDomain)
 
+	cfg.FeedbackAPI = &config.FeedbackConfig{
+		APIURL:           "localhost:28600",
+		ServiceAuthToken: "beehai7aeFoh4re8HaepaiFiwae9UXa6eeteimeil0ieyooyo5HohVoos2ahfeuw",
+	}
+
 	routes.Setup(ctx, r, cfg, rend, healthcheck, cacheService)
 
 	healthcheck.Start(ctx)

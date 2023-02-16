@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/ONSdigital/dp-feedback-api/models"
-	"github.com/ONSdigital/dp-feedback-api/sdk"
 	"html"
 	"net/http"
-	"regexp"
 
+	"github.com/ONSdigital/dp-feedback-api/models"
+	"github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
@@ -124,13 +123,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(to, from string, isPositive bool, rend interfaces.Renderer, cacheService *cacheHelper.Helper, feedbackCfg *config.FeedbackConfig) http.HandlerFunc {
+func AddFeedback(isPositive bool, rend interfaces.Renderer, cacheService *cacheHelper.Helper, cfg *config.Config, feedbackClient *sdk.Client) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, isPositive, rend, lang, cacheService, feedbackCfg)
+		addFeedback(w, req, isPositive, rend, lang, cacheService, cfg, feedbackClient)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, lang string, cacheService *cacheHelper.Helper, feedbackCfg *config.FeedbackConfig) {
+func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, lang string, cacheService *cacheHelper.Helper, cfg *config.Config, feedbackClient *sdk.Client) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -153,17 +152,6 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		return
 	}
 
-	if len(f.Email) > 0 && !isPositive {
-		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, f.Email); !ok || err != nil {
-			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, rend, cacheService)
-			return
-		}
-	}
-
-	if f.URL == "" {
-		f.URL = "Whole site"
-	}
-
 	var isGeneralFeedback bool
 	// Use the Feedback API instead of emailing
 	apiFeedback := &models.Feedback{
@@ -176,7 +164,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	}
 
 	// Call PostFeedback to send the POST request to the feedback API
-	err := feedbackCfg.Client.PostFeedback(ctx, apiFeedback, sdk.Options{AuthToken: feedbackCfg.ServiceAuthToken})
+	err := feedbackClient.PostFeedback(ctx, apiFeedback, sdk.Options{AuthToken: cfg.FeedbackAPI.ServiceAuthToken})
 	if err != nil {
 		log.Error(ctx, "unable to post feedback", err)
 
@@ -188,6 +176,9 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		case 400, 401, 500:
 			// post back an error
 			w.WriteHeader(err.Status())
+			return
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 	}
