@@ -123,13 +123,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(isPositive bool, rend interfaces.Renderer, cacheService *cacheHelper.Helper, cfg *config.Config, feedbackClient *sdk.Client) http.HandlerFunc {
+func AddFeedback(rend interfaces.Renderer, cacheService *cacheHelper.Helper, cfg *config.Config, feedbackClient *sdk.Client) http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, isPositive, rend, lang, cacheService, cfg, feedbackClient)
+		addFeedback(w, req, rend, lang, cacheService, cfg, feedbackClient)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, lang string, cacheService *cacheHelper.Helper, cfg *config.Config, feedbackClient *sdk.Client) {
+func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, lang string, cacheService *cacheHelper.Helper, cfg *config.Config, feedbackClient *sdk.Client) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -147,20 +147,17 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 		return
 	}
 
-	if f.Description == "" && !isPositive {
+	if f.Description == "" {
 		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, rend, cacheService)
 		return
 	}
 
-	var isGeneralFeedback bool
 	// Use the Feedback API instead of emailing
 	apiFeedback := &models.Feedback{
-		IsPageUseful:      &isPositive,
-		IsGeneralFeedback: &isGeneralFeedback,
-		OnsURL:            f.URL,
-		Feedback:          f.Description,
-		Name:              f.Name,
-		EmailAddress:      f.Email,
+		OnsURL:       f.URL,
+		Feedback:     f.Description,
+		Name:         f.Name,
+		EmailAddress: f.Email,
 	}
 
 	// Call PostFeedback to send the POST request to the feedback API

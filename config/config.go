@@ -82,6 +82,10 @@ func get() (*Config, error) {
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",
 		SupportedLanguages:          []string{"en", "cy"},
+		FeedbackAPI: &FeedbackConfig{
+			APIURL:           "localhost:28600",
+			ServiceAuthToken: "beehai7aeFoh4re8HaepaiFiwae9UXa6eeteimeil0ieyooyo5HohVoos2ahfeuw",
+		},
 	}
 
 	return cfg, envconfig.Process("", cfg)

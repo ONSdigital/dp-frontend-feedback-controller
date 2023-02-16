@@ -33,9 +33,9 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, rend *render.
 	log.Info(ctx, "adding routes")
 	r.StrictSlash(true).Path("/health").HandlerFunc(hc.Handler)
 	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(rend, cacheService))
-	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(false, rend, cacheService, cfg, feedbackClient))
+	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(rend, cacheService, cfg, feedbackClient))
 	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(handlers.FeedbackThanks(rend, cacheService))
-	r.StrictSlash(true).Path("/feedback/thanks").Methods("POST").HandlerFunc(handlers.AddFeedback(false, rend, cacheService, cfg, feedbackClient))
+	r.StrictSlash(true).Path("/feedback/thanks").Methods("POST").HandlerFunc(handlers.AddFeedback(rend, cacheService, cfg, feedbackClient))
 }
 
 type unencryptedAuth struct {
