@@ -7,7 +7,7 @@ require (
 	github.com/ONSdigital/dp-frontend-models v1.10.1
 	github.com/ONSdigital/dp-healthcheck v1.5.0
 	github.com/ONSdigital/dp-net/v2 v2.6.0
-	github.com/ONSdigital/dp-renderer v1.58.0
+	github.com/ONSdigital/dp-renderer v1.62.0
 	github.com/ONSdigital/dp-topic-api v0.16.0
 	github.com/ONSdigital/go-ns v0.0.0-20210916104633-ac1c1c52327e
 	github.com/ONSdigital/log.go/v2 v2.3.0
