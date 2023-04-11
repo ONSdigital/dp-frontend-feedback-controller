@@ -113,7 +113,6 @@ func Test_addFeedback(t *testing.T) {
 	Convey("Given a valid request", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -144,7 +143,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -160,7 +159,6 @@ func Test_addFeedback(t *testing.T) {
 	Convey("Given an error returned from the sender", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -191,7 +189,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -209,7 +207,6 @@ func Test_addFeedback(t *testing.T) {
 	Convey("Given a request with invalid form data", t, func() {
 		req := httptest.NewRequest("POST", "http://localhost?!@£$@$£%£$%^^&^&*", nil)
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -240,7 +237,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -259,7 +256,6 @@ func Test_addFeedback(t *testing.T) {
 		req := httptest.NewRequest("POST", "http://localhost?service=dev", nil)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -290,7 +286,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
@@ -308,7 +304,6 @@ func Test_addFeedback(t *testing.T) {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -339,7 +334,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})

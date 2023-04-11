@@ -36,12 +36,14 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, rend *render.
 		Auth: auth,
 	}
 
+	f := handlers.NewFeedback(rend, cacheService, cfg, emailSender)
+
 	log.Info(ctx, "adding routes")
 	r.StrictSlash(true).Path("/health").HandlerFunc(hc.Handler)
-	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(handlers.GetFeedback(rend, cacheService))
-	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, rend, emailSender, cacheService))
-	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(handlers.FeedbackThanks(rend, cacheService))
-	r.StrictSlash(true).Path("/feedback/thanks").Methods("POST").HandlerFunc(handlers.AddFeedback(cfg.FeedbackTo, cfg.FeedbackFrom, false, rend, emailSender, cacheService))
+	r.StrictSlash(true).Path("/feedback").Methods("GET").HandlerFunc(f.GetFeedback())
+	r.StrictSlash(true).Path("/feedback").Methods("POST").HandlerFunc(f.AddFeedback())
+	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(f.FeedbackThanks())
+	r.StrictSlash(true).Path("/feedback/thanks").Methods("POST").HandlerFunc(f.AddFeedback())
 }
 
 type unencryptedAuth struct {

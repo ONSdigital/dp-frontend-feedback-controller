@@ -18,8 +18,8 @@ import (
 	"github.com/gorilla/schema"
 )
 
-// Feedback represents a user's feedback
-type Feedback struct {
+// FeedbackForm represents a user's feedback
+type FeedbackForm struct {
 	Type             string `schema:"type"`
 	URI              string `schema:":uri"`
 	URL              string `schema:"url"`
@@ -30,9 +30,9 @@ type Feedback struct {
 }
 
 // FeedbackThanks loads the Feedback Thank you page
-func FeedbackThanks(rend interfaces.Renderer, cacheService *cacheHelper.Helper) http.HandlerFunc {
+func (f *Feedback) FeedbackThanks() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, req.Referer(), "", rend, cacheService, lang)
+		feedbackThanks(w, req, req.Referer(), "", f.Render, f.CacheService, lang)
 	})
 }
 
@@ -75,9 +75,9 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 }
 
 // GetFeedback handles the loading of a feedback page
-func GetFeedback(rend interfaces.Renderer, cacheService *cacheHelper.Helper) http.HandlerFunc {
+func (f *Feedback) GetFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		getFeedback(w, req, req.Referer(), "", "", "", "", lang, rend, cacheService)
+		getFeedback(w, req, req.Referer(), "", "", "", "", lang, f.Render, f.CacheService)
 	})
 }
 
@@ -123,13 +123,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 }
 
 // AddFeedback handles a users feedback request and sends a message to slack
-func AddFeedback(to, from string, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, cacheService *cacheHelper.Helper) http.HandlerFunc {
+func (f *Feedback) AddFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, isPositive, rend, emailSender, from, to, lang, cacheService)
+		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.CacheService)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend interfaces.Renderer, emailSender email.Sender, from, to, lang string, cacheService *cacheHelper.Helper) {
+func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang string, cacheService *cacheHelper.Helper) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -140,19 +140,19 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	decoder := schema.NewDecoder()
 	decoder.IgnoreUnknownKeys(true)
 
-	var f Feedback
+	var f FeedbackForm
 	if err := decoder.Decode(&f, req.Form); err != nil {
 		log.Error(ctx, "unable to decode request form", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if f.Description == "" && !isPositive {
+	if f.Description == "" {
 		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, rend, cacheService)
 		return
 	}
 
-	if len(f.Email) > 0 && !isPositive {
+	if len(f.Email) > 0 {
 		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, f.Email); !ok || err != nil {
 			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, rend, cacheService)
 			return
@@ -166,7 +166,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	if err := emailSender.Send(
 		from,
 		[]string{to},
-		generateFeedbackMessage(f, from, to, isPositive),
+		generateFeedbackMessage(f, from, to),
 	); err != nil {
 		log.Error(ctx, "failed to send message", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -183,26 +183,19 @@ func addFeedback(w http.ResponseWriter, req *http.Request, isPositive bool, rend
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 
-func generateFeedbackMessage(f Feedback, from, to string, isPositive bool) []byte {
-	var description string
-	if isPositive {
-		description = "Positive feedback received"
-	} else {
-		description = f.Description
-	}
-
+func generateFeedbackMessage(f FeedbackForm, from, to string) []byte {
 	var b bytes.Buffer
 
 	b.WriteString(fmt.Sprintf("From: %s\n", from))
 	b.WriteString(fmt.Sprintf("To: %s\n", to))
-	b.WriteString(fmt.Sprintf("Subject: Feedback received\n\n"))
+	b.WriteString("Subject: Feedback received\n\n")
 
 	if len(f.Type) > 0 {
 		b.WriteString(fmt.Sprintf("Feedback Type: %s\n", f.Type))
 	}
 
 	b.WriteString(fmt.Sprintf("Page URL: %s\n", f.URL))
-	b.WriteString(fmt.Sprintf("Description: %s\n", description))
+	b.WriteString(fmt.Sprintf("Description: %s\n", f.Description))
 
 	if len(f.Name) > 0 {
 		b.WriteString(fmt.Sprintf("Name: %s\n", f.Name))
