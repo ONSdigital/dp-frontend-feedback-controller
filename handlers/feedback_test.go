@@ -14,8 +14,9 @@ import (
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/mocks"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
-	"github.com/ONSdigital/dp-frontend-models/model/feedback"
+	"github.com/ONSdigital/dp-renderer/helper"
 	coreModel "github.com/ONSdigital/dp-renderer/model"
 	topicModel "github.com/ONSdigital/dp-topic-api/models"
 
@@ -23,6 +24,7 @@ import (
 )
 
 func Test_getFeedback(t *testing.T) {
+	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	Convey("Given a request without a query string", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost", nil)
 		w := httptest.NewRecorder()
@@ -92,7 +94,7 @@ func Test_getFeedback(t *testing.T) {
 		Convey("When getFeedback is called", func() {
 			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer, mockNagivationCache)
 			Convey("Then the page model is sent to the renderer", func() {
-				var expectedPage feedback.Page
+				var expectedPage model.Feedback
 				expectedPage.Language = "en"
 				expectedPage.Metadata.Title = "Feedback"
 				expectedPage.PreviousURL = url
@@ -110,6 +112,7 @@ func Test_getFeedback(t *testing.T) {
 }
 
 func Test_addFeedback(t *testing.T) {
+	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	Convey("Given a valid request", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
 		w := httptest.NewRecorder()
@@ -349,6 +352,7 @@ func Test_addFeedback(t *testing.T) {
 }
 
 func Test_feedbackThanks(t *testing.T) {
+	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	lang := "en"
 	Convey("Given a valid request", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost", nil)
@@ -414,7 +418,7 @@ func Test_feedbackThanks(t *testing.T) {
 			feedbackThanks(w, req, url, errorType, mockRenderer, mockNagivationCache, lang)
 			Convey("Then the handler sanitises the request text", func() {
 				dataSentToRender := mockRenderer.BuildPageCalls()[0].PageModel.(model.Feedback)
-				returnToUrl := dataSentToRender.Metadata.Description
+				returnToUrl := dataSentToRender.ReturnTo
 				So(returnToUrl, ShouldEqual, "&lt;script&gt;alert(1)&lt;/script&gt;")
 			})
 		})

@@ -14,6 +14,8 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/v2/handlers"
+	"github.com/ONSdigital/dp-renderer/helper"
+	core "github.com/ONSdigital/dp-renderer/model"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/schema"
 )
@@ -57,11 +59,11 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 		}
 	}
 	p.Type = "feedback"
-	p.Metadata.Title = "Thank you"
+	p.Metadata.Title = helper.Localise("FeedbackThanks", lang, 1)
 	p.ErrorType = errorType
 	p.PreviousURL = url
 
-	// returnTo is redered on page so needs XSS protection
+	// returnTo is rendered on page so needs XSS protection
 	returnTo := html.EscapeString(req.URL.Query().Get("returnTo"))
 	if returnTo == "Whole site" {
 		returnTo = wholeSite
@@ -69,7 +71,7 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 		returnTo = url
 	}
 
-	p.Metadata.Description = returnTo
+	p.ReturnTo = returnTo
 
 	rend.BuildPage(w, p, "feedback-thanks")
 }
@@ -86,16 +88,22 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p := model.Feedback{
 		Page: basePage,
 	}
+	p.Breadcrumb = []core.TaxonomyNode{
+		{
+			Title: "Home",
+			URI:   "/",
+		},
+	}
 
 	var services = make(map[string]string)
-	services["cmd"] = "Customising data by applying filters"
-	services["dev"] = "ONS developer website"
+	services["cmd"] = "customising data by applying filters"
+	services["dev"] = "ONS developer"
 
 	p.ServiceDescription = services[req.URL.Query().Get("service")]
 
 	p.Language = lang
 	p.Type = "feedback"
-	p.Metadata.Title = "Feedback"
+	p.Metadata.Title = helper.Localise("FeedbackTitle", lang, 1)
 	p.Metadata.Description = url
 	ctx := context.Background()
 	cfg, err := config.Get()
@@ -179,7 +187,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		returnTo = "https://www.ons.gov.uk"
 	}
 
-	redirectURL := "/feedback/thanks?returnTo=" + returnTo
+	redirectURL := fmt.Sprintf("/feedback/thanks?returnTo=%s", returnTo)
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 

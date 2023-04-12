@@ -11,5 +11,6 @@ type Feedback struct {
 	Email              string `json:"email"`
 	ErrorType          string `json:"error_type"`
 	PreviousURL        string `json:"previous_url"`
+	ReturnTo           string `json:"return_to"`
 	ServiceDescription string `json:"service_description"`
 }

@@ -4,13 +4,13 @@ go 1.19
 
 require (
 	github.com/ONSdigital/dp-frontend-cache-helper v0.2.0
-	github.com/ONSdigital/dp-frontend-models v1.10.1
 	github.com/ONSdigital/dp-healthcheck v1.5.0
 	github.com/ONSdigital/dp-net/v2 v2.6.0
 	github.com/ONSdigital/dp-renderer v1.62.0
 	github.com/ONSdigital/dp-topic-api v0.16.0
 	github.com/ONSdigital/go-ns v0.0.0-20210916104633-ac1c1c52327e
 	github.com/ONSdigital/log.go/v2 v2.3.0
+	github.com/elazarl/go-bindata-assetfs v1.0.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -25,7 +25,6 @@ require (
 	github.com/ONSdigital/dp-net v1.5.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.76 // indirect
 	github.com/c2h5oh/datasize v0.0.0-20200825124411-48ed595a09d2 // indirect
-	github.com/elazarl/go-bindata-assetfs v1.0.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect

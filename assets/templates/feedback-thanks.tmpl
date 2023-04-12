@@ -1,21 +1,36 @@
-{{$Language := .Language}}
-<div class="feedback-page-intro background--gallery">
-    <div class="wrapper">
-        <div class="col-wrap">
-            <div class="col margin-top--1">
-                {{ template "partials/breadcrumb" . }}
-                <h1 class="feedback-thanks feedback-page-intro__title margin-bottom--4" aria-live="polite">
-                    <strong>{{ localise "FeedbackThanks" $Language 1 $.Metadata.Title }}</strong>
-                </h1>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="feedback-form-page-container" class="wrapper">
-    <div class="col-wrap margin-bottom--4">
-        <div class="col col--lg-two-thirds col--md-two-thirds">
-            <div class="font-size--16 margin-top--4">
-                {{ localise "FeedbackFinished" $Language 1 .Metadata.Description .Metadata.Description | safeHTML }}
+<div class="ons-page__container ons-container">
+    <div class="ons-grid ons-u-ml-no">
+        <div class="ons-grid__col ons-col-12@m ons-u-pl-no">
+            <div class="ons-page__main">
+                <div aria-labelledby="alert" role="alert" tabindex="-1" class="ons-panel ons-panel--success ons-panel--no-title">
+                    <span id="alert" class="ons-panel__assistive-text ons-u-vh">Completed:
+                    </span>
+                    <span class="ons-panel__icon ons-u-fs-xl">
+                        <svg
+                            class="ons-svg-icon ons-svg-icon--xl"
+                            viewBox="0 0 13 10"
+                            xmlns="http://www.w3.org/2000/svg"
+                            focusable="false"
+                            fill="currentColor">
+                            <path
+                                d="M14.35,3.9l-.71-.71a.5.5,0,0,0-.71,0h0L5.79,10.34,3.07,7.61a.51.51,0,0,0-.71,0l-.71.71a.51.51,0,0,0,0,.71l3.78,3.78a.5.5,0,0,0,.71,0h0L14.35,4.6A.5.5,0,0,0,14.35,3.9Z"
+                                transform="translate(-1.51 -3.04)"/>
+                        </svg>
+                    </span>
+                    <div class="ons-panel__body ons-svg-icon-margin--xl">
+                        <h1>{{- localise "FeedbackThanks" .Language 1 -}}</h1>
+                        <div class="ons-panel__body">
+                            {{- localise "FeedbackFinished" .Language 1 | safeHTML -}}
+                        </div>
+                    </div>
+                </div>
+                <a href="{{- .ReturnTo -}}" class="ons-btn ons-btn--link ons-js-submit-btn ons-u-mt-m">
+                    <span class="ons-btn__inner">
+                        <span class="ons-btn__text">
+                            Done
+                        </span>
+                    </span>
+                </a>
             </div>
         </div>
     </div>
