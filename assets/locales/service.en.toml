@@ -33,9 +33,9 @@ one = "This specific page"
 description = "Enter URL or name of the page"
 one = "Enter URL or name of the page"
 
-[FeedbackWhatOptHintSpecificPage]
-description = "{{.ServiceDescription}}"
-one = "({{.arg0}})"
+[FeedbackChooseType]
+description = "Choose a type"
+one = "Choose a type"
 
 [FeedbackWhatOptNewService]
 description = "This {{.ServiceName}} service"

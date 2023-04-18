@@ -1,84 +1,94 @@
 <div class="ons-page__container ons-container">
     <div class="ons-grid ons-u-ml-no">
         {{ template "partials/breadcrumb" . }}
+        {{ if .Page.Error.Title }}
+            {{ template "partials/error-summary" .Page.Error }}
+        {{ end }}
         <h1 class="ons-u-fs-xxxl ons-u-mt-m ons-u-fw-b">{{- localise "FeedbackTitle" .Language 1 $.Metadata.Title -}}</h1>
         <div class="ons-grid__col ons-col-8@m ons-u-pl-no">
             <div class="ons-page__main ons-u-mt-no">
                 <p>{{- localise "FeedbackDesc" .Language 1 -}}</p>
                 <form method="post">
                     <input type="hidden" name="feedback-form-type" value="page">
-                    <fieldset class="ons-fieldset">
-                        <legend class="ons-fieldset__legend">
-                            {{- localise "FeedbackTitleWhat" .Language 1 -}}
-                        </legend>
-                        <div class="ons-radios__items">
-                            <div class="ons-radios__item ons-radios__item--no-border ons-u-fw">
-                                <div class="ons-radio ons-radio--no-border">
-                                    <input type="radio" id="whole-site" class="ons-radio__input ons-js-radio" value="The whole website" name="type">
-                                    <label class="ons-radio__label" for="whole-site">{{- localise "FeedbackWholeWebsite" .Language 1 -}}</label>
+                    {{ if or (.IsURLErr) (.IsRadioErr) }}
+                        <div class="ons-panel ons-panel--error ons-panel--no-title" id="radio-error">
+                            <span class="ons-u-vh">
+                                {{ localise "Error" .Language 1 }}:
+                            </span>
+                            <div class="ons-panel__body">
+                                <p class="ons-panel__error">
+                                    <strong>
+                                        {{ if .IsURLErr }}
+                                            {{- localise "FeedbackWhatEnterURL" .Language 1 -}}
+                                        {{ else }}
+                                            {{- localise "FeedbackChooseType" .Language 1 -}}
+                                        {{ end }}
+                                    </strong>
+                                </p>
+                            {{ end }}
+                            <fieldset class="ons-fieldset">
+                                <legend class="ons-fieldset__legend">
+                                    {{- localise "FeedbackTitleWhat" .Language 1 -}}
+                                </legend>
+                                <div class="ons-radios__items">
+                                    <div class="ons-radios__item ons-radios__item--no-border ons-u-fw">
+                                        <div class="ons-radio ons-radio--no-border">
+                                            <input type="radio" id="whole-site" class="ons-radio__input ons-js-radio" value="The whole website" name="type" {{ if eq .Radio "The whole website" }} checked="checked" {{end}}>
+                                            <label class="ons-radio__label" for="whole-site">{{- localise "FeedbackWholeWebsite" .Language 1 -}}</label>
+                                        </div>
+                                    </div>
+                                    {{ if .ServiceDescription }}
+                                        <div class="ons-radios__item ons-radios__item--no-border ons-u-fw">
+                                            <div class="ons-radio ons-radio--no-border">
+                                                <input type="radio" class="ons-radio__input ons-js-radio ons-js-other" id="new-service" name="type" value="new-service" {{ if eq .Radio "new-service" }} checked="checked" {{end}}>
+                                                <label class="ons-radio__label" for="new-service">
+                                                    {{- localise "FeedbackWhatOptNewService" .Language 1 .ServiceDescription -}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    {{ end }}
+                                    <div class="ons-radios__item ons-radios__item--no-border ons-u-fw">
+                                        <div class="ons-radio ons-radio--no-border">
+                                            <input type="hidden" value="{{.PreviousURL}}" name="url">
+                                            <input type="radio" class="ons-radio__input ons-js-radio ons-js-other" id="specific-page" name="type" value="A specific page" {{ if or ( eq .Radio "A specific page") (.PreviousURL) }} checked="checked" {{end}}>
+                                            <label class="ons-radio__label" for="specific-page">
+                                                {{ if .PreviousURL }}
+                                                    {{- localise "FeedbackWhatOptSpecificPage" .Language 1 -}}
+                                                {{ else }}
+                                                    {{- localise "FeedbackASpecificPage" .Language 1 -}}
+                                                {{ end }}
+                                            </label>
+                                            <div class="ons-radio__other">
+                                                <label class="ons-label" for="page-url-field">{{- localise "FeedbackWhatEnterURL" .Language 1 -}}</label>
+                                                <input class="ons-input ons-input--text ons-input-type__input" type="text" id="page-url-field" value="{{.PreviousURL}}" name="url">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </fieldset>
+                            {{ if or (.IsURLErr) (.IsRadioErr) }}
                             </div>
-                            {{ if .ServiceDescription }}
-                                <div class="ons-radios__item ons-radios__item--no-border ons-u-fw">
-                                    <div class="ons-radio ons-radio--no-border">
-                                        <input
-                                            type="radio"
-                                            class="ons-radio__input ons-js-radio ons-js-other"
-                                            id="new-service"
-                                            name="type"
-                                            value="The new service">
-                                        <label class="ons-radio__label" for="new-service">
-                                            {{ localise "FeedbackWhatOptNewService" .Language 1 .ServiceDescription }}
-                                        </label>
-                                    </div>
-                                </div>
-                            {{ end }}
-                            {{ if .PreviousURL }}
-                                <div class="ons-radios__item ons-radios__item--no-border ons-u-fw">
-                                    <div class="ons-radio ons-radio--no-border">
-                                        <input type="hidden" value="{{.PreviousURL}}" name="url">
-                                        <input
-                                            type="radio"
-                                            class="ons-radio__input ons-js-radio ons-js-other"
-                                            id="specific-page"
-                                            name="type"
-                                            value="A specific page">
-                                        <label class="ons-radio__label" for="specific-page">
-                                            {{- localise "FeedbackWhatOptSpecificPage" .Language 1 -}}
-                                        </label>
-                                        <div class="ons-radio__other">
-                                            <label class="ons-label" for="page-url-field">{{ localise "FeedbackWhatEnterURL" .Language 1 }}</label>
-                                            <input class="ons-input ons-input--text ons-input-type__input" type="url" id="page-url-field" value="{{.PreviousURL}}" name="url">
-                                        </div>
-                                    </div>
-                                </div>
-                            {{ else }}
-                                <div class="ons-radios__item ons-radios__item--no-border ons-u-fw">
-                                    <div class="ons-radio ons-radio--no-border">
-                                        <input type="hidden" value="{{.PreviousURL}}" name="url">
-                                        <input
-                                            type="radio"
-                                            class="ons-radio__input ons-js-radio ons-js-other"
-                                            id="specific-page"
-                                            name="type"
-                                            value="A specific page">
-                                        <label class="ons-radio__label" for="specific-page">
-                                            {{- localise "FeedbackASpecificPage" .Language 1 -}}
-                                        </label>
-                                        <div class="ons-radio__other">
-                                            <label class="ons-label" for="page-url-field">{{ localise "FeedbackWhatEnterURL" .Language 1 }}</label>
-                                            <input class="ons-input ons-input--text ons-input-type__input" type="text" id="page-url-field" name="url">
-                                        </div>
-                                    </div>
-                                </div>
-                            {{ end }}
                         </div>
-                    </fieldset>
-                    <div class="ons-field">
-                        <label class="ons-label ons-label--with-description" aria-describedby="description-hint" for="description-field">{{- localise "FeedbackTitleEntry" .Language 1 -}}</label>
-                        <span id="description-hint" class="ons-label__description ons-input--with-description">{{- localise "FeedbackHintEntry" .Language 1 -}}</span>
-                        <textarea id="description-field" class="ons-input ons-input--textarea" name="description" rows="8">{{.Feedback}}</textarea>
-                    </div>
+                    {{ end }}
+                    {{ if .IsFeedbackErr }}
+                        <div class="ons-panel ons-panel--error ons-panel--no-title" id="feedback-error">
+                            <span class="ons-u-vh">
+                                {{ localise "Error" .Language 1 }}:
+                            </span>
+                            <div class="ons-panel__body">
+                                <p class="ons-panel__error">
+                                    <strong>{{- localise "FeedbackAlertEntry" .Language 1 -}}</strong>
+                                </p>
+                            {{ end }}
+                            <div class="ons-field">
+                                <label class="ons-label ons-label--with-description" aria-describedby="description-hint" for="description-field">{{- localise "FeedbackTitleEntry" .Language 1 -}}</label>
+                                <span id="description-hint" class="ons-label__description ons-input--with-description">{{- localise "FeedbackHintEntry" .Language 1 -}}</span>
+                                <textarea id="description-field" class="ons-input ons-input--textarea" name="description" rows="8">{{.Feedback}}</textarea>
+                            </div>
+                            {{ if .IsFeedbackErr }}
+                            </div>
+                        </div>
+                    {{ end }}
                     <fieldset class="ons-fieldset">
                         <legend class="ons-fieldset__legend">{{- localise "FeedbackTitleReply" .Language 1 -}}</legend>
                         <p>{{- localise "FeedbackDescReply" .Language 1 -}}</p>
@@ -87,10 +97,24 @@
                             <label class="ons-label" for="name-field">{{- localise "FeedbackTitleName" .Language 1 -}}</label>
                             <input type="text" id="name-field" class="ons-input ons-input--text ons-input-type__input" name="name" value="{{- .Name -}}">
                         </div>
-                        <div class="ons-field">
-                            <label class="ons-label" for="email-field">{{- localise "FeedbackTitleEmail" .Language 1 -}}</label>
-                            <input type="text" id="email-field" class="ons-input ons-input--text ons-input-type__input" name="email" value="{{- .Email -}}">
-                        </div>
+                        {{ if .IsEmailErr }}
+                            <div class="ons-panel ons-panel--error ons-panel--no-title" id="email-error">
+                                <span class="ons-u-vh">
+                                    {{ localise "Error" .Language 1 }}:
+                                </span>
+                                <div class="ons-panel__body">
+                                    <p class="ons-panel__error">
+                                        <strong>{{- localise "FeedbackAlertEmail" .Language 1 -}}</strong>
+                                    </p>
+                                {{ end }}
+                                <div class="ons-field">
+                                    <label class="ons-label" for="email-field">{{- localise "FeedbackTitleEmail" .Language 1 -}}</label>
+                                    <input type="text" id="email-field" class="ons-input ons-input--text ons-input-type__input" name="email" value="{{- .Email -}}">
+                                </div>
+                                {{ if .IsEmailErr }}
+                                </div>
+                            </div>
+                        {{ end }}
                     </fieldset>
                     <button type="submit" class="ons-btn ons-u-mt-xl">
                         <span class="ons-btn__inner">

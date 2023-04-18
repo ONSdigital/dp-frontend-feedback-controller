@@ -7,6 +7,7 @@ import (
 	"html"
 	"net/http"
 	"regexp"
+	"strings"
 
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
@@ -22,23 +23,27 @@ import (
 
 // FeedbackForm represents a user's feedback
 type FeedbackForm struct {
+	FormLocation     string `schema:"feedback-form-type"`
 	Type             string `schema:"type"`
+	IsTypeErr        bool   `schema:"is_type_err"`
 	URI              string `schema:":uri"`
 	URL              string `schema:"url"`
+	IsURLErr         bool   `schema:"is_url_err"`
 	Description      string `schema:"description"`
+	IsDescriptionErr bool   `schema:"is_description_err"`
 	Name             string `schema:"name"`
 	Email            string `schema:"email"`
-	FeedbackFormType string `schema:"feedback-form-type"`
+	IsEmailErr       bool   `schema:"is_email_err"`
 }
 
 // FeedbackThanks loads the Feedback Thank you page
 func (f *Feedback) FeedbackThanks() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, req.Referer(), "", f.Render, f.CacheService, lang)
+		feedbackThanks(w, req, req.Referer(), f.Render, f.CacheService, lang)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, lang string) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, url string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, lang string) {
 	ctx := req.Context()
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
@@ -60,7 +65,6 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 	}
 	p.Type = "feedback"
 	p.Metadata.Title = helper.Localise("FeedbackThanks", lang, 1)
-	p.ErrorType = errorType
 	p.PreviousURL = url
 
 	// returnTo is rendered on page so needs XSS protection
@@ -79,11 +83,11 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url, errorType str
 // GetFeedback handles the loading of a feedback page
 func (f *Feedback) GetFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		getFeedback(w, req, req.Referer(), "", "", "", "", lang, f.Render, f.CacheService)
+		getFeedback(w, req, []core.ErrorItem{}, FeedbackForm{URL: req.Referer()}, lang, f.Render, f.CacheService)
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, description, name, userEmail, lang string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper) {
+func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []core.ErrorItem, ff FeedbackForm, lang string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper) {
 	basePage := rend.NewBasePageModel()
 	p := model.Feedback{
 		Page: basePage,
@@ -104,7 +108,7 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 	p.Language = lang
 	p.Type = "feedback"
 	p.Metadata.Title = helper.Localise("FeedbackTitle", lang, 1)
-	p.Metadata.Description = url
+	p.Metadata.Description = ff.URL
 	ctx := context.Background()
 	cfg, err := config.Get()
 	if err != nil {
@@ -121,11 +125,23 @@ func getFeedback(w http.ResponseWriter, req *http.Request, url, errorType, descr
 		p.Metadata.Description = p.Metadata.Description[len(p.Metadata.Description)-50 : len(p.Metadata.Description)]
 	}
 
-	p.ErrorType = errorType
-	p.Feedback = description
-	p.Name = name
-	p.Email = userEmail
-	p.PreviousURL = url
+	if len(validationErrors) > 0 {
+		p.Page.Error = core.Error{
+			Title:      p.Metadata.Title,
+			ErrorItems: validationErrors,
+			Language:   lang,
+		}
+	}
+
+	p.Radio = ff.Type
+	p.IsRadioErr = ff.IsTypeErr
+	p.Feedback = ff.Description
+	p.IsFeedbackErr = ff.IsDescriptionErr
+	p.Name = ff.Name
+	p.Email = ff.Email
+	p.IsEmailErr = ff.IsEmailErr
+	p.PreviousURL = ff.URL
+	p.IsURLErr = ff.IsURLErr
 
 	rend.BuildPage(w, p, "feedback")
 }
@@ -148,40 +164,35 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 	decoder := schema.NewDecoder()
 	decoder.IgnoreUnknownKeys(true)
 
-	var f FeedbackForm
-	if err := decoder.Decode(&f, req.Form); err != nil {
+	var ff FeedbackForm
+	if err := decoder.Decode(&ff, req.Form); err != nil {
 		log.Error(ctx, "unable to decode request form", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if f.Description == "" {
-		getFeedback(w, req, f.URL, "description", f.Description, f.Name, f.Email, lang, rend, cacheService)
+	validationErrors := validateForm(&ff)
+
+	if len(validationErrors) > 0 {
+		getFeedback(w, req, validationErrors, ff, lang, rend, cacheService)
 		return
 	}
 
-	if len(f.Email) > 0 {
-		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, f.Email); !ok || err != nil {
-			getFeedback(w, req, f.URL, "email", f.Description, f.Name, f.Email, lang, rend, cacheService)
-			return
-		}
-	}
-
-	if f.URL == "" {
-		f.URL = "Whole site"
+	if ff.URL == "" {
+		ff.URL = "Whole site"
 	}
 
 	if err := emailSender.Send(
 		from,
 		[]string{to},
-		generateFeedbackMessage(f, from, to),
+		generateFeedbackMessage(ff, from, to),
 	); err != nil {
 		log.Error(ctx, "failed to send message", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	returnTo := f.URL
+	returnTo := ff.URL
 
 	if returnTo == "Whole site" || returnTo == "" {
 		returnTo = "https://www.ons.gov.uk"
@@ -189,6 +200,62 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 
 	redirectURL := fmt.Sprintf("/feedback/thanks?returnTo=%s", returnTo)
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
+}
+
+// validateForm is a helper function that validates a slice of FeedbackForm to determine if there are form validation errors
+func validateForm(ff *FeedbackForm) (validationErrors []core.ErrorItem) {
+	if ff.Type == "" && ff.FormLocation != "footer" {
+		validationErrors = append(validationErrors, core.ErrorItem{
+			Description: core.Localisation{
+				LocaleKey: "FeedbackChooseType",
+				Plural:    1,
+			},
+			URL: "#radio-error",
+		})
+		ff.IsTypeErr = true
+	}
+
+	ff.URL = strings.TrimSpace(ff.URL)
+	if ff.Type == "A specific page" && ff.URL == "" {
+		validationErrors = append(validationErrors, core.ErrorItem{
+			Description: core.Localisation{
+				LocaleKey: "FeedbackWhatEnterURL",
+				Plural:    1,
+			},
+			URL: "#radio-error",
+		})
+		ff.IsURLErr = true
+	}
+
+	if ff.Type != "A specific page" && ff.URL != "" {
+		ff.URL = ""
+	}
+
+	ff.Description = strings.TrimSpace(ff.Description)
+	if ff.Description == "" {
+		validationErrors = append(validationErrors, core.ErrorItem{
+			Description: core.Localisation{
+				LocaleKey: "FeedbackAlertEntry",
+				Plural:    1,
+			},
+			URL: "#feedback-error",
+		})
+		ff.IsDescriptionErr = true
+	}
+
+	if len(ff.Email) > 0 {
+		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, ff.Email); !ok || err != nil {
+			validationErrors = append(validationErrors, core.ErrorItem{
+				Description: core.Localisation{
+					LocaleKey: "FeedbackAlertEmail",
+					Plural:    1,
+				},
+				URL: "#email-error",
+			})
+		}
+		ff.IsEmailErr = true
+	}
+	return validationErrors
 }
 
 func generateFeedbackMessage(f FeedbackForm, from, to string) []byte {
