@@ -93,7 +93,6 @@ func Test_getFeedback(t *testing.T) {
 				expectedPage.Metadata.Title = "Feedback"
 				expectedPage.PreviousURL = ff.URL
 				expectedPage.Metadata.Description = ff.Description
-				expectedPage.ServiceDescription = "ONS developer website"
 				expectedPage.Type = "feedback"
 
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)

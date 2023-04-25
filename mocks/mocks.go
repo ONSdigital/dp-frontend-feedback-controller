@@ -8,6 +8,10 @@ var enLocale = []string{
 	"one = \"Feedback\"",
 	"[FeedbackThanks]",
 	"one = \"Thank you\"",
+	"[FeedbackChooseType]",
+	"one = \"Choose feedback type\"",
+	"[FeedbackWhatOptNewService]",
+	"one = \"This service\"",
 }
 
 // MockAssetFunction returns mocked toml []bytes
