@@ -110,7 +110,7 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 						Text: helper.Localise("FeedbackWhatOptNewService", lang, 1, serviceDescription),
 					},
 					Name:  "type",
-					Value: "new-service",
+					Value: "The new service",
 				},
 			},
 			p.TypeRadios.Radios[1])
