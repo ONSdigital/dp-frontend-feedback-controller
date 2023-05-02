@@ -25,7 +25,6 @@ type Config struct {
 	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
 	IsPublishingMode            bool           `envconfig:"IS_PUBLISHING_MODE"`
-	Languages                   string         `envconfig:"LANGUAGES"`
 	PatternLibraryAssetsPath    string         `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
