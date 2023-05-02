@@ -12,6 +12,8 @@ var enLocale = []string{
 	"one = \"Choose feedback type\"",
 	"[FeedbackWhatOptNewService]",
 	"one = \"This service\"",
+	"[FeedbackWhatEnterURL]",
+	"one = \"Enter URL or name of the page\"",
 }
 
 // MockAssetFunction returns mocked toml []bytes

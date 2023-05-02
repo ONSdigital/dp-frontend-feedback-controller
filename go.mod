@@ -3,10 +3,10 @@ module github.com/ONSdigital/dp-frontend-feedback-controller
 go 1.19
 
 require (
-	github.com/ONSdigital/dp-frontend-cache-helper v0.2.0
+	github.com/ONSdigital/dp-frontend-cache-helper v0.3.0
 	github.com/ONSdigital/dp-healthcheck v1.6.1
 	github.com/ONSdigital/dp-net/v2 v2.9.1
-	github.com/ONSdigital/dp-renderer v1.63.1-0.20230421152438-95966db431b8
+	github.com/ONSdigital/dp-renderer/v2 v2.0.1
 	github.com/ONSdigital/dp-topic-api v0.17.1
 	github.com/ONSdigital/go-ns v0.0.0-20210916104633-ac1c1c52327e
 	github.com/ONSdigital/log.go/v2 v2.4.1

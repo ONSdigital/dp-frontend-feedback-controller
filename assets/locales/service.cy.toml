@@ -30,8 +30,8 @@ description = "This specific page"
 one = "This specific page"
 
 [FeedbackWhatEnterURL]
-description = "Enter URL or name of the page"
-one = "Enter URL or name of the page"
+description = "Enter URL of the page"
+one = "Enter URL of the page"
 
 [FeedbackChooseType]
 description = "Choose a type"

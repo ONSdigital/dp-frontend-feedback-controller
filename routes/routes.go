@@ -10,7 +10,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/handlers"
 
-	render "github.com/ONSdigital/dp-renderer"
+	render "github.com/ONSdigital/dp-renderer/v2"
 
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
