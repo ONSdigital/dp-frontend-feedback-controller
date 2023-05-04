@@ -140,7 +140,7 @@ func validateForm(ff *model.FeedbackForm) (validationErrors []core.ErrorItem) {
 				LocaleKey: "FeedbackChooseType",
 				Plural:    1,
 			},
-			URL: "#radio-error",
+			URL: "#type-error",
 		})
 		ff.IsTypeErr = true
 	}
@@ -152,7 +152,7 @@ func validateForm(ff *model.FeedbackForm) (validationErrors []core.ErrorItem) {
 				LocaleKey: "FeedbackWhatEnterURL",
 				Plural:    1,
 			},
-			URL: "#radio-error",
+			URL: "#type-error",
 		})
 		ff.IsURLErr = true
 	}

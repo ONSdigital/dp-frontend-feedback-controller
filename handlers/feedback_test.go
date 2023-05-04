@@ -359,7 +359,7 @@ func TestValidateForm(t *testing.T) {
 							LocaleKey: "FeedbackChooseType",
 							Plural:    1,
 						},
-						URL: "#radio-error",
+						URL: "#type-error",
 					},
 				},
 			},
@@ -376,7 +376,7 @@ func TestValidateForm(t *testing.T) {
 							LocaleKey: "FeedbackWhatEnterURL",
 							Plural:    1,
 						},
-						URL: "#radio-error",
+						URL: "#type-error",
 					},
 				},
 			},
@@ -465,7 +465,7 @@ func TestValidateForm(t *testing.T) {
 							LocaleKey: "FeedbackWhatEnterURL",
 							Plural:    1,
 						},
-						URL: "#radio-error",
+						URL: "#type-error",
 					},
 					{
 						Description: coreModel.Localisation{

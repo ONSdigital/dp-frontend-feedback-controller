@@ -94,7 +94,7 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 				Description: core.Localisation{
 					Text: radioErrDetail,
 				},
-				ID: "radio-error",
+				ID: "type-error",
 			},
 		},
 	}
