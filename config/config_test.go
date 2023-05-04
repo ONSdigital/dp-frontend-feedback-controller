@@ -28,7 +28,7 @@ func TestConfig(t *testing.T) {
 				So(cfg.SiteDomain, ShouldEqual, "localhost")
 				So(cfg.Debug, ShouldEqual, false)
 				So(cfg.SupportedLanguages, ShouldResemble, []string{"en", "cy"})
-				So(cfg.IsPublishingMode, ShouldEqual, false)
+				So(cfg.IsPublishing, ShouldEqual, false)
 				So(cfg.EnableCensusTopicSubsection, ShouldEqual, false)
 			})
 

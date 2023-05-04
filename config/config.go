@@ -24,7 +24,7 @@ type Config struct {
 	MailPort                    string         `envconfig:"MAIL_PORT"`
 	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
-	IsPublishingMode            bool           `envconfig:"IS_PUBLISHING_MODE"`
+	IsPublishing                bool           `envconfig:"IS_PUBLISHING"`
 	PatternLibraryAssetsPath    string         `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
@@ -70,7 +70,7 @@ func get() (*Config, error) {
 		MailPassword:                "",
 		FeedbackTo:                  "to@gmail.com",
 		FeedbackFrom:                "from@gmail.com",
-		IsPublishingMode:            false,
+		IsPublishing:                false,
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",
 		SupportedLanguages:          []string{"en", "cy"},

@@ -60,7 +60,7 @@ func main() {
 		EnableNewNavBar:             cfg.EnableNewNavBar,
 		EnableCensusTopicSubsection: cfg.EnableCensusTopicSubsection,
 		CensusTopicID:               cfg.CensusTopicID,
-		IsPublishingMode:            cfg.IsPublishingMode,
+		IsPublishingMode:            cfg.IsPublishing,
 		Languages:                   cfg.SupportedLanguages,
 		ServiceAuthToken:            cfg.ServiceAuthToken,
 	}
