@@ -199,7 +199,7 @@ func Test_addFeedback(t *testing.T) {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
 
-			Convey("Then the email sender is called", func() {
+			Convey("Then the email sender is not called", func() {
 				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
 
@@ -248,7 +248,7 @@ func Test_addFeedback(t *testing.T) {
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
-			Convey("Then the email sender is called", func() {
+			Convey("Then the email sender is not called", func() {
 				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
 			Convey("Then a 200 response is returned", func() {
@@ -333,26 +333,26 @@ func Test_feedbackThanks(t *testing.T) {
 func TestValidateForm(t *testing.T) {
 	Convey("Given the validateForm function", t, func() {
 		testCases := []struct {
-			givenTxt    string
-			given       *model.FeedbackForm
-			expectedTxt string
-			expected    []coreModel.ErrorItem
+			givenDescription    string
+			given               *model.FeedbackForm
+			expectedDescription string
+			expected            []coreModel.ErrorItem
 		}{
 			{
-				givenTxt: "the form is valid",
+				givenDescription: "the form is valid",
 				given: &model.FeedbackForm{
 					Type:        "Whole site",
 					Description: "Some text",
 				},
-				expectedTxt: "no validation errors are returned",
-				expected:    []coreModel.ErrorItem(nil),
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
 			},
 			{
-				givenTxt: "the form does not have a type selected",
+				givenDescription: "the form does not have a type selected",
 				given: &model.FeedbackForm{
 					Description: "Some text",
 				},
-				expectedTxt: "a type validation error is returned",
+				expectedDescription: "a type validation error is returned",
 				expected: []coreModel.ErrorItem{
 					{
 						Description: coreModel.Localisation{
@@ -364,12 +364,12 @@ func TestValidateForm(t *testing.T) {
 				},
 			},
 			{
-				givenTxt: "the a specific page/url type is chosen but the child input field is empty",
+				givenDescription: "the a specific page/url type is chosen but the child input field is empty",
 				given: &model.FeedbackForm{
 					Type:        "A specific page",
 					Description: "Some text",
 				},
-				expectedTxt: "a page/url validation error is returned",
+				expectedDescription: "a page/url validation error is returned",
 				expected: []coreModel.ErrorItem{
 					{
 						Description: coreModel.Localisation{
@@ -381,20 +381,30 @@ func TestValidateForm(t *testing.T) {
 				},
 			},
 			{
-				givenTxt: "the form does not have a type selected but is located on the footer",
+				givenDescription: "the a whole site type is chosen but the child input for a specific page is not empty",
+				given: &model.FeedbackForm{
+					Type:        "Whole site",
+					Description: "Some text",
+					URL:         "http://somewhere.com",
+				},
+				expectedDescription: "no validation error is returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "the form does not have a type selected but is located on the footer",
 				given: &model.FeedbackForm{
 					FormLocation: "footer",
 					Description:  "Some text",
 				},
-				expectedTxt: "no validation error is returned",
-				expected:    []coreModel.ErrorItem(nil),
+				expectedDescription: "no validation error is returned",
+				expected:            []coreModel.ErrorItem(nil),
 			},
 			{
-				givenTxt: "the form does not have any feedback",
+				givenDescription: "the form does not have any feedback",
 				given: &model.FeedbackForm{
 					Type: "Whole site",
 				},
-				expectedTxt: "a description validation error is returned",
+				expectedDescription: "a description validation error is returned",
 				expected: []coreModel.ErrorItem{
 					{
 						Description: coreModel.Localisation{
@@ -406,12 +416,12 @@ func TestValidateForm(t *testing.T) {
 				},
 			},
 			{
-				givenTxt: "the feedback provided is whitespace",
+				givenDescription: "the feedback provided is whitespace",
 				given: &model.FeedbackForm{
 					Type:        "Whole site",
 					Description: " ",
 				},
-				expectedTxt: "a description validation error is returned",
+				expectedDescription: "a description validation error is returned",
 				expected: []coreModel.ErrorItem{
 					{
 						Description: coreModel.Localisation{
@@ -423,13 +433,13 @@ func TestValidateForm(t *testing.T) {
 				},
 			},
 			{
-				givenTxt: "the email field has an invalid email address",
+				givenDescription: "the email field has an invalid email address",
 				given: &model.FeedbackForm{
 					Type:        "Whole site",
 					Description: "A description",
 					Email:       "a.string",
 				},
-				expectedTxt: "an email validation error is returned",
+				expectedDescription: "an email validation error is returned",
 				expected: []coreModel.ErrorItem{
 					{
 						Description: coreModel.Localisation{
@@ -441,24 +451,24 @@ func TestValidateForm(t *testing.T) {
 				},
 			},
 			{
-				givenTxt: "the email field has a valid email address",
+				givenDescription: "the email field has a valid email address",
 				given: &model.FeedbackForm{
 					Type:        "Whole site",
 					Description: "A description",
 					Email:       "hello@world.com",
 				},
-				expectedTxt: "no validation errors are returned",
-				expected:    []coreModel.ErrorItem(nil),
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
 			},
 			{
-				givenTxt: "multiple for validation errors",
+				givenDescription: "multiple form validation errors",
 				given: &model.FeedbackForm{
 					Type:        "A specific page",
 					URL:         "",
 					Description: "",
 					Email:       "not an email address",
 				},
-				expectedTxt: "validation errors are returned",
+				expectedDescription: "validation errors are returned",
 				expected: []coreModel.ErrorItem{
 					{
 						Description: coreModel.Localisation{
@@ -485,8 +495,8 @@ func TestValidateForm(t *testing.T) {
 			},
 		}
 		for _, t := range testCases {
-			Convey(fmt.Sprintf("When %s", t.givenTxt), func() {
-				Convey(fmt.Sprintf("Then %s", t.expectedTxt), func() {
+			Convey(fmt.Sprintf("When %s", t.givenDescription), func() {
+				Convey(fmt.Sprintf("Then %s", t.expectedDescription), func() {
 					So(validateForm(t.given), ShouldResemble, t.expected)
 				})
 			})
