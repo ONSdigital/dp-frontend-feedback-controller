@@ -18,8 +18,8 @@ github.com/ONSdigital/dp-net/v2 v2.9.1 h1:2hGa0ArL0m2pMT9cFxMPcSOgvJ0zstH3NxWeyk
 github.com/ONSdigital/dp-net/v2 v2.9.1/go.mod h1:iy1XmnqC7aKwHCpbTDhfAVrlYDGJGkZl36zeXyHq+Hw=
 github.com/ONSdigital/dp-rchttp v0.0.0-20190919143000-bb5699e6fd59/go.mod h1:KkW68U3FPuivW4ogi9L8CPKNj9ZxGko4qcUY7KoAAkQ=
 github.com/ONSdigital/dp-rchttp v0.0.0-20200114090501-463a529590e8/go.mod h1:821jZtK0oBsV8hjIkNr8vhAWuv0FxJBPJuAHa2B70Gk=
-github.com/ONSdigital/dp-renderer/v2 v2.0.1 h1:hXPbKnR2xKpmAcf1G8VEi2SRi8uNEtASaQL4SUu8Jok=
-github.com/ONSdigital/dp-renderer/v2 v2.0.1/go.mod h1:EiepEQWRSybj43r9jlHojJidSls6M8ERmWn1XdH3Iek=
+github.com/ONSdigital/dp-renderer/v2 v2.1.0 h1:fgD+BTMTkf+1GZRC6C6/gU4AA5NefY0aq3ojMHSCSn8=
+github.com/ONSdigital/dp-renderer/v2 v2.1.0/go.mod h1:EiepEQWRSybj43r9jlHojJidSls6M8ERmWn1XdH3Iek=
 github.com/ONSdigital/dp-topic-api v0.17.1 h1:rYQi0Ve+ckiL5Bk8E1iUHrazQrZFxL0JsIl8xEWL+gc=
 github.com/ONSdigital/dp-topic-api v0.17.1/go.mod h1:HySqqTOmVX6ElSOrioTtjWiU3dV9hfy2MFg0730lY1g=
 github.com/ONSdigital/go-ns v0.0.0-20191104121206-f144c4ec2e58/go.mod h1:iWos35il+NjbvDEqwtB736pyHru0MPFE/LqcwkV1wDc=

@@ -85,6 +85,7 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 						LocaleKey: "FeedbackWhatEnterURL",
 						Plural:    1,
 					},
+					Type: core.Url,
 				},
 			},
 		},
@@ -134,11 +135,12 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 				Autocomplete: "email",
 				ID:           "email-field",
 				Name:         "email",
-				Value:        ff.Email,
 				Label: core.Localisation{
 					LocaleKey: "FeedbackTitleEmail",
 					Plural:    1,
 				},
+				Type:  core.Email,
+				Value: ff.Email,
 			},
 			ValidationErr: core.ValidationErr{
 				HasValidationErr: ff.IsEmailErr,
