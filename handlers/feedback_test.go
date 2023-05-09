@@ -381,6 +381,34 @@ func TestValidateForm(t *testing.T) {
 				},
 			},
 			{
+				givenDescription: "the a specific page/url type is chosen and the url is invalid",
+				given: &model.FeedbackForm{
+					Type:        "A specific page",
+					Description: "Some text",
+					URL:         "not a url",
+				},
+				expectedDescription: "a url validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackValidURL",
+							Plural:    1,
+						},
+						URL: "#type-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the a specific page/url type is chosen and the url is valid",
+				given: &model.FeedbackForm{
+					Type:        "A specific page",
+					Description: "Some text",
+					URL:         "https://somewhere.com",
+				},
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
 				givenDescription: "the a whole site type is chosen but the child input for a specific page is not empty",
 				given: &model.FeedbackForm{
 					Type:        "Whole site",

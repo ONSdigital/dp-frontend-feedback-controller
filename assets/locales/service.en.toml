@@ -33,6 +33,10 @@ one = "This specific page"
 description = "Enter URL of the page"
 one = "Enter URL of the page"
 
+[FeedbackValidURL]
+description = "Enter a valid URL"
+one = "Enter a valid URL"
+
 [FeedbackChooseType]
 description = "Choose a type"
 one = "Choose a type"

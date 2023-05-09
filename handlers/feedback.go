@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -155,6 +156,20 @@ func validateForm(ff *model.FeedbackForm) (validationErrors []core.ErrorItem) {
 			URL: "#type-error",
 		})
 		ff.IsURLErr = true
+	}
+
+	if ff.Type == "A specific page" && ff.URL != "" {
+		_, err := url.ParseRequestURI(ff.URL)
+		if err != nil {
+			validationErrors = append(validationErrors, core.ErrorItem{
+				Description: core.Localisation{
+					LocaleKey: "FeedbackValidURL",
+					Plural:    1,
+				},
+				URL: "#type-error",
+			})
+			ff.IsURLErr = true
+		}
 	}
 
 	if ff.Type != "A specific page" && ff.URL != "" {
