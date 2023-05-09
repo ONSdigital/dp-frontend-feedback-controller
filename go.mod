@@ -1,6 +1,6 @@
 module github.com/ONSdigital/dp-frontend-feedback-controller
 
-go 1.19
+go 1.20
 
 require (
 	github.com/ONSdigital/dp-frontend-cache-helper v0.3.0
