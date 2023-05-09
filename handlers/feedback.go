@@ -88,7 +88,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 

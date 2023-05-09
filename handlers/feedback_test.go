@@ -204,7 +204,7 @@ func Test_addFeedback(t *testing.T) {
 			})
 
 			Convey("Then a 500 response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusInternalServerError)
+				So(w.Code, ShouldEqual, http.StatusBadRequest)
 			})
 		})
 	})
