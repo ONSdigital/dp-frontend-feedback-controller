@@ -139,7 +139,6 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 					LocaleKey: "FeedbackTitleEmail",
 					Plural:    1,
 				},
-				Type:  core.Email,
 				Value: ff.Email,
 			},
 			ValidationErr: core.ValidationErr{
