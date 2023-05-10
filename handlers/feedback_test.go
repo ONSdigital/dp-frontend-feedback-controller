@@ -203,7 +203,7 @@ func Test_addFeedback(t *testing.T) {
 				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
 
-			Convey("Then a 500 response is returned", func() {
+			Convey("Then a 400 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusBadRequest)
 			})
 		})
