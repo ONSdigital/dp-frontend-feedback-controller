@@ -18,8 +18,9 @@ audit:
 build: generate-prod
 	go build -tags 'production' $(LDFLAGS) -o $(BINPATH)/dp-frontend-feedback-controller
 
+.PHONY: lint 
 lint:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
 	golangci-lint run ./...
 
 .PHONY: debug

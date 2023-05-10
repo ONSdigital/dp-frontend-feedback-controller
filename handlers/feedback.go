@@ -28,7 +28,7 @@ func (f *Feedback) FeedbackThanks() http.HandlerFunc {
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, url string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, lang string) {
+func feedbackThanks(w http.ResponseWriter, req *http.Request, uri string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, lang string) {
 	ctx := req.Context()
 	var wholeSite string
 
@@ -40,7 +40,7 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, url string, rend i
 	}
 
 	basePage := rend.NewBasePageModel()
-	p := mapper.CreateGetFeedbackThanks(req, basePage, lang, url, wholeSite)
+	p := mapper.CreateGetFeedbackThanks(req, basePage, lang, uri, wholeSite)
 
 	if cfg.EnableNewNavBar {
 		mappedNavContent, err := cacheHelperService.GetMappedNavigationContent(ctx, lang)

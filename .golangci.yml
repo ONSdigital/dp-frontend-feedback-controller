@@ -50,7 +50,6 @@ linters:
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
   disable-all: true
   enable:
-    - deadcode
     - depguard
     - dogsled
     - gochecknoinits
@@ -64,7 +63,6 @@ linters:
     - ineffassign
     - nakedret
     - unconvert
-    - varcheck
     - whitespace
     - gocognit
     - prealloc
@@ -82,12 +80,14 @@ issues:
         - gocritic
         - ineffassign
         - govet
+    - path: main.go
+      linters:
         - typecheck
   new: false
 
 # golangci.com configuration
 # https://github.com/golangci/golangci/wiki/Configuration
 service:
-  golangci-lint-version: 1.43.x # use the fixed version to not introduce new linters unexpectedly
+  golangci-lint-version: 1.52.x # use the fixed version to not introduce new linters unexpectedly
   prepare:
     - echo "here I can run custom commands, but no preparation needed for this repo"

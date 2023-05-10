@@ -17,6 +17,6 @@ var enLocale = []string{
 }
 
 // MockAssetFunction returns mocked toml []bytes
-func MockAssetFunction(name string) ([]byte, error) {
+func MockAssetFunction(name string) ([]byte, error) { //nolint:all // app does not use welsh
 	return []byte(strings.Join(enLocale, "\n")), nil
 }

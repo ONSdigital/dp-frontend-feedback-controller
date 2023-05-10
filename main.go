@@ -69,7 +69,7 @@ func main() {
 	cacheService, err := cacheHelper.Init(ctx, cacheConfig)
 	cacheService.RunUpdates(ctx, svcErrors)
 
-	// nolint: typecheck
+	//nolint:typecheck
 	rend := render.NewWithDefaultClient(assets.Asset, assets.AssetNames, cfg.PatternLibraryAssetsPath, cfg.SiteDomain)
 
 	routes.Setup(ctx, r, cfg, rend, healthcheck, cacheService)
