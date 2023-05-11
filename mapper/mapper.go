@@ -28,6 +28,7 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 
 	p.Language = lang
 	p.Type = "feedback"
+	p.URI = req.URL.Path
 	p.Metadata.Title = helper.Localise("FeedbackTitle", lang, 1)
 	p.Metadata.Description = ff.URL
 
@@ -195,6 +196,7 @@ func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, url, w
 
 	p.Language = lang
 	p.Type = "feedback"
+	p.URI = req.URL.Path
 	p.Metadata.Title = helper.Localise("FeedbackThanks", lang, 1)
 	p.PreviousURL = url
 
