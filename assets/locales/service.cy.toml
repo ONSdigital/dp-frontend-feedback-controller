@@ -14,8 +14,8 @@
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 [FeedbackTitle]
-description = "{{.Metadata.Title}}"
-one = "{{.arg0}}"
+description = "Feedback"
+one = "Feedback"
 
 [FeedbackDesc]
 descriptions = "You can use the form below to ask a question, report a problem or suggest an improvement we can make to ONS.GOV.UK"
@@ -30,16 +30,20 @@ description = "This specific page"
 one = "This specific page"
 
 [FeedbackWhatEnterURL]
-description = "Enter URL or name of the page"
-one = "Enter URL or name of the page"
+description = "Enter URL of the page"
+one = "Enter URL of the page"
 
-[FeedbackWhatOptHintSpecificPage]
-description = "{{.ServiceDescription}}"
-one = "({{.arg0}})"
+[FeedbackValidURL]
+description = "Enter a valid URL"
+one = "Enter a valid URL"
+
+[FeedbackChooseType]
+description = "Choose a type"
+one = "Choose a type"
 
 [FeedbackWhatOptNewService]
-description = "This new service"
-one = "This new service"
+description = "This {{.ServiceName}} service"
+one = "The {{.arg0}} service"
 
 [FeedbackWhatOptGeneral]
 description = "The whole <abbr title=\"Office for National Statistics\">ONS</abbr> website or general feedback"
@@ -86,8 +90,8 @@ description = "Send feedback"
 one = "Send feedback"
 
 [FeedbackFinished]
-description = "Your feedback will help us to improve the website. We are unable to respond to all enquiries. If your matter is urgent, please <a href=\"/aboutus/contactus\">contact us</a>.<br><br>Return to <a href=\"{{.Metadata.Description}}\">{{.Metadata.Description}}"
-one = "Your feedback will help us to improve the website. We are unable to respond to all enquiries. If your matter is urgent, please <a href=\"/aboutus/contactus\">contact us</a>.<br><br>Return to <a href=\"{{.arg0}}\">{{.arg0}}"
+description = "Your feedback will help us to improve the website. We are unable to respond to all enquiries. If your matter is urgent, please <a href=\"/aboutus/contactus\">contact us</a>."
+one = "Your feedback will help us to improve the website. We are unable to respond to all enquiries. If your matter is urgent, please <a href=\"/aboutus/contactus\">contact us</a>."
 
 [FeedbackWholeWebsite]
 description = "The whole ONS website or general feedback"

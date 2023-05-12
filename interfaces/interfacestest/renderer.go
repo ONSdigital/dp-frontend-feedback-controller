@@ -5,7 +5,7 @@ package interfacestest
 
 import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
-	"github.com/ONSdigital/dp-renderer/model"
+	"github.com/ONSdigital/dp-renderer/v2/model"
 	"io"
 	"sync"
 )

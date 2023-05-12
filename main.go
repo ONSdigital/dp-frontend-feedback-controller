@@ -11,7 +11,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/routes"
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
-	render "github.com/ONSdigital/dp-renderer"
+	render "github.com/ONSdigital/dp-renderer/v2"
 	"github.com/ONSdigital/go-ns/server"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
@@ -60,7 +60,7 @@ func main() {
 		EnableNewNavBar:             cfg.EnableNewNavBar,
 		EnableCensusTopicSubsection: cfg.EnableCensusTopicSubsection,
 		CensusTopicID:               cfg.CensusTopicID,
-		IsPublishingMode:            cfg.IsPublishingMode,
+		IsPublishingMode:            cfg.IsPublishing,
 		Languages:                   cfg.SupportedLanguages,
 		ServiceAuthToken:            cfg.ServiceAuthToken,
 	}
@@ -69,7 +69,7 @@ func main() {
 	cacheService, err := cacheHelper.Init(ctx, cacheConfig)
 	cacheService.RunUpdates(ctx, svcErrors)
 
-	// nolint: typecheck
+	//nolint:typecheck
 	rend := render.NewWithDefaultClient(assets.Asset, assets.AssetNames, cfg.PatternLibraryAssetsPath, cfg.SiteDomain)
 
 	routes.Setup(ctx, r, cfg, rend, healthcheck, cacheService)

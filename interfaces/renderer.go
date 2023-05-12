@@ -3,7 +3,7 @@ package interfaces
 import (
 	"io"
 
-	coreModel "github.com/ONSdigital/dp-renderer/model"
+	coreModel "github.com/ONSdigital/dp-renderer/v2/model"
 )
 
 //go:generate moq -out interfacestest/renderer.go -pkg interfacestest . Renderer

@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,23 +15,22 @@ import (
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/mocks"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
-	"github.com/ONSdigital/dp-frontend-models/model/feedback"
-	coreModel "github.com/ONSdigital/dp-renderer/model"
+	"github.com/ONSdigital/dp-renderer/v2/helper"
+	coreModel "github.com/ONSdigital/dp-renderer/v2/model"
 	topicModel "github.com/ONSdigital/dp-topic-api/models"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func Test_getFeedback(t *testing.T) {
-	Convey("Given a request without a query string", t, func() {
+	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
+	Convey("Given a valid request", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost", nil)
 		w := httptest.NewRecorder()
-		url := "whatever"
-		errorType := ""
-		description := ""
-		name := ""
-		email := ""
+		ff := model.FeedbackForm{}
+		ff.URL = "whatever"
 		lang := "en"
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -53,56 +53,8 @@ func Test_getFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When getFeedback is called", func() {
-			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer, mockNagivationCache)
+			getFeedback(w, req, []coreModel.ErrorItem{}, ff, lang, mockRenderer, mockNagivationCache)
 			Convey("Then a 200 request is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusOK)
-			})
-		})
-	})
-
-	Convey("Given a valid request", t, func() {
-		req := httptest.NewRequest("GET", "http://localhost?service=dev", nil)
-		w := httptest.NewRecorder()
-		url := "whatever"
-		errorType := ""
-		description := ""
-		name := ""
-		email := ""
-		lang := "en"
-		mockRenderer := &interfacestest.RendererMock{
-			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
-			NewBasePageModelFunc: func() coreModel.Page {
-				return coreModel.Page{}
-			},
-		}
-		mockNagivationCache := &cacheHelper.Helper{
-			Clienter: &cacheClient.ClienterMock{
-				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
-					return nil
-				},
-				CloseFunc: func() {
-				},
-				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
-					return &topicModel.Navigation{}, nil
-				},
-				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
-				},
-			}}
-
-		Convey("When getFeedback is called", func() {
-			getFeedback(w, req, url, errorType, description, name, email, lang, mockRenderer, mockNagivationCache)
-			Convey("Then the page model is sent to the renderer", func() {
-				var expectedPage feedback.Page
-				expectedPage.Language = "en"
-				expectedPage.Metadata.Title = "Feedback"
-				expectedPage.PreviousURL = url
-				expectedPage.Metadata.Description = url
-				expectedPage.ServiceDescription = "ONS developer website"
-				expectedPage.Type = "feedback"
-
-				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
-			})
-			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
 		})
@@ -110,10 +62,12 @@ func Test_getFeedback(t *testing.T) {
 }
 
 func Test_addFeedback(t *testing.T) {
+	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	Convey("Given a valid request", t, func() {
-		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
+		body := strings.NewReader("description=testing1234&type=test")
+		req := httptest.NewRequest("POST", "http://localhost", body)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -144,7 +98,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -158,9 +112,10 @@ func Test_addFeedback(t *testing.T) {
 	})
 
 	Convey("Given an error returned from the sender", t, func() {
-		req := httptest.NewRequest("GET", "http://localhost?description=whatever", nil)
+		body := strings.NewReader("description=testing1234&type=test")
+		req := httptest.NewRequest("POST", "http://localhost", body)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -191,7 +146,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -209,7 +164,6 @@ func Test_addFeedback(t *testing.T) {
 	Convey("Given a request with invalid form data", t, func() {
 		req := httptest.NewRequest("POST", "http://localhost?!@£$@$£%£$%^^&^&*", nil)
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -240,75 +194,26 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
 
-			Convey("Then the email sender is called", func() {
+			Convey("Then the email sender is not called", func() {
 				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
 
-			Convey("Then a 500 response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusInternalServerError)
+			Convey("Then a 400 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusBadRequest)
 			})
 		})
 	})
 
 	Convey("Given a request for feedback with an empty description value", t, func() {
-		req := httptest.NewRequest("POST", "http://localhost?service=dev", nil)
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		w := httptest.NewRecorder()
-		isPositive := false
-		from := ""
-		to := ""
-		lang := "en"
-
-		mockRenderer := &interfacestest.RendererMock{
-			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
-			NewBasePageModelFunc: func() coreModel.Page {
-				return coreModel.Page{}
-			},
-		}
-
-		mockSender := &emailtest.SenderMock{
-			SendFunc: func(from string, to []string, msg []byte) error {
-				return nil
-			},
-		}
-		mockNagivationCache := &cacheHelper.Helper{
-			Clienter: &cacheClient.ClienterMock{
-				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
-					return nil
-				},
-				CloseFunc: func() {
-				},
-				GetNavigationDataFunc: func(ctx context.Context, lang string) (*topicModel.Navigation, error) {
-					return &topicModel.Navigation{}, nil
-				},
-				StartBackgroundUpdateFunc: func(ctx context.Context, errorChannel chan error) {
-				},
-			}}
-		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
-			Convey("Then the renderer is called to render the feedback page", func() {
-				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
-			})
-			Convey("Then the email sender is called", func() {
-				So(len(mockSender.SendCalls()), ShouldEqual, 0)
-			})
-			Convey("Then a 200 response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusOK)
-			})
-		})
-	})
-	Convey("Given a request for feedback with an invalid email address", t, func() {
-		body := strings.NewReader("email=hello&description=hfjkshk")
+		body := strings.NewReader("description=")
 		req := httptest.NewRequest("POST", "http://localhost?service=dev", body)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
 		w := httptest.NewRecorder()
-		isPositive := false
 		from := ""
 		to := ""
 		lang := "en"
@@ -339,11 +244,11 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, isPositive, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, mockNagivationCache)
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
-			Convey("Then the email sender is called", func() {
+			Convey("Then the email sender is not called", func() {
 				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
 			Convey("Then a 200 response is returned", func() {
@@ -354,12 +259,12 @@ func Test_addFeedback(t *testing.T) {
 }
 
 func Test_feedbackThanks(t *testing.T) {
+	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	lang := "en"
 	Convey("Given a valid request", t, func() {
 		req := httptest.NewRequest("GET", "http://localhost", nil)
 		w := httptest.NewRecorder()
 		url := "www.test.com"
-		errorType := ""
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -381,7 +286,7 @@ func Test_feedbackThanks(t *testing.T) {
 				},
 			}}
 		Convey("When feedbackThanks is called", func() {
-			feedbackThanks(w, req, url, errorType, mockRenderer, mockNagivationCache, lang)
+			feedbackThanks(w, req, url, mockRenderer, mockNagivationCache, lang)
 			Convey("Then the renderer is called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
@@ -395,7 +300,6 @@ func Test_feedbackThanks(t *testing.T) {
 		req := httptest.NewRequest("GET", "http://localhost?returnTo=<script>alert(1)</script>", nil)
 		w := httptest.NewRecorder()
 		url := "www.test.com"
-		errorType := ""
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
 			NewBasePageModelFunc: func() coreModel.Page {
@@ -416,12 +320,214 @@ func Test_feedbackThanks(t *testing.T) {
 				},
 			}}
 		Convey("When feedbackThanks is called", func() {
-			feedbackThanks(w, req, url, errorType, mockRenderer, mockNagivationCache, lang)
+			feedbackThanks(w, req, url, mockRenderer, mockNagivationCache, lang)
 			Convey("Then the handler sanitises the request text", func() {
 				dataSentToRender := mockRenderer.BuildPageCalls()[0].PageModel.(model.Feedback)
-				returnToUrl := dataSentToRender.Metadata.Description
+				returnToUrl := dataSentToRender.ReturnTo
 				So(returnToUrl, ShouldEqual, "&lt;script&gt;alert(1)&lt;/script&gt;")
 			})
 		})
+	})
+}
+
+func TestValidateForm(t *testing.T) {
+	Convey("Given the validateForm function", t, func() {
+		testCases := []struct {
+			givenDescription    string
+			given               *model.FeedbackForm
+			expectedDescription string
+			expected            []coreModel.ErrorItem
+		}{
+			{
+				givenDescription: "the form is valid",
+				given: &model.FeedbackForm{
+					Type:        "Whole site",
+					Description: "Some text",
+				},
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "the form does not have a type selected",
+				given: &model.FeedbackForm{
+					Description: "Some text",
+				},
+				expectedDescription: "a type validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackChooseType",
+							Plural:    1,
+						},
+						URL: "#type-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the a specific page/url type is chosen but the child input field is empty",
+				given: &model.FeedbackForm{
+					Type:        "A specific page",
+					Description: "Some text",
+				},
+				expectedDescription: "a page/url validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackWhatEnterURL",
+							Plural:    1,
+						},
+						URL: "#type-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the a specific page/url type is chosen and the url is invalid",
+				given: &model.FeedbackForm{
+					Type:        "A specific page",
+					Description: "Some text",
+					URL:         "not a url",
+				},
+				expectedDescription: "a url validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackValidURL",
+							Plural:    1,
+						},
+						URL: "#type-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the a specific page/url type is chosen and the url is valid",
+				given: &model.FeedbackForm{
+					Type:        "A specific page",
+					Description: "Some text",
+					URL:         "https://somewhere.com",
+				},
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "the a whole site type is chosen but the child input for a specific page is not empty",
+				given: &model.FeedbackForm{
+					Type:        "Whole site",
+					Description: "Some text",
+					URL:         "http://somewhere.com",
+				},
+				expectedDescription: "no validation error is returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "the form does not have a type selected but is located on the footer",
+				given: &model.FeedbackForm{
+					FormLocation: "footer",
+					Description:  "Some text",
+				},
+				expectedDescription: "no validation error is returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "the form does not have any feedback",
+				given: &model.FeedbackForm{
+					Type: "Whole site",
+				},
+				expectedDescription: "a description validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackAlertEntry",
+							Plural:    1,
+						},
+						URL: "#feedback-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the feedback provided is whitespace",
+				given: &model.FeedbackForm{
+					Type:        "Whole site",
+					Description: " ",
+				},
+				expectedDescription: "a description validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackAlertEntry",
+							Plural:    1,
+						},
+						URL: "#feedback-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the email field has an invalid email address",
+				given: &model.FeedbackForm{
+					Type:        "Whole site",
+					Description: "A description",
+					Email:       "a.string",
+				},
+				expectedDescription: "an email validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackAlertEmail",
+							Plural:    1,
+						},
+						URL: "#email-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the email field has a valid email address",
+				given: &model.FeedbackForm{
+					Type:        "Whole site",
+					Description: "A description",
+					Email:       "hello@world.com",
+				},
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "multiple form validation errors",
+				given: &model.FeedbackForm{
+					Type:        "A specific page",
+					URL:         "",
+					Description: "",
+					Email:       "not an email address",
+				},
+				expectedDescription: "validation errors are returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackWhatEnterURL",
+							Plural:    1,
+						},
+						URL: "#type-error",
+					},
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackAlertEntry",
+							Plural:    1,
+						},
+						URL: "#feedback-error",
+					},
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackAlertEmail",
+							Plural:    1,
+						},
+						URL: "#email-error",
+					},
+				},
+			},
+		}
+		for _, t := range testCases {
+			Convey(fmt.Sprintf("When %s", t.givenDescription), func() {
+				Convey(fmt.Sprintf("Then %s", t.expectedDescription), func() {
+					So(validateForm(t.given), ShouldResemble, t.expected)
+				})
+			})
+		}
 	})
 }
