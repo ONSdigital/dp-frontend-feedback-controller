@@ -34,6 +34,8 @@ To allow users to provide feedback about the ONS website
 | SERVICE_AUTH_TOKEN             | ""                          | Service authorisation token                                                                                        |
 | SITE_DOMAIN                    | localhost                   |
 | SUPPORTED_LANGUAGES            | []string{"en", "cy"}        | Supported languages                                                                                                |
+| OTEL_EXPORTER_OTLP_ENDPOINT    | localhost:4317                         | Endpoint for OpenTelemetry service
+| OTEL_SERVICE_NAME              | dp-frontend-feedback-controller        | Label of service for OpenTelemetry service
 
 ## Contributing
 

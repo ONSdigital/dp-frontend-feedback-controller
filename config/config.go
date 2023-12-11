@@ -29,6 +29,8 @@ type Config struct {
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
 	SupportedLanguages          []string       `envconfig:"SUPPORTED_LANGUAGES"`
+	OTExporterOTLPEndpoint      string         `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
+	OTServiceName               string         `envconfig:"OTEL_SERVICE_NAME"`
 }
 
 var cfg *Config
@@ -74,6 +76,8 @@ func get() (*Config, error) {
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",
 		SupportedLanguages:          []string{"en", "cy"},
+		OTExporterOTLPEndpoint:      "localhost:4317",
+		OTServiceName:               "dp-frontend-feedback-controller",
 	}
 
 	return cfg, envconfig.Process("", cfg)
