@@ -11,11 +11,12 @@ require (
 	github.com/ONSdigital/dp-topic-api v0.17.1
 	github.com/ONSdigital/go-ns v0.0.0-20210916104633-ac1c1c52327e
 	github.com/ONSdigital/log.go/v2 v2.4.1
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.2.0
 	github.com/justinas/alice v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/smartystreets/goconvey v1.8.1
+	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.46.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1
 )
 
