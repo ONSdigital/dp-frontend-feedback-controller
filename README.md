@@ -36,6 +36,7 @@ To allow users to provide feedback about the ONS website
 | SUPPORTED_LANGUAGES            | []string{"en", "cy"}            | Supported languages                                                                                                |
 | OTEL_EXPORTER_OTLP_ENDPOINT    | localhost:4317                  | Endpoint for OpenTelemetry service                                                                                 |
 | OTEL_SERVICE_NAME              | dp-frontend-feedback-controller | Label of service for OpenTelemetry service                                                                         |
+| OTEL_BATCH_TIMEOUT             | 5s                              | Timeout for OpenTelemetry                                                                                          |
 
 ## Contributing
 
