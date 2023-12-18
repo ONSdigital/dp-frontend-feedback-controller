@@ -31,7 +31,7 @@ type Config struct {
 	SupportedLanguages          []string       `envconfig:"SUPPORTED_LANGUAGES"`
 	OTExporterOTLPEndpoint      string         `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
 	OTServiceName               string         `envconfig:"OTEL_SERVICE_NAME"`
-	OTBatchTimeout 				time.Duration  `envconfig:"OTEL_BATCH_TIMEOUT"`
+	OTBatchTimeout              time.Duration  `envconfig:"OTEL_BATCH_TIMEOUT"`
 }
 
 var cfg *Config
@@ -79,7 +79,7 @@ func get() (*Config, error) {
 		SupportedLanguages:          []string{"en", "cy"},
 		OTExporterOTLPEndpoint:      "localhost:4317",
 		OTServiceName:               "dp-frontend-feedback-controller",
-		OTBatchTimeout: 			 5 * time.Second,
+		OTBatchTimeout:              5 * time.Second,
 	}
 
 	return cfg, envconfig.Process("", cfg)
