@@ -43,23 +43,25 @@ func main() {
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
-	// Set up OpenTelemetry
-	otelConfig := dpotelgo.Config{
-		OtelServiceName:          cfg.OTServiceName,
-		OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
-		OtelBatchTimeout:         cfg.OTBatchTimeout,
+	if cfg.OtelEnabled {
+		// Set up OpenTelemetry
+		otelConfig := dpotelgo.Config{
+			OtelServiceName:          cfg.OTServiceName,
+			OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
+			OtelBatchTimeout:         cfg.OTBatchTimeout,
+		}
+
+		otelShutdown, err := dpotelgo.SetupOTelSDK(ctx, otelConfig)
+
+		if err != nil {
+			log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", err)
+		}
+
+		// Handle shutdown properly so nothing leaks.
+		defer func() {
+			err = errors.Join(err, otelShutdown(context.Background()))
+		}()
 	}
-
-	otelShutdown, err := dpotelgo.SetupOTelSDK(ctx, otelConfig)
-
-	if err != nil {
-		log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", err)
-	}
-
-	// Handle shutdown properly so nothing leaks.
-	defer func() {
-		err = errors.Join(err, otelShutdown(context.Background()))
-	}()
 
 	versionInfo, healthErr := health.NewVersionInfo(
 		BuildTime,
@@ -73,7 +75,9 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.Use(otelmux.Middleware(cfg.OTServiceName))
+	if cfg.OtelEnabled {
+		r.Use(otelmux.Middleware(cfg.OTServiceName))
+	}
 
 	healthcheck := health.New(versionInfo, cfg.HealthCheckCriticalTimeout, cfg.HealthCheckInterval)
 	if err = registerCheckers(ctx, &healthcheck); err != nil {
@@ -107,8 +111,14 @@ func main() {
 
 	healthcheck.Start(ctx)
 
-	otelHandler := otelhttp.NewHandler(newAlice, "/")
-	s := server.New(cfg.BindAddr, otelHandler)
+	var s *server.Server
+
+	if cfg.OtelEnabled {
+		otelHandler := otelhttp.NewHandler(newAlice, "/")
+		s = server.New(cfg.BindAddr, otelHandler)
+	} else {
+		s = server.New(cfg.BindAddr, newAlice)
+	}
 
 	s.HandleOSSignals = false
 
