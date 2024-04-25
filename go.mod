@@ -12,11 +12,11 @@ require (
 	github.com/ONSdigital/go-ns v0.0.0-20210916104633-ac1c1c52327e
 	github.com/ONSdigital/log.go/v2 v2.4.3
 	github.com/elazarl/go-bindata-assetfs v1.0.1
-	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.3.0
 	github.com/justinas/alice v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/kevinburke/go-bindata v3.24.0+incompatible
 	github.com/smartystreets/goconvey v1.8.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.46.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1
