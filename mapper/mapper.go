@@ -70,7 +70,7 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 			{
 				Input: core.Input{
 					ID:        "specific-page",
-					IsChecked: ff.Type == "A specific page" || ff.URL != "",
+					IsChecked: ff.Type == "A specific page" || (ff.URL != "" && serviceDescription == ""),
 					Label: core.Localisation{
 						LocaleKey: "FeedbackASpecificPage",
 						Plural:    1,
@@ -82,7 +82,12 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 					Autocomplete: "url",
 					ID:           "page-url-field",
 					Name:         "url",
-					Value:        ff.URL,
+					Value: func() string {
+						if serviceDescription != "" {
+							return ""
+						}
+						return ff.URL
+					}(),
 					Label: core.Localisation{
 						LocaleKey: "FeedbackWhatEnterURL",
 						Plural:    1,
@@ -108,7 +113,7 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 			core.Radio{
 				Input: core.Input{
 					ID:        "new-service",
-					IsChecked: ff.Type == "new-service",
+					IsChecked: true,
 					Label: core.Localisation{
 						Text: helper.Localise("FeedbackWhatOptNewService", lang, 1, serviceDescription),
 					},
