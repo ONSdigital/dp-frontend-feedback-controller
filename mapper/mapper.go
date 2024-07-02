@@ -24,6 +24,7 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 	var services = make(map[string]string)
 	services["cmd"] = "customising data by applying filters"
 	services["dev"] = "ONS developer"
+	services["search"] = "search"
 	serviceDescription := services[req.URL.Query().Get("service")]
 
 	p.Language = lang
