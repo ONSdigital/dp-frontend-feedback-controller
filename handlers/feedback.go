@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 	"regexp"
 	"strings"
 
@@ -24,25 +23,16 @@ import (
 // FeedbackThanks loads the Feedback Thank you page
 func (f *Feedback) FeedbackThanks() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		feedbackThanks(w, req, req.Referer(), f.Render, f.CacheService, lang)
+		feedbackThanks(w, req, req.Referer(), f.Render, f.CacheService, lang, f.Config.SiteDomain, f.Config.EnableNewNavBar)
 	})
 }
 
-func feedbackThanks(w http.ResponseWriter, req *http.Request, uri string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, lang string) {
-	ctx := req.Context()
-	var wholeSite string
-
-	cfg, err := config.Get()
-	if err != nil {
-		log.Warn(ctx, "Unable to retrieve configuration", log.FormatErrors([]error{err}))
-	} else {
-		wholeSite = cfg.SiteDomain
-	}
-
+func feedbackThanks(w http.ResponseWriter, req *http.Request, uri string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, lang, siteDomain string, enableNewNavBar bool) {
 	basePage := rend.NewBasePageModel()
-	p := mapper.CreateGetFeedbackThanks(req, basePage, lang, uri, wholeSite)
+	p := mapper.CreateGetFeedbackThanks(req, basePage, lang, uri, siteDomain)
 
-	if cfg.EnableNewNavBar {
+	if enableNewNavBar {
+		ctx := req.Context()
 		mappedNavContent, err := cacheHelperService.GetMappedNavigationContent(ctx, lang)
 		if err == nil {
 			p.NavigationContent = mappedNavContent
@@ -55,20 +45,16 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, uri string, rend i
 // GetFeedback handles the loading of a feedback page
 func (f *Feedback) GetFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		getFeedback(w, req, []core.ErrorItem{}, model.FeedbackForm{URL: req.Referer()}, lang, f.Render, f.CacheService)
+		getFeedback(w, req, []core.ErrorItem{}, model.FeedbackForm{URL: req.Referer()}, lang, f.Render, f.CacheService, f.Config.EnableNewNavBar)
 	})
 }
 
-func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []core.ErrorItem, ff model.FeedbackForm, lang string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper) {
+func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []core.ErrorItem, ff model.FeedbackForm, lang string, rend interfaces.Renderer, cacheHelperService *cacheHelper.Helper, enableNewNavBar bool) {
 	basePage := rend.NewBasePageModel()
 	p := mapper.CreateGetFeedback(req, basePage, validationErrors, ff, lang)
 
-	ctx := context.Background()
-	cfg, err := config.Get()
-	if err != nil {
-		log.Warn(ctx, "Unable to retrieve configuration", log.FormatErrors([]error{err}))
-	}
-	if cfg.EnableNewNavBar {
+	if enableNewNavBar {
+		ctx := context.Background()
 		mappedNavContent, err := cacheHelperService.GetMappedNavigationContent(ctx, lang)
 		if err == nil {
 			p.NavigationContent = mappedNavContent
@@ -81,11 +67,11 @@ func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []co
 // AddFeedback handles a users feedback request
 func (f *Feedback) AddFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.CacheService)
+		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.Config.SiteDomain, f.CacheService)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang string, cacheService *cacheHelper.Helper) {
+func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang, siteDomain string, cacheService *cacheHelper.Helper) {
 	ctx := req.Context()
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -103,9 +89,9 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		return
 	}
 
-	validationErrors := validateForm(&ff)
+	validationErrors := validateForm(&ff, siteDomain)
 	if len(validationErrors) > 0 {
-		getFeedback(w, req, validationErrors, ff, lang, rend, cacheService)
+		getFeedback(w, req, validationErrors, ff, lang, rend, cacheService, false)
 		return
 	}
 
@@ -134,7 +120,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 }
 
 // validateForm is a helper function that validates a slice of FeedbackForm to determine if there are form validation errors
-func validateForm(ff *model.FeedbackForm) (validationErrors []core.ErrorItem) {
+func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors []core.ErrorItem) {
 	if ff.Type == "" && ff.FormLocation != "footer" {
 		validationErrors = append(validationErrors, core.ErrorItem{
 			Description: core.Localisation{
@@ -147,28 +133,28 @@ func validateForm(ff *model.FeedbackForm) (validationErrors []core.ErrorItem) {
 	}
 
 	ff.URL = strings.TrimSpace(ff.URL)
-	if ff.Type == "A specific page" && ff.URL == "" {
-		validationErrors = append(validationErrors, core.ErrorItem{
-			Description: core.Localisation{
-				LocaleKey: "FeedbackWhatEnterURL",
-				Plural:    1,
-			},
-			URL: "#type-error",
-		})
-		ff.IsURLErr = true
-	}
-
-	if ff.Type == "A specific page" && ff.URL != "" {
-		_, err := url.ParseRequestURI(ff.URL)
-		if err != nil {
+	if ff.Type == "A specific page" {
+		if ff.URL == "" {
 			validationErrors = append(validationErrors, core.ErrorItem{
 				Description: core.Localisation{
-					LocaleKey: "FeedbackValidURL",
+					LocaleKey: "FeedbackWhatEnterURL",
 					Plural:    1,
 				},
 				URL: "#type-error",
 			})
 			ff.IsURLErr = true
+
+		} else {
+			if !config.IsSiteDomainURL(ff.URL, siteDomain) {
+				validationErrors = append(validationErrors, core.ErrorItem{
+					Description: core.Localisation{
+						LocaleKey: "FeedbackValidURL",
+						Plural:    1,
+					},
+					URL: "#type-error",
+				})
+				ff.IsURLErr = true
+			}
 		}
 	}
 

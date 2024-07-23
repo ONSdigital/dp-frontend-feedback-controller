@@ -1,6 +1,8 @@
 package config
 
 import (
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -40,6 +42,10 @@ var cfg *Config
 // Get returns the default config with any modifications through environment
 // variables
 func Get() (*Config, error) {
+	if cfg != nil {
+		return cfg, nil
+	}
+
 	envCfg, err := get()
 	if err != nil {
 		return nil, err
@@ -50,14 +56,12 @@ func Get() (*Config, error) {
 	} else {
 		envCfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/e0a75c3"
 	}
-	return envCfg, nil
+
+	cfg = envCfg
+	return cfg, nil
 }
 
 func get() (*Config, error) {
-	if cfg != nil {
-		return cfg, nil
-	}
-
 	cfg := &Config{
 		APIRouterURL:                "http://localhost:23200/v1",
 		BindAddr:                    "localhost:25200",
@@ -85,4 +89,23 @@ func get() (*Config, error) {
 	}
 
 	return cfg, envconfig.Process("", cfg)
+}
+
+// IsSiteDomainURL is true when urlString is a URL and its host ends with `.`+siteDomain (when siteDomain is blank, uses cfg.SiteDomain)
+func IsSiteDomainURL(urlString, siteDomain string) bool {
+	if urlString == "" {
+		return false
+	}
+	if siteDomain == "" {
+		siteDomain = cfg.SiteDomain
+	}
+	urlObject, err := url.ParseRequestURI(urlString)
+	if err != nil {
+		return false
+	}
+	hostName := urlObject.Hostname()
+	if hostName != siteDomain && !strings.HasSuffix(hostName, "."+siteDomain) {
+		return false
+	}
+	return true
 }
