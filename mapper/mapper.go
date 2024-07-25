@@ -4,6 +4,7 @@ import (
 	"html"
 	"net/http"
 
+	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	"github.com/ONSdigital/dp-renderer/v2/helper"
 	core "github.com/ONSdigital/dp-renderer/v2/model"
@@ -195,23 +196,28 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 	return p
 }
 
-func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, url, wholeSite string) model.Feedback {
+func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, referrer, wholeSite string) model.Feedback {
 	p := model.Feedback{
 		Page: basePage,
+	}
+	if referrer == "" {
+		referrer = wholeSite
 	}
 
 	p.Language = lang
 	p.Type = "feedback"
 	p.URI = req.URL.Path
 	p.Metadata.Title = helper.Localise("FeedbackThanks", lang, 1)
-	p.PreviousURL = url
+	p.PreviousURL = referrer
 
 	// returnTo is rendered on page so needs XSS protection
 	returnTo := html.EscapeString(req.URL.Query().Get("returnTo"))
 	if returnTo == "Whole site" {
 		returnTo = wholeSite
 	} else if returnTo == "" {
-		returnTo = url
+		returnTo = referrer
+	} else if !config.IsSiteDomainURL(returnTo, "") {
+		returnTo = referrer
 	}
 
 	p.ReturnTo = returnTo
