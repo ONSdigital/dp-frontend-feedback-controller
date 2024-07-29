@@ -58,7 +58,7 @@ func TestConfig(t *testing.T) {
 				So(isAllowedURL, ShouldBeTrue)
 			})
 			Convey("Then a sub-domain/host of the config's site domain is recognised", func() {
-				isAllowedURL := IsSiteDomainURL("https://anything.localhost", "")
+				isAllowedURL := IsSiteDomainURL("anything.localhost", "")
 				So(isAllowedURL, ShouldBeTrue)
 			})
 			Convey("Then a non-site domain URL is not recognised for config's site domain", func() {

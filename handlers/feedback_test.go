@@ -16,6 +16,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mocks"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	"github.com/ONSdigital/dp-renderer/v2/helper"
@@ -345,7 +346,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the form is valid",
 				given: &model.FeedbackForm{
-					Type:        "Whole site",
+					Type:        mapper.WholeSite,
 					Description: "Some text",
 				},
 				expectedDescription: "no validation errors are returned",
@@ -370,7 +371,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the a specific page/url type is chosen but the child input field is empty",
 				given: &model.FeedbackForm{
-					Type:        "A specific page",
+					Type:        mapper.ASpecificPage,
 					Description: "Some text",
 				},
 				expectedDescription: "a page/url validation error is returned",
@@ -387,7 +388,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the a specific page/url type is chosen and the url is invalid",
 				given: &model.FeedbackForm{
-					Type:        "A specific page",
+					Type:        mapper.ASpecificPage,
 					Description: "Some text",
 					URL:         "not a url",
 				},
@@ -405,7 +406,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the a specific page/url type is chosen and the url is valid but not allowed",
 				given: &model.FeedbackForm{
-					Type:        "A specific page",
+					Type:        mapper.ASpecificPage,
 					Description: "Some text",
 					URL:         "https://not-site-domain.com",
 				},
@@ -422,7 +423,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the a specific page/url type is chosen and the url is valid without a path",
 				given: &model.FeedbackForm{
-					Type:        "A specific page",
+					Type:        mapper.ASpecificPage,
 					Description: "Some text",
 					URL:         "https://cy.ons.gov.uk",
 				},
@@ -432,7 +433,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the a specific page/url type is chosen and the url is valid and has a path",
 				given: &model.FeedbackForm{
-					Type:        "A specific page",
+					Type:        mapper.ASpecificPage,
 					Description: "Some text",
 					URL:         "https://cy.ons.gov.uk/path",
 				},
@@ -440,9 +441,9 @@ func TestValidateForm(t *testing.T) {
 				expected:            []coreModel.ErrorItem(nil),
 			},
 			{
-				givenDescription: "the a whole site type is chosen but the child input for a specific page is not empty",
+				givenDescription: "the whole-site type is chosen but the child input for a specific page is not empty",
 				given: &model.FeedbackForm{
-					Type:        "Whole site",
+					Type:        mapper.WholeSite,
 					Description: "Some text",
 					URL:         "http://somewhere.com",
 				},
@@ -461,7 +462,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the form does not have any feedback",
 				given: &model.FeedbackForm{
-					Type: "Whole site",
+					Type: mapper.WholeSite,
 				},
 				expectedDescription: "a description validation error is returned",
 				expected: []coreModel.ErrorItem{
@@ -477,7 +478,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the feedback provided is whitespace",
 				given: &model.FeedbackForm{
-					Type:        "Whole site",
+					Type:        mapper.WholeSite,
 					Description: " ",
 				},
 				expectedDescription: "a description validation error is returned",
@@ -494,7 +495,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the email field has an invalid email address",
 				given: &model.FeedbackForm{
-					Type:        "Whole site",
+					Type:        mapper.WholeSite,
 					Description: "A description",
 					Email:       "a.string",
 				},
@@ -512,7 +513,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "the email field has a valid email address",
 				given: &model.FeedbackForm{
-					Type:        "Whole site",
+					Type:        mapper.WholeSite,
 					Description: "A description",
 					Email:       "hello@world.com",
 				},
@@ -522,7 +523,7 @@ func TestValidateForm(t *testing.T) {
 			{
 				givenDescription: "multiple form validation errors",
 				given: &model.FeedbackForm{
-					Type:        "A specific page",
+					Type:        mapper.ASpecificPage,
 					URL:         "",
 					Description: "",
 					Email:       "not an email address",

@@ -3,6 +3,7 @@ package mapper
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mocks"
@@ -105,8 +106,8 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 			bp := core.Page{}
 			url := "https://localhost/a/page/somewhere"
 			lang := "en"
-			wholeSite := "https://ons.gov.uk"
-			sut := CreateGetFeedbackThanks(req, bp, lang, url, wholeSite)
+			wholeSiteURL := "https://ons.gov.uk"
+			sut := CreateGetFeedbackThanks(req, bp, lang, url, wholeSiteURL)
 
 			Convey("Then it sets the page metadata", func() {
 				So(sut.Metadata.Title, ShouldEqual, "Thank you")
@@ -123,16 +124,28 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 			})
 		})
 
-		Convey("When the return to parameter is set", func() {
-			req := httptest.NewRequest(http.MethodGet, "/?returnTo=Whole%20site", nil)
-			bp := core.Page{}
-			url := "https://localhost/a/page/somewhere"
-			lang := "en"
-			wholeSite := "https://ons.gov.uk"
-			sut := CreateGetFeedbackThanks(req, bp, lang, url, wholeSite)
+		var (
+			referrer     = "https://any.localhost/a/page/somewhere"
+			lang         = "en"
+			wholeSiteURL = "https://cy.localhost"
+			encWholeSite = url.QueryEscape(WholeSite)
+			bp           = core.Page{}
+		)
 
-			Convey("Then it sets the returnTo property", func() {
-				So(sut.ReturnTo, ShouldEqual, wholeSite)
+		Convey("When the returnTo parameter is set to whole-site and whole-site is explicit", func() {
+			req := httptest.NewRequest(http.MethodGet, "/?returnTo="+encWholeSite, nil)
+			sut := CreateGetFeedbackThanks(req, bp, lang, referrer, wholeSiteURL)
+
+			Convey("Then it sets the returnTo property to the whole-site", func() {
+				So(sut.ReturnTo, ShouldEqual, wholeSiteURL)
+			})
+		})
+		Convey("When the returnTo parameter is set to whole-site but whole-site is not explicit", func() {
+			req := httptest.NewRequest(http.MethodGet, "/?returnTo="+encWholeSite, nil)
+			sut := CreateGetFeedbackThanks(req, bp, lang, referrer, "")
+
+			Convey("Then it sets the returnTo property to the default whole-site", func() {
+				So(sut.ReturnTo, ShouldEqual, "https://www.ons.gov.uk")
 			})
 		})
 	})
