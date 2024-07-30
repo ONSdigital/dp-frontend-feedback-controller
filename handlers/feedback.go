@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
@@ -145,7 +144,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 			ff.IsURLErr = true
 
 		} else {
-			if !config.IsSiteDomainURL(ff.URL, siteDomain) {
+			if !mapper.IsSiteDomainURL(ff.URL, siteDomain) {
 				validationErrors = append(validationErrors, core.ErrorItem{
 					Description: core.Localisation{
 						LocaleKey: "FeedbackValidURL",

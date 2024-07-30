@@ -1,8 +1,6 @@
 package config
 
 import (
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -89,27 +87,4 @@ func get() (*Config, error) {
 	}
 
 	return cfg, envconfig.Process("", cfg)
-}
-
-// IsSiteDomainURL is true when urlString is a URL and its host ends with `.`+siteDomain (when siteDomain is blank, uses cfg.SiteDomain)
-func IsSiteDomainURL(urlString, siteDomain string) bool {
-	if urlString == "" {
-		return false
-	}
-	if siteDomain == "" {
-		siteDomain = cfg.SiteDomain
-	}
-	if !strings.HasPrefix(urlString, "http") {
-		// user may enter a URL without a scheme (e.g. `host/path`), so add it before parsing
-		urlString = "https://" + urlString
-	}
-	urlObject, err := url.ParseRequestURI(urlString)
-	if err != nil {
-		return false
-	}
-	hostName := urlObject.Hostname()
-	if hostName != siteDomain && !strings.HasSuffix(hostName, "."+siteDomain) {
-		return false
-	}
-	return true
 }

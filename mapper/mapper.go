@@ -3,6 +3,8 @@ package mapper
 import (
 	"html"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
@@ -14,6 +16,8 @@ const (
 	WholeSite     = "The whole website"
 	ASpecificPage = "A specific page"
 )
+
+var cfg *config.Config
 
 // CreateGetFeedback returns a mapped feedback page to the feedback model
 func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors []core.ErrorItem, ff model.FeedbackForm, lang string) model.Feedback {
@@ -224,11 +228,46 @@ func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, referr
 		returnTo = wholeSiteURL
 	} else if returnTo == "" {
 		returnTo = referrer
-	} else if !config.IsSiteDomainURL(returnTo, "") {
+	} else if IsSiteDomainURL(returnTo, "") {
+		returnTo = NormaliseURL(returnTo)
+	} else {
 		returnTo = referrer
 	}
 
 	p.ReturnTo = returnTo
 
 	return p
+}
+
+// IsSiteDomainURL is true when urlString is a URL and its host ends with `.`+siteDomain (when siteDomain is blank, or uses config.SiteDomain)
+func IsSiteDomainURL(urlString, siteDomain string) bool {
+	if urlString == "" {
+		return false
+	}
+	urlString = NormaliseURL(urlString)
+	urlObject, err := url.ParseRequestURI(urlString)
+	if err != nil {
+		return false
+	}
+	if siteDomain == "" {
+		if cfg == nil {
+			if cfg, err = config.Get(); err != nil {
+				return false
+			}
+		}
+		siteDomain = cfg.SiteDomain
+	}
+	hostName := urlObject.Hostname()
+	if hostName != siteDomain && !strings.HasSuffix(hostName, "."+siteDomain) {
+		return false
+	}
+	return true
+}
+
+// NormaliseURL when a string is a URL without a scheme (e.g. `host.name/path`), add it (`https://`)
+func NormaliseURL(urlString string) string {
+	if strings.HasPrefix(urlString, "http") {
+		return urlString
+	}
+	return "https://" + urlString
 }

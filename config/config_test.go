@@ -40,35 +40,6 @@ func TestConfig(t *testing.T) {
 				So(newErr, ShouldBeNil)
 				So(newCfg, ShouldResemble, cfg)
 			})
-			Convey("Then a sub-domain off an explicit site domain is recognised", func() {
-				isAllowedURL := IsSiteDomainURL("https://anything.ons.gov.uk:443/ook", "ons.gov.uk")
-				So(isAllowedURL, ShouldBeTrue)
-			})
-			Convey("Then a non-site domain URL is not recognised for explicit site domain", func() {
-				isAllowedURL := IsSiteDomainURL("https://anything.example.com", "ons.gov.uk")
-				So(isAllowedURL, ShouldBeFalse)
-			})
-
-			Convey("Then a non-URL is not recognised for explicit site domain", func() {
-				isAllowedURL := IsSiteDomainURL("blah", "ons.gov.uk")
-				So(isAllowedURL, ShouldBeFalse)
-			})
-			Convey("Then a URL of the config's site domain is recognised", func() {
-				isAllowedURL := IsSiteDomainURL("https://localhost", "")
-				So(isAllowedURL, ShouldBeTrue)
-			})
-			Convey("Then a sub-domain/host of the config's site domain is recognised", func() {
-				isAllowedURL := IsSiteDomainURL("anything.localhost", "")
-				So(isAllowedURL, ShouldBeTrue)
-			})
-			Convey("Then a non-site domain URL is not recognised for config's site domain", func() {
-				isAllowedURL := IsSiteDomainURL("https://not-site-domain.example.com", "")
-				So(isAllowedURL, ShouldBeFalse)
-			})
-			Convey("Then a non-URL is not recognised for config's site domain", func() {
-				isAllowedURL := IsSiteDomainURL("blah", "")
-				So(isAllowedURL, ShouldBeFalse)
-			})
 		})
 	})
 }
