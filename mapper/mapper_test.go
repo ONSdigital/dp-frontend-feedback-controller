@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -146,6 +147,88 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 
 			Convey("Then it sets the returnTo property to the default whole-site", func() {
 				So(sut.ReturnTo, ShouldEqual, "https://www.ons.gov.uk")
+			})
+		})
+	})
+}
+
+func TestURLFunctions(t *testing.T) {
+	Convey("Given the IsSiteDomainURL functions", t, func() {
+
+		type testSiteDomainStruct struct {
+			name      string
+			pageURL   string
+			siteURL   string
+			isAllowed bool
+		}
+		tests := []testSiteDomainStruct{
+			{
+				"sub-domain off an explicit site domain",
+				"https://anything.ons.gov.uk:443/ook",
+				"ons.gov.uk",
+				true,
+			},
+			{
+				"non-site domain URL is not recognised for explicit site domain",
+				"https://anything.example.com",
+				"ons.gov.uk",
+				false,
+			},
+			{
+				"non-URL is not recognised for explicit site domain",
+				"blah",
+				"ons.gov.uk",
+				false,
+			},
+			{
+				"URL of the config's site domain is recognised",
+				"https://localhost",
+				"",
+				true,
+			},
+			{
+				"sub-domain/host of the config's site domain is recognised",
+				"anything.localhost",
+				"",
+				true,
+			},
+			{
+				"non-site domain URL is not recognised for config's site domain",
+				"https://not-site-domain.example.com",
+				"",
+				false,
+			},
+			{
+				"non-URL is not recognised for config's site domain",
+				"blah",
+				"",
+				false,
+			},
+		}
+		// test IsSiteDomainURL
+		for _, check := range tests {
+			Convey("When "+check.name, func() {
+				allowedStr := fmt.Sprint(check.isAllowed)
+				Convey("Then "+check.name+" is "+allowedStr, func() {
+					isAllowedURL := IsSiteDomainURL(check.pageURL, check.siteURL)
+					So(isAllowedURL, ShouldEqual, check.isAllowed)
+				})
+			})
+		}
+
+		// test NormaliseURL
+		Convey("When given a normal URL", func() {
+			origURL := "http://is.url"
+			normalURL := NormaliseURL(origURL)
+			Convey("Then it returns as itself", func() {
+				So(normalURL, ShouldEqual, origURL)
+			})
+		})
+		Convey("When given a user-typed URL", func() {
+			origURL := "is.url/path"
+			normalURL := NormaliseURL(origURL)
+			Convey("Then it is normalised with `https://`", func() {
+				So(normalURL, ShouldEqual, `https://`+origURL)
 			})
 		})
 	})
