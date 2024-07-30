@@ -10,6 +10,11 @@ import (
 	core "github.com/ONSdigital/dp-renderer/v2/model"
 )
 
+const (
+	WholeSite     = "The whole website"
+	ASpecificPage = "A specific page"
+)
+
 // CreateGetFeedback returns a mapped feedback page to the feedback model
 func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors []core.ErrorItem, ff model.FeedbackForm, lang string) model.Feedback {
 	p := model.Feedback{
@@ -59,25 +64,25 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 			{
 				Input: core.Input{
 					ID:        "whole-site",
-					IsChecked: ff.Type == "The whole website",
+					IsChecked: ff.Type == WholeSite,
 					Label: core.Localisation{
 						LocaleKey: "FeedbackWholeWebsite",
 						Plural:    1,
 					},
 					Name:  "type",
-					Value: "The whole website",
+					Value: WholeSite,
 				},
 			},
 			{
 				Input: core.Input{
 					ID:        "specific-page",
-					IsChecked: ff.Type == "A specific page" || (ff.URL != "" && serviceDescription == ""),
+					IsChecked: ff.Type == ASpecificPage || (ff.URL != "" && serviceDescription == ""),
 					Label: core.Localisation{
 						LocaleKey: "FeedbackASpecificPage",
 						Plural:    1,
 					},
 					Name:  "type",
-					Value: "A specific page",
+					Value: ASpecificPage,
 				},
 				OtherInput: core.Input{
 					Autocomplete: "url",
@@ -196,24 +201,27 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 	return p
 }
 
-func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, referrer, wholeSite string) model.Feedback {
-	p := model.Feedback{
-		Page: basePage,
+func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, referrer, wholeSiteURL string) model.Feedback {
+	if wholeSiteURL == "" {
+		wholeSiteURL = "https://www.ons.gov.uk"
 	}
 	if referrer == "" {
-		referrer = wholeSite
+		referrer = wholeSiteURL
 	}
 
+	p := model.Feedback{
+		Page:        basePage,
+		PreviousURL: referrer,
+	}
 	p.Language = lang
 	p.Type = "feedback"
 	p.URI = req.URL.Path
 	p.Metadata.Title = helper.Localise("FeedbackThanks", lang, 1)
-	p.PreviousURL = referrer
 
 	// returnTo is rendered on page so needs XSS protection
 	returnTo := html.EscapeString(req.URL.Query().Get("returnTo"))
-	if returnTo == "Whole site" {
-		returnTo = wholeSite
+	if returnTo == WholeSite {
+		returnTo = wholeSiteURL
 	} else if returnTo == "" {
 		returnTo = referrer
 	} else if !config.IsSiteDomainURL(returnTo, "") {

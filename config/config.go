@@ -99,6 +99,10 @@ func IsSiteDomainURL(urlString, siteDomain string) bool {
 	if siteDomain == "" {
 		siteDomain = cfg.SiteDomain
 	}
+	if !strings.HasPrefix(urlString, "http") {
+		// user may enter a URL without a scheme (e.g. `host/path`), so add it before parsing
+		urlString = "https://" + urlString
+	}
 	urlObject, err := url.ParseRequestURI(urlString)
 	if err != nil {
 		return false

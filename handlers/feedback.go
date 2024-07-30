@@ -96,7 +96,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 	}
 
 	if ff.URL == "" {
-		ff.URL = "Whole site"
+		ff.URL = mapper.WholeSite
 	}
 
 	if err := emailSender.Send(
@@ -111,7 +111,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 
 	returnTo := ff.URL
 
-	if returnTo == "Whole site" || returnTo == "" {
+	if returnTo == mapper.WholeSite || returnTo == "" {
 		returnTo = "https://www.ons.gov.uk"
 	}
 
@@ -133,7 +133,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 	}
 
 	ff.URL = strings.TrimSpace(ff.URL)
-	if ff.Type == "A specific page" {
+	if ff.Type == mapper.ASpecificPage {
 		if ff.URL == "" {
 			validationErrors = append(validationErrors, core.ErrorItem{
 				Description: core.Localisation{
@@ -156,9 +156,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 				ff.IsURLErr = true
 			}
 		}
-	}
-
-	if ff.Type != "A specific page" && ff.URL != "" {
+	} else if ff.Type != mapper.ASpecificPage && ff.URL != "" {
 		ff.URL = ""
 	}
 
