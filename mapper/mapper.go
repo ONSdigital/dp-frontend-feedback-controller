@@ -3,11 +3,21 @@ package mapper
 import (
 	"html"
 	"net/http"
+	"net/url"
+	"strings"
 
+	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	"github.com/ONSdigital/dp-renderer/v2/helper"
 	core "github.com/ONSdigital/dp-renderer/v2/model"
 )
+
+const (
+	WholeSite     = "The whole website"
+	ASpecificPage = "A specific page"
+)
+
+var cfg *config.Config
 
 // CreateGetFeedback returns a mapped feedback page to the feedback model
 func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors []core.ErrorItem, ff model.FeedbackForm, lang string) model.Feedback {
@@ -58,25 +68,25 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 			{
 				Input: core.Input{
 					ID:        "whole-site",
-					IsChecked: ff.Type == "The whole website",
+					IsChecked: ff.Type == WholeSite,
 					Label: core.Localisation{
 						LocaleKey: "FeedbackWholeWebsite",
 						Plural:    1,
 					},
 					Name:  "type",
-					Value: "The whole website",
+					Value: WholeSite,
 				},
 			},
 			{
 				Input: core.Input{
 					ID:        "specific-page",
-					IsChecked: ff.Type == "A specific page" || (ff.URL != "" && serviceDescription == ""),
+					IsChecked: ff.Type == ASpecificPage || (ff.URL != "" && serviceDescription == ""),
 					Label: core.Localisation{
 						LocaleKey: "FeedbackASpecificPage",
 						Plural:    1,
 					},
 					Name:  "type",
-					Value: "A specific page",
+					Value: ASpecificPage,
 				},
 				OtherInput: core.Input{
 					Autocomplete: "url",
@@ -195,26 +205,69 @@ func CreateGetFeedback(req *http.Request, basePage core.Page, validationErrors [
 	return p
 }
 
-func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, url, wholeSite string) model.Feedback {
-	p := model.Feedback{
-		Page: basePage,
+func CreateGetFeedbackThanks(req *http.Request, basePage core.Page, lang, referrer, wholeSiteURL string) model.Feedback {
+	if wholeSiteURL == "" {
+		wholeSiteURL = "https://www.ons.gov.uk"
+	}
+	if referrer == "" {
+		referrer = wholeSiteURL
 	}
 
+	p := model.Feedback{
+		Page:        basePage,
+		PreviousURL: referrer,
+	}
 	p.Language = lang
 	p.Type = "feedback"
 	p.URI = req.URL.Path
 	p.Metadata.Title = helper.Localise("FeedbackThanks", lang, 1)
-	p.PreviousURL = url
 
 	// returnTo is rendered on page so needs XSS protection
 	returnTo := html.EscapeString(req.URL.Query().Get("returnTo"))
-	if returnTo == "Whole site" {
-		returnTo = wholeSite
+	if returnTo == WholeSite {
+		returnTo = wholeSiteURL
 	} else if returnTo == "" {
-		returnTo = url
+		returnTo = referrer
+	} else if IsSiteDomainURL(returnTo, "") {
+		returnTo = NormaliseURL(returnTo)
+	} else {
+		returnTo = referrer
 	}
 
 	p.ReturnTo = returnTo
 
 	return p
+}
+
+// IsSiteDomainURL is true when urlString is a URL and its host ends with `.`+siteDomain (when siteDomain is blank, or uses config.SiteDomain)
+func IsSiteDomainURL(urlString, siteDomain string) bool {
+	if urlString == "" {
+		return false
+	}
+	urlString = NormaliseURL(urlString)
+	urlObject, err := url.ParseRequestURI(urlString)
+	if err != nil {
+		return false
+	}
+	if siteDomain == "" {
+		if cfg == nil {
+			if cfg, err = config.Get(); err != nil {
+				return false
+			}
+		}
+		siteDomain = cfg.SiteDomain
+	}
+	hostName := urlObject.Hostname()
+	if hostName != siteDomain && !strings.HasSuffix(hostName, "."+siteDomain) {
+		return false
+	}
+	return true
+}
+
+// NormaliseURL when a string is a URL without a scheme (e.g. `host.name/path`), add it (`https://`)
+func NormaliseURL(urlString string) string {
+	if strings.HasPrefix(urlString, "http") {
+		return urlString
+	}
+	return "https://" + urlString
 }

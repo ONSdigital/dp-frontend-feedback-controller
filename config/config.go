@@ -40,6 +40,10 @@ var cfg *Config
 // Get returns the default config with any modifications through environment
 // variables
 func Get() (*Config, error) {
+	if cfg != nil {
+		return cfg, nil
+	}
+
 	envCfg, err := get()
 	if err != nil {
 		return nil, err
@@ -50,14 +54,12 @@ func Get() (*Config, error) {
 	} else {
 		envCfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/e0a75c3"
 	}
-	return envCfg, nil
+
+	cfg = envCfg
+	return cfg, nil
 }
 
 func get() (*Config, error) {
-	if cfg != nil {
-		return cfg, nil
-	}
-
 	cfg := &Config{
 		APIRouterURL:                "http://localhost:23200/v1",
 		BindAddr:                    "localhost:25200",

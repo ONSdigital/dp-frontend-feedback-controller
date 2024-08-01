@@ -9,8 +9,8 @@ import (
 
 func TestConfig(t *testing.T) {
 	Convey("Given an environment with no environment variables set", t, func() {
-		cfg, err := Get()
 		Convey("When the config values are retrieved", func() {
+			cfg, err := Get()
 			Convey("Then there should be no error returned", func() {
 				So(err, ShouldBeNil)
 			})
