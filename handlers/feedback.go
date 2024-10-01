@@ -172,7 +172,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 	}
 
 	if len(ff.Email) > 0 {
-		if ok, err := regexp.MatchString(`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$`, ff.Email); !ok || err != nil {
+		if ok, err := regexp.MatchString("^[A-Za-z0-9.`!#$%&'*+-/=?^_{|}~]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", ff.Email); !ok || err != nil {
 			validationErrors = append(validationErrors, core.ErrorItem{
 				Description: core.Localisation{
 					LocaleKey: "FeedbackAlertEmail",
