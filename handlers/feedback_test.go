@@ -511,11 +511,67 @@ func TestValidateForm(t *testing.T) {
 				},
 			},
 			{
+				givenDescription: "the email field has an invalid special character in local part",
+				given: &model.FeedbackForm{
+					Type:        mapper.WholeSite,
+					Description: "A description",
+					Email:       "hello(world)@email.com",
+				},
+				expectedDescription: "an email validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackAlertEmail",
+							Plural:    1,
+						},
+						URL: "#email-error",
+					},
+				},
+			},
+			{
+				givenDescription: "the email field has invalid domain",
+				given: &model.FeedbackForm{
+					Type:        mapper.WholeSite,
+					Description: "A description",
+					Email:       "hello@email.c0m",
+				},
+				expectedDescription: "an email validation error is returned",
+				expected: []coreModel.ErrorItem{
+					{
+						Description: coreModel.Localisation{
+							LocaleKey: "FeedbackAlertEmail",
+							Plural:    1,
+						},
+						URL: "#email-error",
+					},
+				},
+			},
+			{
 				givenDescription: "the email field has a valid email address",
 				given: &model.FeedbackForm{
 					Type:        mapper.WholeSite,
 					Description: "A description",
 					Email:       "hello@world.com",
+				},
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "the email field is valid with special characters",
+				given: &model.FeedbackForm{
+					Type:        mapper.WholeSite,
+					Description: "A description",
+					Email:       "hello.hello'world@email.com",
+				},
+				expectedDescription: "no validation errors are returned",
+				expected:            []coreModel.ErrorItem(nil),
+			},
+			{
+				givenDescription: "the email field is valid with RFC 3696 special characters",
+				given: &model.FeedbackForm{
+					Type:        mapper.WholeSite,
+					Description: "A description",
+					Email:       "hello.`!#$%&'*+-/=?^_{|}world@email.com",
 				},
 				expectedDescription: "no validation errors are returned",
 				expected:            []coreModel.ErrorItem(nil),
