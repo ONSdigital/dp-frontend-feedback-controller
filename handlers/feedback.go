@@ -5,10 +5,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
+	feedbackAPIModel "github.com/ONSdigital/dp-feedback-api/models"
+	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
@@ -72,6 +76,13 @@ func (f *Feedback) AddFeedback() http.HandlerFunc {
 
 func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang, siteDomain string, cacheService *cacheHelper.Helper) {
 	ctx := req.Context()
+	cfg, err := config.Get()
+
+	if err != nil {
+		log.Error(ctx, "unable to retrieve service configuration", err)
+		os.Exit(1)
+	}
+
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -98,14 +109,41 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		ff.URL = mapper.WholeSite
 	}
 
-	if err := emailSender.Send(
-		from,
-		[]string{to},
-		generateFeedbackMessage(ff, from, to),
-	); err != nil {
-		log.Error(ctx, "failed to send message", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	if cfg.FeedbackAPIEnabled {
+		feedbackAPIClient := feedbackAPI.New(cfg.FeedbackAPIURL)
+
+		isPageUsefulVal := true
+		isGeneralFeedbackVal := true
+
+		f := &feedbackAPIModel.Feedback{
+			IsPageUseful:      &isPageUsefulVal,
+			IsGeneralFeedback: &isGeneralFeedbackVal,
+			OnsURL:            "",
+			Feedback:          "",
+			Name:              "",
+			EmailAddress:      "",
+		}
+
+		opts := feedbackAPI.Options{}
+
+		err := feedbackAPIClient.PostFeedback(ctx, f, opts)
+
+		if err != nil {
+			statusCode := err.Status()
+			log.Error(ctx, "failed to provide feedback", err, log.Data{"code": statusCode})
+
+		}
+	} else {
+		if err := emailSender.Send(
+			from,
+			[]string{to},
+			generateFeedbackMessage(ff, from, to),
+		); err != nil {
+			log.Error(ctx, "failed to send message", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 	}
 
 	returnTo := ff.URL

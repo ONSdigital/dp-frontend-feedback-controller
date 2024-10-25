@@ -9,6 +9,7 @@ import (
 // Config represents service configuration for dp-frontend-feedback-controller
 type Config struct {
 	APIRouterURL                string         `envconfig:"API_ROUTER_URL"`
+	FeedbackAPIURL              string         `envconfig:"FEEDBACK_API_URL"`
 	BindAddr                    string         `envconfig:"BIND_ADDR"`
 	CacheUpdateInterval         *time.Duration `envconfig:"CACHE_UPDATE_INTERVAL"`
 	CensusTopicID               string         `envconfig:"CENSUS_TOPIC_ID"`
@@ -25,6 +26,7 @@ type Config struct {
 	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
 	IsPublishing                bool           `envconfig:"IS_PUBLISHING"`
+	FeedbackAPIEnabled          bool           `envconfig:"FEEDBACK_API"`
 	PatternLibraryAssetsPath    string         `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
@@ -62,6 +64,7 @@ func Get() (*Config, error) {
 func get() (*Config, error) {
 	cfg := &Config{
 		APIRouterURL:                "http://localhost:23200/v1",
+		FeedbackAPIURL:              "http://localhost:28600",
 		BindAddr:                    "localhost:25200",
 		CensusTopicID:               "4445",
 		Debug:                       false,
@@ -76,6 +79,7 @@ func get() (*Config, error) {
 		MailPassword:                "",
 		FeedbackTo:                  "to@gmail.com",
 		FeedbackFrom:                "from@gmail.com",
+		FeedbackAPIEnabled:          false,
 		IsPublishing:                false,
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",
