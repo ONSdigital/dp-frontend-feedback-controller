@@ -112,16 +112,16 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 	if cfg.FeedbackAPIEnabled {
 		feedbackAPIClient := feedbackAPI.New(cfg.FeedbackAPIURL)
 
-		isPageUsefulVal := true
+		isPageUsefulVal := false
 		isGeneralFeedbackVal := true
 
 		f := &feedbackAPIModel.Feedback{
 			IsPageUseful:      &isPageUsefulVal,
 			IsGeneralFeedback: &isGeneralFeedbackVal,
-			OnsURL:            "",
-			Feedback:          "",
-			Name:              "",
-			EmailAddress:      "",
+			OnsURL:            ff.URL,
+			Feedback:          ff.Description,
+			Name:              ff.Name,
+			EmailAddress:      ff.Email,
 		}
 
 		opts := feedbackAPI.Options{}
@@ -131,7 +131,8 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		if err != nil {
 			statusCode := err.Status()
 			log.Error(ctx, "failed to provide feedback", err, log.Data{"code": statusCode})
-
+			// TODO Add error or handle API failure
+			return
 		}
 	} else {
 		if err := emailSender.Send(
