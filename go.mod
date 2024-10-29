@@ -3,6 +3,7 @@ module github.com/ONSdigital/dp-frontend-feedback-controller
 go 1.22
 
 require (
+	github.com/ONSdigital/dp-feedback-api v0.2.0
 	github.com/ONSdigital/dp-frontend-cache-helper v0.3.0
 	github.com/ONSdigital/dp-healthcheck v1.6.3
 	github.com/ONSdigital/dp-net/v2 v2.11.2
@@ -26,7 +27,6 @@ require (
 	github.com/ONSdigital/dp-api-clients-go/v2 v2.260.0 // indirect
 	github.com/ONSdigital/dp-cache v0.3.0 // indirect
 	github.com/ONSdigital/dp-cookies v0.5.0 // indirect
-	github.com/ONSdigital/dp-feedback-api v0.2.0 // indirect
 	github.com/c2h5oh/datasize v0.0.0-20231215233829-aa82cc1e6500 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
