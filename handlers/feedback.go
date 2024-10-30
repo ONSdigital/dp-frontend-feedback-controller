@@ -124,7 +124,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 			EmailAddress:      ff.Email,
 		}
 
-		opts := feedbackAPI.Options{}
+		opts := feedbackAPI.Options{cfg.ServiceAuthToken}
 
 		err := feedbackAPIClient.PostFeedback(ctx, f, opts)
 
@@ -154,6 +154,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 	}
 
 	redirectURL := fmt.Sprintf("/feedback/thanks?returnTo=%s", returnTo)
+	// TODO: Why do we return 301
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 
