@@ -10,7 +10,6 @@ require (
 	github.com/ONSdigital/dp-otel-go v0.0.6
 	github.com/ONSdigital/dp-renderer/v2 v2.10.0
 	github.com/ONSdigital/dp-topic-api v0.22.0
-	github.com/ONSdigital/go-ns v0.0.0-20210916104633-ac1c1c52327e
 	github.com/ONSdigital/log.go/v2 v2.4.3
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1

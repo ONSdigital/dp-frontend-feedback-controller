@@ -12,10 +12,10 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/routes"
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
+	"github.com/ONSdigital/dp-net/v2/http"
 	dpotelgo "github.com/ONSdigital/dp-otel-go"
 	render "github.com/ONSdigital/dp-renderer/v2"
 	"github.com/ONSdigital/dp-renderer/v2/middleware/renderror"
-	"github.com/ONSdigital/go-ns/server"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -111,21 +111,21 @@ func main() {
 
 	healthcheck.Start(ctx)
 
-	var s *server.Server
+	var httpServer *http.Server
 
 	if cfg.OtelEnabled {
 		otelHandler := otelhttp.NewHandler(newAlice, "/")
-		s = server.New(cfg.BindAddr, otelHandler)
+		httpServer = http.NewServer(cfg.BindAddr, otelHandler)
 	} else {
-		s = server.New(cfg.BindAddr, newAlice)
+		httpServer = http.NewServer(cfg.BindAddr, newAlice)
 	}
 
-	s.HandleOSSignals = false
+	httpServer.HandleOSSignals = false
 
 	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
 	go func() {
-		if err := s.ListenAndServe(); err != nil {
+		if err := httpServer.ListenAndServe(); err != nil {
 			log.Error(ctx, "failed to start http listen and serve", err)
 			return
 		}
@@ -139,7 +139,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	log.Info(ctx, "shutting service down gracefully")
 	defer cancel()
-	if err := s.Server.Shutdown(ctx); err != nil {
+	if err := httpServer.Server.Shutdown(ctx); err != nil {
 		log.Error(ctx, "failed to shutdown http server", err)
 	}
 }
