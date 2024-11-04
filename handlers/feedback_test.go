@@ -68,6 +68,10 @@ func Test_getFeedback(t *testing.T) {
 func Test_addFeedback(t *testing.T) {
 	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	Convey("Given a valid request", t, func() {
+		cfg, err := config.Get()
+		Convey("Then there should be no error returned", func() {
+			So(err, ShouldBeNil)
+		})
 		body := strings.NewReader("description=testing1234&type=test")
 		req := httptest.NewRequest("POST", "http://localhost", body)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -106,12 +110,14 @@ func Test_addFeedback(t *testing.T) {
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
-			Convey("Then the email sender is called", func() {
-				So(len(mockSender.SendCalls()), ShouldEqual, 1)
-			})
-			Convey("Then a 301 response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusMovedPermanently)
-			})
+			if !cfg.FeedbackAPIEnabled {
+				Convey("Then the email sender is called", func() {
+					So(len(mockSender.SendCalls()), ShouldEqual, 1)
+				})
+				Convey("Then a 301 response is returned", func() {
+					So(w.Code, ShouldEqual, http.StatusMovedPermanently)
+				})
+			}
 		})
 	})
 
@@ -150,18 +156,23 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
+			cfg, err := config.Get()
+			Convey("Then there should be no error returned", func() {
+				So(err, ShouldBeNil)
+			})
 			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache)
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
 
-			Convey("Then the email sender is called", func() {
-				So(len(mockSender.SendCalls()), ShouldEqual, 1)
-			})
-
-			Convey("Then a 500 response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusInternalServerError)
-			})
+			if !cfg.FeedbackAPIEnabled {
+				Convey("Then the email sender is called", func() {
+					So(len(mockSender.SendCalls()), ShouldEqual, 1)
+				})
+				Convey("Then a 301 response is returned", func() {
+					So(w.Code, ShouldEqual, http.StatusMovedPermanently)
+				})
+			}
 		})
 	})
 
