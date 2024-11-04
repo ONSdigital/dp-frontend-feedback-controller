@@ -5,9 +5,12 @@ To allow users to provide feedback about the ONS website
 ## Getting started
 
 - Run `make debug`
+- Clone `dp-design-system`
+    - Run `npm run dev`
 
 ## Dependencies
 
+- dp-design-system - Serves CSS and JS for the page
 - No further dependencies other than those defined in `go.mod`
 
 ## Configuration

@@ -79,7 +79,7 @@ func get() (*Config, error) {
 		MailPassword:                "",
 		FeedbackTo:                  "to@gmail.com",
 		FeedbackFrom:                "from@gmail.com",
-		FeedbackAPIEnabled:          false,
+		FeedbackAPIEnabled:          true,
 		IsPublishing:                false,
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",

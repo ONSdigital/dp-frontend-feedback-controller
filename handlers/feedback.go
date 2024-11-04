@@ -124,14 +124,13 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 			EmailAddress:      ff.Email,
 		}
 
-		opts := feedbackAPI.Options{cfg.ServiceAuthToken}
+		opts := feedbackAPI.Options{AuthToken: cfg.ServiceAuthToken}
 
 		err := feedbackAPIClient.PostFeedback(ctx, f, opts)
 
 		if err != nil {
 			statusCode := err.Status()
 			log.Error(ctx, "failed to provide feedback", err, log.Data{"code": statusCode})
-			// TODO Add error or handle API failure
 			return
 		}
 	} else {
