@@ -25,6 +25,7 @@ func TestConfig(t *testing.T) {
 				So(cfg.MailPassword, ShouldEqual, "")
 				So(cfg.FeedbackTo, ShouldEqual, "to@gmail.com")
 				So(cfg.FeedbackFrom, ShouldEqual, "from@gmail.com")
+				So(cfg.FeedbackAPIEnabled, ShouldEqual, false)
 				So(cfg.SiteDomain, ShouldEqual, "localhost")
 				So(cfg.Debug, ShouldEqual, false)
 				So(cfg.SupportedLanguages, ShouldResemble, []string{"en", "cy"})
