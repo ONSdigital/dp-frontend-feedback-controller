@@ -26,7 +26,7 @@ type Config struct {
 	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
 	IsPublishing                bool           `envconfig:"IS_PUBLISHING"`
-	FeedbackAPIEnabled          bool           `envconfig:"FEEDBACK_API"`
+	EnableFeedbackAPI           bool           `envconfig:"ENABLE_FEEDBACK_API"`
 	PatternLibraryAssetsPath    string         `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
@@ -79,7 +79,7 @@ func get() (*Config, error) {
 		MailPassword:                "",
 		FeedbackTo:                  "to@gmail.com",
 		FeedbackFrom:                "from@gmail.com",
-		FeedbackAPIEnabled:          false,
+		EnableFeedbackAPI:           false,
 		IsPublishing:                false,
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",

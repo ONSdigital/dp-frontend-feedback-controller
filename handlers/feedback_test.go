@@ -110,7 +110,7 @@ func Test_addFeedback(t *testing.T) {
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
-			if !cfg.FeedbackAPIEnabled {
+			if !cfg.EnableFeedbackAPI {
 				Convey("Then the email sender is called", func() {
 					So(len(mockSender.SendCalls()), ShouldEqual, 1)
 				})
@@ -165,7 +165,7 @@ func Test_addFeedback(t *testing.T) {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
 
-			if !cfg.FeedbackAPIEnabled {
+			if !cfg.EnableFeedbackAPI {
 				Convey("Then the email sender is called", func() {
 					So(len(mockSender.SendCalls()), ShouldEqual, 1)
 				})

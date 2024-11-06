@@ -109,7 +109,7 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		ff.URL = mapper.WholeSite
 	}
 
-	if cfg.FeedbackAPIEnabled {
+	if cfg.EnableFeedbackAPI {
 		feedbackAPIClient := feedbackAPI.New(cfg.FeedbackAPIURL)
 
 		isPageUsefulVal := false
