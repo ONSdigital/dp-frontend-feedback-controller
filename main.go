@@ -12,7 +12,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/routes"
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
-	"github.com/ONSdigital/dp-net/v2/http"
+	dphttp "github.com/ONSdigital/dp-net/v2/http"
 	dpotelgo "github.com/ONSdigital/dp-otel-go"
 	render "github.com/ONSdigital/dp-renderer/v2"
 	"github.com/ONSdigital/dp-renderer/v2/middleware/renderror"
@@ -111,13 +111,13 @@ func main() {
 
 	healthcheck.Start(ctx)
 
-	var httpServer *http.Server
+	var s *dphttp.Server
 
 	if cfg.OtelEnabled {
 		otelHandler := otelhttp.NewHandler(newAlice, "/")
-		httpServer = http.NewServer(cfg.BindAddr, otelHandler)
+		s = dphttp.NewServer(cfg.BindAddr, otelHandler)
 	} else {
-		httpServer = http.NewServer(cfg.BindAddr, newAlice)
+		s = dphttp.NewServer(cfg.BindAddr, newAlice)
 	}
 
 	httpServer.HandleOSSignals = false
