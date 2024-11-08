@@ -120,12 +120,12 @@ func main() {
 		s = dphttp.NewServer(cfg.BindAddr, newAlice)
 	}
 
-	httpServer.HandleOSSignals = false
+	s.HandleOSSignals = false
 
 	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
 	go func() {
-		if err := httpServer.ListenAndServe(); err != nil {
+		if err := s.ListenAndServe(); err != nil {
 			log.Error(ctx, "failed to start http listen and serve", err)
 			return
 		}
@@ -139,7 +139,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	log.Info(ctx, "shutting service down gracefully")
 	defer cancel()
-	if err := httpServer.Server.Shutdown(ctx); err != nil {
+	if err := s.Server.Shutdown(ctx); err != nil {
 		log.Error(ctx, "failed to shutdown http server", err)
 	}
 }
