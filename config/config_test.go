@@ -23,6 +23,7 @@ func TestConfig(t *testing.T) {
 				So(cfg.MailPort, ShouldEqual, "1025")
 				So(cfg.MailUser, ShouldEqual, "")
 				So(cfg.MailPassword, ShouldEqual, "")
+				So(cfg.Encrypted, ShouldEqual, true)
 				So(cfg.FeedbackTo, ShouldEqual, "to@gmail.com")
 				So(cfg.FeedbackFrom, ShouldEqual, "from@gmail.com")
 				So(cfg.EnableFeedbackAPI, ShouldEqual, false)
