@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 
@@ -70,18 +69,12 @@ func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []co
 // AddFeedback handles a users feedback request
 func (f *Feedback) AddFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.Config.SiteDomain, f.CacheService)
+		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.Config.SiteDomain, f.CacheService, f.Config)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang, siteDomain string, cacheService *cacheHelper.Helper) {
+func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang, siteDomain string, cacheService *cacheHelper.Helper, cfg *config.Config) {
 	ctx := req.Context()
-	cfg, err := config.Get()
-
-	if err != nil {
-		log.Error(ctx, "unable to retrieve service configuration", err)
-		os.Exit(1)
-	}
 
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
@@ -105,15 +98,17 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		return
 	}
 
-	if ff.URL == "" {
-		ff.URL = mapper.WholeSite
-	}
-
 	if cfg.EnableFeedbackAPI {
-		feedbackAPIClient := feedbackAPI.New(cfg.FeedbackAPIURL)
+		feedbackAPIClient := feedbackAPI.New(cfg.APIRouterURL)
 
 		isPageUsefulVal := false
-		isGeneralFeedbackVal := true
+		var isGeneralFeedbackVal bool
+
+		if ff.Type == mapper.WholeSite {
+			isGeneralFeedbackVal = true
+		} else {
+			isGeneralFeedbackVal = false
+		}
 
 		f := &feedbackAPIModel.Feedback{
 			IsPageUseful:      &isPageUsefulVal,
@@ -143,7 +138,6 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
 	}
 
 	returnTo := ff.URL
@@ -153,7 +147,6 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 	}
 
 	redirectURL := fmt.Sprintf("/feedback/thanks?returnTo=%s", returnTo)
-	// TODO: Why do we return 301
 	http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 }
 
@@ -181,18 +174,15 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 				URL: "#type-error",
 			})
 			ff.IsURLErr = true
-
-		} else {
-			if !mapper.IsSiteDomainURL(ff.URL, siteDomain) {
-				validationErrors = append(validationErrors, core.ErrorItem{
-					Description: core.Localisation{
-						LocaleKey: "FeedbackValidURL",
-						Plural:    1,
-					},
-					URL: "#type-error",
-				})
-				ff.IsURLErr = true
-			}
+		} else if !mapper.IsSiteDomainURL(ff.URL, siteDomain) {
+			validationErrors = append(validationErrors, core.ErrorItem{
+				Description: core.Localisation{
+					LocaleKey: "FeedbackValidURL",
+					Plural:    1,
+				},
+				URL: "#type-error",
+			})
+			ff.IsURLErr = true
 		}
 	} else if ff.Type != mapper.ASpecificPage && ff.URL != "" {
 		ff.URL = ""

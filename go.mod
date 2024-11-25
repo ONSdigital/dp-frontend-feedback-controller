@@ -3,6 +3,7 @@ module github.com/ONSdigital/dp-frontend-feedback-controller
 go 1.23
 
 require (
+	github.com/ONSdigital/dp-api-clients-go/v2 v2.260.0
 	github.com/ONSdigital/dp-feedback-api v0.2.0
 	github.com/ONSdigital/dp-frontend-cache-helper v0.3.0
 	github.com/ONSdigital/dp-healthcheck v1.6.3
@@ -23,7 +24,6 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
-	github.com/ONSdigital/dp-api-clients-go/v2 v2.260.0 // indirect
 	github.com/ONSdigital/dp-cache v0.3.0 // indirect
 	github.com/ONSdigital/dp-cookies v0.5.0 // indirect
 	github.com/c2h5oh/datasize v0.0.0-20231215233829-aa82cc1e6500 // indirect
@@ -31,7 +31,6 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-chi/chi/v5 v5.0.8 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect

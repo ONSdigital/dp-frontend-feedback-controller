@@ -5,7 +5,7 @@ run:
   concurrency: 4
 
   # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 5m
+  timeout: 15m
 linters-settings:
   govet:
     shadow: true
@@ -14,14 +14,14 @@ linters-settings:
   gocyclo:
     min-complexity: 20
   gocognit:
-    min-complexity: 100
+    min-complexity: 40
   maligned:
     suggest-new: true
   dupl:
     threshold: 100
   goconst:
     min-len: 2
-    min-occurrences: 2
+    min-occurrences: 5
   misspell:
     locale: UK
   lll:
@@ -41,18 +41,24 @@ linters-settings:
       - ifElseChain
       - octalLiteral
       - hugeParam
-  funlen:
-  # lines: 100
-  # statements: 100
+  revive:
+    rules:
+      # disabled as parameter names are useful for context even when unused, especially in interface implementations
+      - name: unused-parameter
+        severity: warning
+        disabled: true
+    include:
+      - "**/*_test.go" # Specify test files to include
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
   disable-all: true
   enable:
-    - depguard
     - dogsled
+    - errcheck
     - gochecknoinits
+    - goconst
     - gocritic
     - gocyclo
     - gofmt
@@ -62,7 +68,10 @@ linters:
     - govet
     - ineffassign
     - nakedret
+    - nakedret
     - unconvert
+    - unused
+    - typecheck
     - whitespace
     - gocognit
     - prealloc
@@ -75,19 +84,13 @@ issues:
         - errcheck
         - dupl
         - gosec
-        - goconst
-        - revive
-        - gocritic
-        - ineffassign
-        - govet
-    - path: main.go
+    - path: main.go|service.go|component.go
       linters:
         - typecheck
+    # Allow dot import in test files for goconvey
+    - path: _test.go
+      text: "dot-imports"
+      linters:
+        - revive
+      source: "github.com/smartystreets/goconvey/convey"
   new: false
-
-# golangci.com configuration
-# https://github.com/golangci/golangci/wiki/Configuration
-service:
-  golangci-lint-version: 1.52.x # use the fixed version to not introduce new linters unexpectedly
-  prepare:
-    - echo "here I can run custom commands, but no preparation needed for this repo"

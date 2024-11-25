@@ -22,7 +22,7 @@ type Config struct {
 	MailUser                    string         `envconfig:"MAIL_USER"`
 	MailPassword                string         `envconfig:"MAIL_PASSWORD" json:"-"`
 	MailPort                    string         `envconfig:"MAIL_PORT"`
-	Encrypted                   bool           `envconfig:"MAIL_ENCRYPTION"`
+	MailEncrypted               bool           `envconfig:"MAIL_ENCRYPTION"`
 	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
 	IsPublishing                bool           `envconfig:"IS_PUBLISHING"`
@@ -76,10 +76,10 @@ func get() (*Config, error) {
 		MailPort:                    "1025",
 		MailUser:                    "",
 		MailPassword:                "",
-		Encrypted:                   true,
+		MailEncrypted:               true,
 		FeedbackTo:                  "to@gmail.com",
 		FeedbackFrom:                "from@gmail.com",
-		EnableFeedbackAPI:           true,
+		EnableFeedbackAPI:           false,
 		IsPublishing:                false,
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",

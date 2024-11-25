@@ -6,16 +6,20 @@ To allow users to provide feedback about the ONS website
 
 - Run `make debug`
 
+Run service in feedback stack:
+
+- Run [feedback stack](https://github.com/ONSdigital/dp-compose/tree/main/v2/stacks/feedback)
+
 ## Dependencies
 
 - dp-design-system - Serves CSS and JS for the page
-- Run a local mail server to receive feedback 
+- Run a local mail server to receive feedback if not running the feedback stack
 - No further dependencies other than those defined in `go.mod`
 
 ## Configuration
 
 | Environment variable           | Default                         | Description                                                                                                        |
-| ------------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+|--------------------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------------|
 | API_ROUTER_URL                 | <http://localhost:23200/v1>     | The URL of the [dp-api-router](https://github.com/ONSdigital/dp-api-router)                                        |
 | BIND_ADDR                      | localhost:25200                 | The host and port to bind to                                                                                       |
 | CENSUS_TOPIC_ID                | 4445                            | The census topic id                                                                                                |
@@ -39,7 +43,7 @@ To allow users to provide feedback about the ONS website
 | OTEL_EXPORTER_OTLP_ENDPOINT    | localhost:4317                  | Endpoint for OpenTelemetry service                                                                                 |
 | OTEL_SERVICE_NAME              | dp-frontend-feedback-controller | Label of service for OpenTelemetry service                                                                         |
 | OTEL_BATCH_TIMEOUT             | 5s                              | Timeout for OpenTelemetry                                                                                          |
-| OTEL_ENABLED                   | false                           | Feature flag to enable OpenTelemetry
+| OTEL_ENABLED                   | false                           | Feature flag to enable OpenTelemetry                                                                               |
 
 ## Contributing
 
