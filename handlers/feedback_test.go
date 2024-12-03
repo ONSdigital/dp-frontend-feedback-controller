@@ -27,15 +27,15 @@ import (
 )
 
 const siteDomain = "ons.gov.uk"
+const lang = "en"
 
 func Test_getFeedback(t *testing.T) {
 	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	Convey("Given a valid request", t, func() {
-		req := httptest.NewRequest("GET", "http://localhost", nil)
+		req := httptest.NewRequest("GET", "http://localhost", http.NoBody)
 		w := httptest.NewRecorder()
 		ff := model.FeedbackForm{}
 		ff.URL = "whatever"
-		lang := "en"
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
 			NewBasePageModelFunc: func() coreModel.Page {
@@ -74,7 +74,6 @@ func Test_addFeedback(t *testing.T) {
 		w := httptest.NewRecorder()
 		from := ""
 		to := ""
-		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -102,7 +101,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -122,7 +121,6 @@ func Test_addFeedback(t *testing.T) {
 		w := httptest.NewRecorder()
 		from := ""
 		to := ""
-		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -150,7 +148,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -166,11 +164,10 @@ func Test_addFeedback(t *testing.T) {
 	})
 
 	Convey("Given a request with invalid form data", t, func() {
-		req := httptest.NewRequest("POST", "http://localhost?!@£$@$£%£$%^^&^&*", nil)
+		req := httptest.NewRequest("POST", "http://localhost?!@£$@$£%£$%^^&^&*", http.NoBody)
 		w := httptest.NewRecorder()
 		from := ""
 		to := ""
-		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -198,7 +195,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
@@ -220,7 +217,6 @@ func Test_addFeedback(t *testing.T) {
 		w := httptest.NewRecorder()
 		from := ""
 		to := ""
-		lang := "en"
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -248,7 +244,7 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache)
+			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
@@ -264,10 +260,9 @@ func Test_addFeedback(t *testing.T) {
 
 func Test_feedbackThanks(t *testing.T) {
 	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
-	lang := "en"
 	config.Get() // need to seed config
 	Convey("Given a valid request", t, func() {
-		req := httptest.NewRequest("GET", "http://localhost", nil)
+		req := httptest.NewRequest("GET", "http://localhost", http.NoBody)
 		w := httptest.NewRecorder()
 		url := "www.test.com"
 
@@ -302,7 +297,7 @@ func Test_feedbackThanks(t *testing.T) {
 	})
 
 	Convey("Given a reflective XSS request", t, func() {
-		req := httptest.NewRequest("GET", "http://localhost?returnTo=<script>alert(1)</script>", nil)
+		req := httptest.NewRequest("GET", "http://localhost?returnTo=<script>alert(1)</script>", http.NoBody)
 		w := httptest.NewRecorder()
 		url := "https://www.referrer-test.com"
 		mockRenderer := &interfacestest.RendererMock{

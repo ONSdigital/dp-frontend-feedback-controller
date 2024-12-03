@@ -8,7 +8,10 @@ import (
 	"regexp"
 	"strings"
 
+	feedbackAPIModel "github.com/ONSdigital/dp-feedback-api/models"
+	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
@@ -66,12 +69,13 @@ func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []co
 // AddFeedback handles a users feedback request
 func (f *Feedback) AddFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.Config.SiteDomain, f.CacheService)
+		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.Config.SiteDomain, f.CacheService, f.Config)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang, siteDomain string, cacheService *cacheHelper.Helper) {
+func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang, siteDomain string, cacheService *cacheHelper.Helper, cfg *config.Config) {
 	ctx := req.Context()
+
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -94,18 +98,46 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		return
 	}
 
-	if ff.URL == "" {
-		ff.URL = mapper.WholeSite
-	}
+	if cfg.EnableFeedbackAPI {
+		feedbackAPIClient := feedbackAPI.New(cfg.APIRouterURL)
 
-	if err := emailSender.Send(
-		from,
-		[]string{to},
-		generateFeedbackMessage(ff, from, to),
-	); err != nil {
-		log.Error(ctx, "failed to send message", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		isPageUsefulVal := false
+		var isGeneralFeedbackVal bool
+
+		if ff.Type == mapper.WholeSite {
+			isGeneralFeedbackVal = true
+		} else {
+			isGeneralFeedbackVal = false
+		}
+
+		f := &feedbackAPIModel.Feedback{
+			IsPageUseful:      &isPageUsefulVal,
+			IsGeneralFeedback: &isGeneralFeedbackVal,
+			OnsURL:            ff.URL,
+			Feedback:          ff.Description,
+			Name:              ff.Name,
+			EmailAddress:      ff.Email,
+		}
+
+		opts := feedbackAPI.Options{AuthToken: cfg.ServiceAuthToken}
+
+		err := feedbackAPIClient.PostFeedback(ctx, f, opts)
+
+		if err != nil {
+			statusCode := err.Status()
+			log.Error(ctx, "failed to provide feedback", err, log.Data{"code": statusCode})
+			return
+		}
+	} else {
+		if err := emailSender.Send(
+			from,
+			[]string{to},
+			generateFeedbackMessage(ff, from, to),
+		); err != nil {
+			log.Error(ctx, "failed to send message", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
 	returnTo := ff.URL
@@ -142,18 +174,15 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 				URL: "#type-error",
 			})
 			ff.IsURLErr = true
-
-		} else {
-			if !mapper.IsSiteDomainURL(ff.URL, siteDomain) {
-				validationErrors = append(validationErrors, core.ErrorItem{
-					Description: core.Localisation{
-						LocaleKey: "FeedbackValidURL",
-						Plural:    1,
-					},
-					URL: "#type-error",
-				})
-				ff.IsURLErr = true
-			}
+		} else if !mapper.IsSiteDomainURL(ff.URL, siteDomain) {
+			validationErrors = append(validationErrors, core.ErrorItem{
+				Description: core.Localisation{
+					LocaleKey: "FeedbackValidURL",
+					Plural:    1,
+				},
+				URL: "#type-error",
+			})
+			ff.IsURLErr = true
 		}
 	} else if ff.Type != mapper.ASpecificPage && ff.URL != "" {
 		ff.URL = ""

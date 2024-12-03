@@ -20,14 +20,16 @@ import (
 
 // Setup registers routes for the service
 func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, rend *render.Render, hc health.HealthCheck, cacheService *cacheHelper.Helper) {
-	auth := smtp.PlainAuth(
-		"",
-		cfg.MailUser,
-		cfg.MailPassword,
-		cfg.MailHost,
-	)
-	if cfg.MailHost == "localhost" {
-		auth = unencryptedAuth{auth}
+	var auth smtp.Auth
+	if cfg.MailEncrypted {
+		auth = smtp.PlainAuth(
+			"",
+			cfg.MailUser,
+			cfg.MailPassword,
+			cfg.MailHost,
+		)
+	} else {
+		auth = smtp.CRAMMD5Auth(cfg.MailUser, cfg.MailPassword)
 	}
 	mailAddr := fmt.Sprintf("%s:%s", cfg.MailHost, cfg.MailPort)
 

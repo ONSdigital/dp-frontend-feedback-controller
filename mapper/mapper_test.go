@@ -18,7 +18,7 @@ func TestCreateGetFeedback(t *testing.T) {
 	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	Convey("Given a valid page request", t, func() {
 		Convey("When the parameters area valid", func() {
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 			bp := core.Page{}
 			validationErr := []core.ErrorItem{}
 			ff := model.FeedbackForm{}
@@ -52,7 +52,7 @@ func TestCreateGetFeedback(t *testing.T) {
 		})
 
 		Convey("When a valid service parameter is passed", func() {
-			req := httptest.NewRequest(http.MethodGet, "/?service=cmd", nil)
+			req := httptest.NewRequest(http.MethodGet, "/?service=cmd", http.NoBody)
 			bp := core.Page{}
 			validationErr := []core.ErrorItem{}
 			ff := model.FeedbackForm{}
@@ -66,7 +66,7 @@ func TestCreateGetFeedback(t *testing.T) {
 		})
 
 		Convey("When validation errors are passed", func() {
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 			bp := core.Page{}
 			lang := "en"
 			validationErr := []core.ErrorItem{
@@ -103,12 +103,12 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 	helper.InitialiseLocalisationsHelper(mocks.MockAssetFunction)
 	Convey("Given a valid page request", t, func() {
 		Convey("When the parameters area valid", func() {
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 			bp := core.Page{}
-			url := "https://localhost/a/page/somewhere"
+			pageURL := "https://localhost/a/page/somewhere"
 			lang := "en"
 			wholeSiteURL := "https://ons.gov.uk"
-			sut := CreateGetFeedbackThanks(req, bp, lang, url, wholeSiteURL)
+			sut := CreateGetFeedbackThanks(req, bp, lang, pageURL, wholeSiteURL)
 
 			Convey("Then it sets the page metadata", func() {
 				So(sut.Metadata.Title, ShouldEqual, "Thank you")
@@ -117,11 +117,11 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 			})
 
 			Convey("Then it sets the previousUrl property", func() {
-				So(sut.PreviousURL, ShouldEqual, url)
+				So(sut.PreviousURL, ShouldEqual, pageURL)
 			})
 
 			Convey("Then it sets the returnTo property", func() {
-				So(sut.ReturnTo, ShouldEqual, url)
+				So(sut.ReturnTo, ShouldEqual, pageURL)
 			})
 		})
 
@@ -134,7 +134,7 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 		)
 
 		Convey("When the returnTo parameter is set to whole-site and whole-site is explicit", func() {
-			req := httptest.NewRequest(http.MethodGet, "/?returnTo="+encWholeSite, nil)
+			req := httptest.NewRequest(http.MethodGet, "/?returnTo="+encWholeSite, http.NoBody)
 			sut := CreateGetFeedbackThanks(req, bp, lang, referrer, wholeSiteURL)
 
 			Convey("Then it sets the returnTo property to the whole-site", func() {
@@ -142,7 +142,7 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 			})
 		})
 		Convey("When the returnTo parameter is set to whole-site but whole-site is not explicit", func() {
-			req := httptest.NewRequest(http.MethodGet, "/?returnTo="+encWholeSite, nil)
+			req := httptest.NewRequest(http.MethodGet, "/?returnTo="+encWholeSite, http.NoBody)
 			sut := CreateGetFeedbackThanks(req, bp, lang, referrer, "")
 
 			Convey("Then it sets the returnTo property to the default whole-site", func() {
@@ -154,7 +154,6 @@ func TestCreateGetFeedbackThanks(t *testing.T) {
 
 func TestURLFunctions(t *testing.T) {
 	Convey("Given the IsSiteDomainURL functions", t, func() {
-
 		type testSiteDomainStruct struct {
 			name      string
 			pageURL   string

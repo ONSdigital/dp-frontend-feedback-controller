@@ -7,6 +7,9 @@ RUN GOBIN=/bin go install github.com/cespare/reflex@v0.3.1
 RUN GOBIN=/bin go install github.com/kevinburke/go-bindata/v4/...@v4.0.2
 RUN PATH=$PATH:/bin
 
+# Prevent git dubious ownership error
+RUN git config --global --add safe.directory /go
+
 # Clean cache, as we want all modules in the container to be under /go/.go/path
 RUN go clean -modcache
 
