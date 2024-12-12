@@ -80,9 +80,6 @@ func main() {
 	}
 
 	healthcheck := health.New(versionInfo, cfg.HealthCheckCriticalTimeout, cfg.HealthCheckInterval)
-	if err = registerCheckers(ctx, &healthcheck); err != nil {
-		os.Exit(1)
-	}
 
 	cacheConfig := cacheHelper.Config{
 		APIRouterURL:                cfg.APIRouterURL,
@@ -95,11 +92,11 @@ func main() {
 		ServiceAuthToken:            cfg.ServiceAuthToken,
 	}
 
-	svcErrors := make(chan error, 0)
-	cacheService, err := cacheHelper.Init(ctx, cacheConfig)
+	svcErrors := make(chan error)
+	cacheService, _ := cacheHelper.Init(ctx, cacheConfig)
 	cacheService.RunUpdates(ctx, svcErrors)
 
-	//nolint:typecheck
+	//nolint:typecheck // ignore typecheck as make command moves assets
 	rend := render.NewWithDefaultClient(assets.Asset, assets.AssetNames, cfg.PatternLibraryAssetsPath, cfg.SiteDomain)
 
 	middleware := []alice.Constructor{
@@ -142,9 +139,4 @@ func main() {
 	if err := s.Server.Shutdown(ctx); err != nil {
 		log.Error(ctx, "failed to shutdown http server", err)
 	}
-}
-
-func registerCheckers(ctx context.Context, h *health.HealthCheck) (err error) {
-	// TODO ADD HEALTH CHECKS HERE
-	return
 }
