@@ -31,8 +31,6 @@ type Check struct {
 }
 
 func (c *FeedbackComponent) RegisterSteps(ctx *godog.ScenarioContext) {
-	c.uiFeature.RegisterSteps(ctx)
-
 	ctx.Step(`^the feedback controller is running$`, c.theFeedbackControllerIsRunning)
 	ctx.Step(`^I wait (\d+) seconds`, c.delayTimeBySeconds)
 }
@@ -57,7 +55,7 @@ func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
 	svcErrors := make(chan error, 1)
 
 	c.StartTime = time.Now()
-	c.svc.Run(ctx, c.svc.Config, svcErrors)
+	c.svc.Run(ctx, svcErrors)
 	c.ServiceRunning = true
 
 	return nil

@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/assets"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/routes"
 	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
@@ -71,16 +70,8 @@ func (svc *Service) Init(ctx context.Context, cfg *config.Config, serviceList *E
 }
 
 // Run starts an initialised service
-func (svc *Service) Run(ctx context.Context, cfg *config.Config, svcErrors chan error) {
-	log.Info(ctx, "Starting service")
-
-	// Initialise render client
-	rend := render.NewWithDefaultClient(assets.Asset, assets.AssetNames, cfg.PatternLibraryAssetsPath, cfg.SiteDomain)
-
-	// Initialise router
-	r := mux.NewRouter()
-
-	routes.Setup(ctx, r, cfg, rend, svc.Health, svc.Cache)
+func (svc *Service) Run(ctx context.Context, svcErrors chan error) {
+	log.Info(ctx, "Starting service", log.Data{"config": svc.Config})
 
 	// Start healthcheck
 	svc.HealthCheck.Start(ctx)

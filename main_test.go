@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"io"
+	golog "log"
 	"os"
 	"testing"
 
 	componenttest "github.com/ONSdigital/dp-component-test"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/features/steps"
+	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
 )
@@ -21,20 +25,35 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 		os.Exit(1)
 	}
 
-	url := fmt.Sprintf("http://%s%s", component.Config.SiteDomain, component.Config.BindAddr)
+	url := fmt.Sprintf("http://localhost:25200")
+	// url := fmt.Sprintf("http://%s%s", component.Config.SiteDomain, component.Config.BindAddr)
 	uiFeature := componenttest.NewUIFeature(url)
 	uiFeature.RegisterSteps(ctx)
 
 	component.RegisterSteps(ctx)
-}
 
-func InitializeTestSuite(ctx *godog.TestSuiteContext) {
-	ctx.BeforeSuite(func() {
+	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+		uiFeature.Reset()
+		return ctx, nil
+	})
+
+	ctx.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
+		if err := component.Close(); err != nil {
+			log.Warn(context.Background(), "error closing component", log.FormatErrors([]error{err}))
+		}
+
+		return ctx, nil
 	})
 }
 
 func TestComponent(t *testing.T) {
 	if *componentFlag {
+		log.SetDestination(io.Discard, io.Discard)
+		golog.SetOutput(io.Discard)
+		defer func() {
+			log.SetDestination(os.Stdout, os.Stderr)
+			golog.SetOutput(os.Stdout)
+		}()
 
 		status := 0
 
@@ -45,10 +64,9 @@ func TestComponent(t *testing.T) {
 		}
 
 		status = godog.TestSuite{
-			Name:                 "feedback_tests",
-			ScenarioInitializer:  InitializeScenario,
-			TestSuiteInitializer: InitializeTestSuite,
-			Options:              &opts,
+			Name:                "feedback_tests",
+			ScenarioInitializer: InitializeScenario,
+			Options:             &opts,
 		}.Run()
 
 		fmt.Println("=================================")

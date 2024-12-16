@@ -13,6 +13,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	dphttp "github.com/ONSdigital/dp-net/v2/http"
+	"github.com/ONSdigital/log.go/v2/log"
 )
 
 const (
@@ -43,8 +44,7 @@ func NewFeedbackComponent() (*FeedbackComponent, error) {
 
 	ctx := context.Background()
 
-	c.svc.Run(ctx, c.svc.Config, c.errorChan)
-	c.ServiceRunning = true
+	log.Info(ctx, "configuration for component test", log.Data{"config": c.Config})
 
 	return c, nil
 }

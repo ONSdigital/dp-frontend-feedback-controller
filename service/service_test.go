@@ -238,7 +238,7 @@ func TestStart(t *testing.T) {
 		}
 
 		Convey("When service starts", func() {
-			svc.Run(ctx, cfg, svcErrors)
+			svc.Run(ctx, svcErrors)
 
 			Convey("Then healthcheck is started and HTTP server starts listening", func() {
 				So(len(hcMock.StartCalls()), ShouldEqual, 1)
@@ -275,7 +275,7 @@ func TestStart(t *testing.T) {
 			}
 
 			Convey("When service starts", func() {
-				svc.Run(ctx, cfg, svcErrors)
+				svc.Run(ctx, svcErrors)
 
 				Convey("Then service start fails and returns an error in the error channel", func() {
 					sErr := <-svcErrors
