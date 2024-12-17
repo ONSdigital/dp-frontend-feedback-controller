@@ -71,7 +71,6 @@ linters:
     - nakedret
     - unconvert
     - unused
-    - typecheck
     - whitespace
     - gocognit
     - prealloc
@@ -84,9 +83,6 @@ issues:
         - errcheck
         - dupl
         - gosec
-    - path: main.go|service.go|component.go
-      linters:
-        - typecheck
     # Allow dot import in test files for goconvey
     - path: _test.go
       text: "dot-imports"
