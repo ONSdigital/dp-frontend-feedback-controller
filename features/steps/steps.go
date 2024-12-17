@@ -2,12 +2,14 @@ package steps
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service/mocks"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	"github.com/ONSdigital/log.go/log"
+	"github.com/chromedp/chromedp"
 	"github.com/cucumber/godog"
 )
 
@@ -33,6 +35,8 @@ type Check struct {
 func (c *FeedbackComponent) RegisterSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the feedback controller is running$`, c.theFeedbackControllerIsRunning)
 	ctx.Step(`^I wait (\d+) seconds`, c.delayTimeBySeconds)
+	ctx.Step(`^I fill in input element "([^"]*)" with value "([^"]*)"$`, c.iFillInInputElementWithValue)
+	ctx.Step(`^I click the "([^"]*)" element$`, c.iClickElement)
 }
 
 func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
@@ -64,4 +68,29 @@ func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
 func (c *FeedbackComponent) delayTimeBySeconds(sec int) error {
 	time.Sleep(time.Duration(int64(sec)) * time.Second)
 	return nil
+}
+
+func (c *FeedbackComponent) iFillInInputElementWithValue(fieldSelector, value string) error {
+	jsScript := fmt.Sprintf(`document.querySelector('%s').value = '%s';`, fieldSelector, value)
+
+	err := chromedp.Run(c.Chrome.Ctx,
+		chromedp.Evaluate(jsScript, nil),
+	)
+	if err != nil {
+		return err
+	}
+
+	return c.ErrorFeature.StepError()
+}
+
+func (c *FeedbackComponent) iClickElement(buttonSelector string) error {
+	// if this doesn't work as expected, you might need a sleep after the click
+	err := chromedp.Run(c.Chrome.Ctx,
+		chromedp.Click(buttonSelector),
+	)
+	if err != nil {
+		return err
+	}
+
+	return c.ErrorFeature.StepError()
 }

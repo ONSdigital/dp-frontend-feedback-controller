@@ -26,6 +26,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	}
 
 	url := fmt.Sprintf("http://localhost:25200")
+	// TODO: Refactor BindAddr to just the :25200 instead of localhost:25200
 	// url := fmt.Sprintf("http://%s%s", component.Config.SiteDomain, component.Config.BindAddr)
 	uiFeature := componenttest.NewUIFeature(url)
 	uiFeature.RegisterSteps(ctx)
@@ -34,14 +35,6 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
 		uiFeature.Reset()
-		return ctx, nil
-	})
-
-	ctx.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
-		if err := component.Close(); err != nil {
-			log.Warn(context.Background(), "error closing component", log.FormatErrors([]error{err}))
-		}
-
 		return ctx, nil
 	})
 }

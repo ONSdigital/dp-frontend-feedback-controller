@@ -22,6 +22,7 @@ const (
 )
 
 type FeedbackComponent struct {
+	Chrome         componenttest.Chrome
 	Config         *config.Config
 	errorChan      chan error
 	ErrorFeature   componenttest.ErrorFeature
@@ -30,7 +31,7 @@ type FeedbackComponent struct {
 	ServiceRunning bool
 	StartTime      time.Time
 	svc            *service.Service
-	uiFeature      *componenttest.UIFeature
+	uiFeature      componenttest.UIFeature
 }
 
 func NewFeedbackComponent() (*FeedbackComponent, error) {
