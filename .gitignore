@@ -1,5 +1,9 @@
 /build
 assets/data.go
+assets/dist
+
+# Exclude coverage file
+coverage.txt
 
 # Mac
 .DS_Store

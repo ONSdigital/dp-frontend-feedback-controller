@@ -33,8 +33,8 @@ test: generate-prod
 
 .PHONY: test-component
 test-component:
-	exit
-
+	make generate-prod
+	go test -cover -tags 'production' -coverpkg=github.com/ONSdigital/dp-frontend-feedback-controller/... -component
 .PHONY: convey
 convey:
 	goconvey ./...
