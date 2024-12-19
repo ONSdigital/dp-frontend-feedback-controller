@@ -44,7 +44,7 @@ func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
 
 	initFunctions := &mocks.InitialiserMock{
 		DoGetHTTPServerFunc:   c.getHTTPServer,
-		DoGetHealthCheckFunc:  getHealthCheckOK,
+		DoGetHealthCheckFunc:  c.getHealthCheckOK,
 		DoGetHealthClientFunc: c.getHealthClient,
 	}
 

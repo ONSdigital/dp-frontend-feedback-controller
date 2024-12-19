@@ -11,6 +11,7 @@ import (
 	componenttest "github.com/ONSdigital/dp-component-test"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/service/mocks"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	dphttp "github.com/ONSdigital/dp-net/v2/http"
 	"github.com/ONSdigital/log.go/v2/log"
@@ -32,6 +33,7 @@ type FeedbackComponent struct {
 	StartTime      time.Time
 	svc            *service.Service
 	uiFeature      componenttest.UIFeature
+	svcList        *service.ExternalServiceList
 }
 
 func NewFeedbackComponent() (*FeedbackComponent, error) {
@@ -46,6 +48,20 @@ func NewFeedbackComponent() (*FeedbackComponent, error) {
 	ctx := context.Background()
 
 	log.Info(ctx, "configuration for component test", log.Data{"config": c.Config})
+
+	var err error
+
+	c.Config, err = config.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	initMock := &mocks.InitialiserMock{
+		DoGetHealthCheckFunc: c.DoGetHealthcheckOk,
+		DoGetHTTPServerFunc:  c.DoGetHTTPServer,
+	}
+
+	c.svcList = service.NewServiceList(initMock)
 
 	return c, nil
 }
@@ -96,7 +112,7 @@ func (c *FeedbackComponent) close(ctx context.Context) error {
 	return nil
 }
 
-func getHealthCheckOK(cfg *config.Config, _, _, _ string) (service.HealthChecker, error) {
+func (c *FeedbackComponent) getHealthCheckOK(cfg *config.Config, _, _, _ string) (service.HealthChecker, error) {
 	componentBuildTime := strconv.Itoa(int(time.Now().Unix()))
 	versionInfo, err := healthcheck.NewVersionInfo(componentBuildTime, gitCommitHash, appVersion)
 	if err != nil {
@@ -106,7 +122,22 @@ func getHealthCheckOK(cfg *config.Config, _, _, _ string) (service.HealthChecker
 	return &hc, nil
 }
 
+func (c *FeedbackComponent) DoGetHealthcheckOk(cfg *config.Config, buildTime, gitCommit, version string) (service.HealthChecker, error) {
+	versionInfo, err := healthcheck.NewVersionInfo(buildTime, gitCommit, version)
+	if err != nil {
+		return nil, err
+	}
+	hc := healthcheck.New(versionInfo, cfg.HealthCheckCriticalTimeout, cfg.HealthCheckInterval)
+	return &hc, nil
+}
+
 func (c *FeedbackComponent) getHTTPServer(bindAddr string, router http.Handler) service.HTTPServer {
+	c.HTTPServer.Addr = bindAddr
+	c.HTTPServer.Handler = router
+	return c.HTTPServer
+}
+
+func (c *FeedbackComponent) DoGetHTTPServer(bindAddr string, router http.Handler) service.HTTPServer {
 	c.HTTPServer.Addr = bindAddr
 	c.HTTPServer.Handler = router
 	return c.HTTPServer
