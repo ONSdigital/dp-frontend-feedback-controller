@@ -11,6 +11,7 @@ import (
 	"github.com/ONSdigital/log.go/log"
 	"github.com/chromedp/chromedp"
 	"github.com/cucumber/godog"
+	"github.com/stretchr/testify/assert"
 )
 
 // HealthCheckTest represents a test healthcheck struct that mimics the real healthcheck struct
@@ -35,6 +36,7 @@ type Check struct {
 func (c *FeedbackComponent) RegisterSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the feedback controller is running$`, c.theFeedbackControllerIsRunning)
 	ctx.Step(`^I wait (\d+) seconds`, c.delayTimeBySeconds)
+	ctx.Step(`^element "([^"]*)" should be visible$`, c.elementShouldBeVisible)
 	ctx.Step(`^I fill in input element "([^"]*)" with value "([^"]*)"$`, c.iFillInInputElementWithValue)
 	ctx.Step(`^I click the "([^"]*)" element$`, c.iClickElement)
 }
@@ -91,6 +93,25 @@ func (c *FeedbackComponent) iClickElement(buttonSelector string) error {
 	if err != nil {
 		return err
 	}
+
+	return c.ErrorFeature.StepError()
+}
+
+func (c *FeedbackComponent) RunWithTimeOut(timeout time.Duration, tasks chromedp.Tasks) chromedp.ActionFunc {
+	return func(ctx context.Context) error {
+		timeoutContext, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		return tasks.Do(timeoutContext)
+	}
+}
+
+func (c *FeedbackComponent) elementShouldBeVisible(elementSelector string) error {
+	err := chromedp.Run(c.Chrome.Ctx,
+		c.RunWithTimeOut(c.WaitTimeOut, chromedp.Tasks{
+			chromedp.WaitVisible(elementSelector),
+		}),
+	)
+	assert.Nil(c, err)
 
 	return c.ErrorFeature.StepError()
 }

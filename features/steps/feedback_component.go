@@ -32,8 +32,14 @@ type FeedbackComponent struct {
 	ServiceRunning bool
 	StartTime      time.Time
 	svc            *service.Service
-	uiFeature      componenttest.UIFeature
 	svcList        *service.ExternalServiceList
+	uiFeature      componenttest.UIFeature
+	WaitTimeOut    time.Duration
+}
+
+// Errorf implements assert.TestingT.
+func (c *FeedbackComponent) Errorf(format string, args ...interface{}) {
+	panic("unimplemented")
 }
 
 func NewFeedbackComponent() (*FeedbackComponent, error) {

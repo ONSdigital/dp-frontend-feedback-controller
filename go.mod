@@ -21,13 +21,14 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/go-bindata v3.24.0+incompatible
 	github.com/smartystreets/goconvey v1.8.1
-	github.com/stretchr/testify v1.8.4 // indirect
+	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.46.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1
 )
 
 require (
 	github.com/ONSdigital/log.go v1.1.0
+	github.com/chromedp/chromedp v0.9.1
 	github.com/maxcnunes/httpfake v1.2.4
 )
 
@@ -41,7 +42,6 @@ require (
 	github.com/c2h5oh/datasize v0.0.0-20231215233829-aa82cc1e6500 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/chromedp/cdproto v0.0.0-20230419194459-b5ff65bc57a3 // indirect
-	github.com/chromedp/chromedp v0.9.1 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/cucumber/gherkin/go/v26 v26.2.0 // indirect
 	github.com/cucumber/messages/go/v21 v21.0.1 // indirect
