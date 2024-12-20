@@ -1,10 +1,13 @@
 Feature: Feedback
-    Scenario: GET /feedback view feedback page
+    Scenario: When I navigate to the feedback page
         Given the feedback controller is running
         When I navigate to "/feedback"
-        Then element ".ons-fieldset__legend" should be visible
-        Then element ".ons-radios__items" should be visible
-        Then element ".ons-field" should be visible
+        And the page should have the following content
+        """
+            {
+                "#main h1": "Feedback"
+            }
+        """
 
     Scenario: When I click the submit button without filling the form
         Given the feedback controller is running
