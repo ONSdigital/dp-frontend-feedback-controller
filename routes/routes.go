@@ -53,13 +53,3 @@ func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, rend *render.
 	r.StrictSlash(true).Path("/feedback/thanks").Methods("GET").HandlerFunc(f.FeedbackThanks())
 	r.StrictSlash(true).Path("/feedback/thanks").Methods("POST").HandlerFunc(f.AddFeedback())
 }
-
-type unencryptedAuth struct {
-	smtp.Auth
-}
-
-func (a unencryptedAuth) Start(server *smtp.ServerInfo) (proto string, toServer []byte, err error) {
-	s := *server
-	s.TLS = true
-	return a.Auth.Start(&s)
-}

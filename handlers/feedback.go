@@ -200,7 +200,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 		ff.IsDescriptionErr = true
 	}
 
-	if len(ff.Email) > 0 {
+	if ff.Email != "" {
 		if ok, err := regexp.MatchString("^[A-Za-z0-9.`!#$%&'*+-/=?^_{|}~]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", ff.Email); !ok || err != nil {
 			validationErrors = append(validationErrors, core.ErrorItem{
 				Description: core.Localisation{
@@ -222,18 +222,18 @@ func generateFeedbackMessage(f model.FeedbackForm, from, to string) []byte {
 	b.WriteString(fmt.Sprintf("To: %s\n", to))
 	b.WriteString("Subject: Feedback received\n\n")
 
-	if len(f.Type) > 0 {
+	if f.Type != "" {
 		b.WriteString(fmt.Sprintf("Feedback Type: %s\n", f.Type))
 	}
 
 	b.WriteString(fmt.Sprintf("Page URL: %s\n", f.URL))
 	b.WriteString(fmt.Sprintf("Description: %s\n", f.Description))
 
-	if len(f.Name) > 0 {
+	if f.Name != "" {
 		b.WriteString(fmt.Sprintf("Name: %s\n", f.Name))
 	}
 
-	if len(f.Email) > 0 {
+	if f.Email != "" {
 		b.WriteString(fmt.Sprintf("Email address: %s\n", f.Email))
 	}
 
