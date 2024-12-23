@@ -25,9 +25,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 		os.Exit(1)
 	}
 
-	// TODO: Refactor BindAddr to just the :25200 instead of localhost:25200
-	url := fmt.Sprintf("http://localhost:25200")
-	// url := fmt.Sprintf("http://%s%s", component.Config.SiteDomain, component.Config.BindAddr)
+	url := fmt.Sprintf("http://%s%s", component.Config.SiteDomain, component.Config.BindAddr)
 	uiFeature := componenttest.NewUIFeature(url)
 	uiFeature.RegisterSteps(ctx)
 

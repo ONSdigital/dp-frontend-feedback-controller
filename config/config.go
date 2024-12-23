@@ -64,7 +64,7 @@ func Get() (*Config, error) {
 func get() (*Config, error) {
 	cfg := &Config{
 		APIRouterURL:                "http://localhost:23200/v1",
-		BindAddr:                    "localhost:25200",
+		BindAddr:                    ":25200",
 		CensusTopicID:               "4445",
 		Debug:                       false,
 		EnableCensusTopicSubsection: false,
