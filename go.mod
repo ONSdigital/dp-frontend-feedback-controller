@@ -3,45 +3,35 @@ module github.com/ONSdigital/dp-frontend-feedback-controller
 go 1.23
 
 require (
+	github.com/ONSdigital/dp-api-clients-go/v2 v2.262.0
 	github.com/ONSdigital/dp-component-test v0.15.0
 	github.com/ONSdigital/dp-feedback-api v0.3.1
 	github.com/ONSdigital/dp-frontend-cache-helper v0.4.0
 	github.com/ONSdigital/dp-healthcheck v1.6.3
 	github.com/ONSdigital/dp-net/v2 v2.12.0
 	github.com/ONSdigital/dp-otel-go v0.0.8
-	github.com/ONSdigital/dp-renderer v1.63.0
 	github.com/ONSdigital/dp-renderer/v2 v2.16.0
 	github.com/ONSdigital/dp-topic-api v0.25.0
 	github.com/ONSdigital/log.go/v2 v2.4.3
+	github.com/chromedp/chromedp v0.11.2
 	github.com/cucumber/godog v0.15.0
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
 	github.com/justinas/alice v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/go-bindata v3.24.0+incompatible
+	github.com/maxcnunes/httpfake v1.2.4
 	github.com/smartystreets/goconvey v1.8.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.10.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.57.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0
 )
 
 require (
-	github.com/ONSdigital/dp-api-clients-go/v2 v2.262.0
-	github.com/ONSdigital/log.go v1.1.0
-	github.com/chromedp/chromedp v0.11.2
-	github.com/maxcnunes/httpfake v1.2.4
-)
-
-require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/ONSdigital/dp-api-clients-go v1.43.0 // indirect
 	github.com/ONSdigital/dp-cache v0.4.0 // indirect
-)
-
-require (
 	github.com/ONSdigital/dp-cookies v0.5.0 // indirect
 	github.com/ONSdigital/dp-mongodb-in-memory v1.7.0 // indirect
-	github.com/ONSdigital/dp-net v1.5.0 // indirect
 	github.com/c2h5oh/datasize v0.0.0-20231215233829-aa82cc1e6500 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/chromedp/cdproto v0.0.0-20241208230723-d1c7de7e5dd2 // indirect

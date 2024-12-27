@@ -2,17 +2,15 @@ package steps
 
 import (
 	"context"
-	"fmt"
-	"time"
+		"time"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service/mocks"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/chromedp/chromedp"
 	"github.com/cucumber/godog"
-	"github.com/stretchr/testify/assert"
-)
+	)
 
 // HealthCheckTest represents a test healthcheck struct that mimics the real healthcheck struct
 type HealthCheckTest struct {
@@ -54,7 +52,7 @@ func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
 
 	c.svc = service.New()
 	if err := c.svc.Init(ctx, c.Config, serviceList); err != nil {
-		log.Error(err)
+		log.Error(ctx, "failed to init service", err)
 		return err
 	}
 

@@ -4,7 +4,7 @@
 package handlers
 
 import (
-	"github.com/ONSdigital/dp-renderer/model"
+	core "github.com/ONSdigital/dp-renderer/v2/model"
 	"io"
 	"sync"
 )
@@ -118,7 +118,7 @@ var _ RenderClient = &RenderClientMock{}
 //			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string)  {
 //				panic("mock out the BuildPage method")
 //			},
-//			NewBasePageModelFunc: func() model.Page {
+//			NewBasePageModelFunc: func() core.Page {
 //				panic("mock out the NewBasePageModel method")
 //			},
 //		}
@@ -132,7 +132,7 @@ type RenderClientMock struct {
 	BuildPageFunc func(w io.Writer, pageModel interface{}, templateName string)
 
 	// NewBasePageModelFunc mocks the NewBasePageModel method.
-	NewBasePageModelFunc func() model.Page
+	NewBasePageModelFunc func() core.Page
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -194,7 +194,7 @@ func (mock *RenderClientMock) BuildPageCalls() []struct {
 }
 
 // NewBasePageModel calls NewBasePageModelFunc.
-func (mock *RenderClientMock) NewBasePageModel() model.Page {
+func (mock *RenderClientMock) NewBasePageModel() core.Page {
 	if mock.NewBasePageModelFunc == nil {
 		panic("RenderClientMock.NewBasePageModelFunc: method is nil but RenderClient.NewBasePageModel was just called")
 	}
