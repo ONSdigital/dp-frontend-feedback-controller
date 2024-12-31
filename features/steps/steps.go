@@ -2,16 +2,13 @@ package steps
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service/mocks"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	"github.com/ONSdigital/log.go/v2/log"
-	"github.com/chromedp/chromedp"
 	"github.com/cucumber/godog"
-	"github.com/stretchr/testify/assert"
 )
 
 // HealthCheckTest represents a test healthcheck struct that mimics the real healthcheck struct
@@ -35,10 +32,6 @@ type Check struct {
 
 func (c *FeedbackComponent) RegisterSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the feedback controller is running$`, c.theFeedbackControllerIsRunning)
-	ctx.Step(`^I wait (\d+) seconds`, c.delayTimeBySeconds)
-	ctx.Step(`^element "([^"]*)" should be visible$`, c.elementShouldBeVisible)
-	ctx.Step(`^I fill in input element "([^"]*)" with value "([^"]*)"$`, c.iFillInInputElementWithValue)
-	ctx.Step(`^I click the "([^"]*)" element$`, c.iClickElement)
 }
 
 func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
@@ -46,7 +39,7 @@ func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
 
 	initFunctions := &mocks.InitialiserMock{
 		DoGetHTTPServerFunc:   c.getHTTPServer,
-		DoGetHealthCheckFunc:  c.getHealthCheckOK,
+		DoGetHealthCheckFunc:  getHealthCheckOK,
 		DoGetHealthClientFunc: c.getHealthClient,
 	}
 
@@ -63,55 +56,5 @@ func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
 	c.StartTime = time.Now()
 	c.svc.Run(ctx, svcErrors)
 	c.ServiceRunning = true
-
 	return nil
-}
-
-func (c *FeedbackComponent) delayTimeBySeconds(sec int) error {
-	time.Sleep(time.Duration(int64(sec)) * time.Second)
-	return nil
-}
-
-func (c *FeedbackComponent) iFillInInputElementWithValue(fieldSelector, value string) error {
-	jsScript := fmt.Sprintf(`document.querySelector('%s').value = '%s';`, fieldSelector, value)
-
-	err := chromedp.Run(c.Chrome.Ctx,
-		chromedp.Evaluate(jsScript, nil),
-	)
-	if err != nil {
-		return err
-	}
-
-	return c.ErrorFeature.StepError()
-}
-
-func (c *FeedbackComponent) iClickElement(buttonSelector string) error {
-	// if this doesn't work as expected, you might need a sleep after the click
-	err := chromedp.Run(c.Chrome.Ctx,
-		chromedp.Click(buttonSelector),
-	)
-	if err != nil {
-		return err
-	}
-
-	return c.ErrorFeature.StepError()
-}
-
-func (c *FeedbackComponent) RunWithTimeOut(timeout time.Duration, tasks chromedp.Tasks) chromedp.ActionFunc {
-	return func(ctx context.Context) error {
-		timeoutContext, cancel := context.WithTimeout(ctx, timeout)
-		defer cancel()
-		return tasks.Do(timeoutContext)
-	}
-}
-
-func (c *FeedbackComponent) elementShouldBeVisible(elementSelector string) error {
-	err := chromedp.Run(c.Chrome.Ctx,
-		c.RunWithTimeOut(c.WaitTimeOut, chromedp.Tasks{
-			chromedp.WaitVisible(elementSelector),
-		}),
-	)
-	assert.Nil(c, err)
-
-	return c.ErrorFeature.StepError()
 }

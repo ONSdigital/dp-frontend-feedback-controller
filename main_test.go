@@ -26,14 +26,15 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	}
 
 	url := fmt.Sprintf("http://%s%s", component.Config.SiteDomain, component.Config.BindAddr)
+
 	uiFeature := componenttest.NewUIFeature(url)
+
 	uiFeature.RegisterSteps(ctx)
 
 	component.RegisterSteps(ctx)
 
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
 		uiFeature.Reset()
-		component.Reset()
 		return ctx, nil
 	})
 
@@ -59,7 +60,6 @@ func TestComponent(t *testing.T) {
 			Output: colors.Colored(os.Stdout),
 			Format: "pretty",
 			Paths:  []string{"features/feedback"},
-			Tags:   "DebugTest",
 		}
 
 		status = godog.TestSuite{

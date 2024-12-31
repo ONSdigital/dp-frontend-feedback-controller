@@ -1,8 +1,9 @@
 Feature: Feedback
+
     Scenario: When I navigate to the feedback page
-        Given the feedback controller is running
-        When I navigate to "/feedback"
-        And the page should have the following content
+      Given the feedback controller is running
+      When I navigate to "/feedback"
+      And the page should have the following content
         """
             {
                 "#main h1": "Feedback"
@@ -17,7 +18,7 @@ Feature: Feedback
         Then element "#error-summary-title" should be visible
         Then element ".ons-panel--error" should be visible
 
-    @DebugTest
+
     Scenario: When I submit the form selecting specific page with invalid url
         Given the feedback controller is running
         When I navigate to "/feedback"

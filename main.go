@@ -17,31 +17,6 @@ func main() {
 	log.Namespace = "dp-frontend-feedback-controller"
 	ctx := context.Background()
 
-	cfg, err := config.Get()
-	if err != nil {
-		log.Error(ctx, "unable to retrieve service configuration", err)
-	}
-
-	if cfg.OtelEnabled {
-		// Set up OpenTelemetry
-		otelConfig := dpotelgo.Config{
-			OtelServiceName:          cfg.OTServiceName,
-			OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
-			OtelBatchTimeout:         cfg.OTBatchTimeout,
-		}
-
-		otelShutdown, err := dpotelgo.SetupOTelSDK(ctx, otelConfig)
-
-		if err != nil {
-			log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", err)
-		}
-
-		// Handle shutdown properly so nothing leaks.
-		defer func() {
-			err = errors.Join(err, otelShutdown(context.Background()))
-		}()
-	}
-
 	if err := run(ctx); err != nil {
 		log.Fatal(ctx, "application unexpectedly failed", err)
 	}
@@ -66,6 +41,26 @@ func run(ctx context.Context) error {
 	}
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
+
+	if cfg.OtelEnabled {
+		// Set up OpenTelemetry
+		otelConfig := dpotelgo.Config{
+			OtelServiceName:          cfg.OTServiceName,
+			OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
+			OtelBatchTimeout:         cfg.OTBatchTimeout,
+		}
+
+		otelShutdown, err := dpotelgo.SetupOTelSDK(ctx, otelConfig)
+
+		if err != nil {
+			log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", err)
+		}
+
+		// Handle shutdown properly so nothing leaks.
+		defer func() {
+			err = errors.Join(err, otelShutdown(context.Background()))
+		}()
+	}
 
 	// Run service
 	svc := service.New()

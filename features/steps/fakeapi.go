@@ -6,7 +6,9 @@ import (
 
 // FakeAPI contains all the information for a fake component API
 type FakeAPI struct {
-	fakeHTTP *httpfake.HTTPFake
+	fakeHTTP        *httpfake.HTTPFake
+	healthRequest   *httpfake.Request
+	feedbackRequest *httpfake.Request
 }
 
 // NewFakeAPI creates a new fake component API
