@@ -16,12 +16,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-const (
-	buildTime = "TestBuildTime"
-	gitCommit = "TestGitCommit"
-	version   = "TestVersion"
-)
-
 var (
 	ctx = context.Background()
 
@@ -80,6 +74,12 @@ var (
 	}
 )
 
+const (
+	TestVersion   = "TestVersion"
+	TestBuildTime = "TestBuildTime"
+	TestGitCommit = "TestGitCommit"
+)
+
 func TestNew(t *testing.T) {
 	Convey("New returns a new uninitialised service", t, func() {
 		So(service.New(), ShouldResemble, &service.Service{})
@@ -96,9 +96,9 @@ func TestInitSuccess(t *testing.T) {
 		mockServiceList := service.NewServiceList(initMock)
 
 		Convey("and valid config and service error channel are provided", func() {
-			service.BuildTime = buildTime
-			service.GitCommit = gitCommit
-			service.Version = version
+			service.BuildTime = TestBuildTime
+			service.GitCommit = TestGitCommit
+			service.Version = TestVersion
 
 			cfg, err := config.Get()
 			So(err, ShouldBeNil)
@@ -119,7 +119,7 @@ func TestInitSuccess(t *testing.T) {
 
 						Convey("And the checkers are registered and the healthcheck", func() {
 							So(mockServiceList.HealthCheck, ShouldBeTrue)
-							So(len(hcMock.AddCheckCalls()), ShouldEqual, 0)
+							So(len(hcMock.AddCheckCalls()), ShouldEqual, 1)
 							So(len(initMock.DoGetHTTPServerCalls()), ShouldEqual, 1)
 							So(initMock.DoGetHTTPServerCalls()[0].BindAddr, ShouldEqual, ":25200")
 						})
@@ -139,9 +139,9 @@ func TestInitFailure(t *testing.T) {
 		mockServiceList := service.NewServiceList(initMock)
 
 		Convey("and valid config and service error channel are provided", func() {
-			service.BuildTime = buildTime
-			service.GitCommit = gitCommit
-			service.Version = version
+			service.BuildTime = TestBuildTime
+			service.GitCommit = TestGitCommit
+			service.Version = TestVersion
 
 			cfg, err := config.Get()
 			So(err, ShouldBeNil)
@@ -177,9 +177,9 @@ func TestInitFailure(t *testing.T) {
 		mockServiceList := service.NewServiceList(initMock)
 
 		Convey("and valid config and service error channel are provided", func() {
-			service.BuildTime = buildTime
-			service.GitCommit = gitCommit
-			service.Version = version
+			service.BuildTime = TestBuildTime
+			service.GitCommit = TestGitCommit
+			service.Version = TestVersion
 
 			cfg, err := config.Get()
 			So(err, ShouldBeNil)
@@ -258,9 +258,9 @@ func TestStart(t *testing.T) {
 		mockServiceList := service.NewServiceList(initMock)
 
 		Convey("and valid config and service error channel are provided", func() {
-			service.BuildTime = buildTime
-			service.GitCommit = gitCommit
-			service.Version = version
+			service.BuildTime = TestBuildTime
+			service.GitCommit = TestGitCommit
+			service.Version = TestVersion
 
 			svcErrors := make(chan error, 1)
 

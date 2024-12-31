@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	gitCommitHash = "3t7e5s1t4272646ef477f8ed755"
-	appVersion    = "v1.2.3"
+	gitCommitHash = "19c075791fc985b380771404528b8dce28e65873"
+	appVersion    = "v1.7.0"
 )
 
 type FeedbackComponent struct {

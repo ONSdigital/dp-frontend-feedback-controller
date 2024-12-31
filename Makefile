@@ -4,8 +4,8 @@ BUILD_TIME=$(shell date +%s)
 GIT_COMMIT=$(shell git rev-parse HEAD)
 VERSION ?= $(shell git tag --points-at HEAD | grep ^v | head -n 1)
 LOCAL_DP_RENDERER_IN_USE = $(shell grep -c "github.com/ONSdigital/dp-renderer/v2 =" go.mod)
-
-LDFLAGS = -ldflags "-X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT) -X main.Version=$(VERSION)"
+SERVICE_PATH = github.com/ONSdigital/dp-frontend-feedback-controller/service
+LDFLAGS = -ldflags "-X $(SERVICE_PATH).BuildTime=$(BUILD_TIME) -X $(SERVICE_PATH).GitCommit=$(GIT_COMMIT) -X $(SERVICE_PATH).Version=$(VERSION)"
 
 .PHONY: all
 all: audit test build
@@ -41,9 +41,9 @@ test: generate-prod
 	go test -race -cover -tags 'production' ./...
 
 .PHONY: test-component
-test-component:
-	make generate-prod
+test-component: generate-prod
 	go test -cover -tags 'production' -coverpkg=github.com/ONSdigital/dp-frontend-feedback-controller/... -component
+
 .PHONY: convey
 convey:
 	goconvey ./...

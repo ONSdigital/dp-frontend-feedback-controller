@@ -59,6 +59,7 @@ func TestComponent(t *testing.T) {
 			Output: colors.Colored(os.Stdout),
 			Format: "pretty",
 			Paths:  []string{"features/feedback"},
+			Tags:   "DebugTest",
 		}
 
 		status = godog.TestSuite{

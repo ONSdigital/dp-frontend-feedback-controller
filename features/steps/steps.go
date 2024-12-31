@@ -2,7 +2,8 @@ package steps
 
 import (
 	"context"
-		"time"
+	"fmt"
+	"time"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/service/mocks"
@@ -10,7 +11,8 @@ import (
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/chromedp/chromedp"
 	"github.com/cucumber/godog"
-	)
+	"github.com/stretchr/testify/assert"
+)
 
 // HealthCheckTest represents a test healthcheck struct that mimics the real healthcheck struct
 type HealthCheckTest struct {

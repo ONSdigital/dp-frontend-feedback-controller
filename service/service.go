@@ -4,13 +4,17 @@ import (
 	"context"
 	"errors"
 
+	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
+	"github.com/ONSdigital/dp-frontend-feedback-controller/assets"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/routes"
-	health "github.com/ONSdigital/dp-healthcheck/healthcheck"
 	render "github.com/ONSdigital/dp-renderer/v2"
+	"github.com/ONSdigital/dp-renderer/v2/middleware/renderror"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
+	"github.com/justinas/alice"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 )
 
 var (
@@ -23,13 +27,9 @@ var (
 )
 
 // Service contains the healthcheck, server and serviceList for the controller
-// renderer *render.Render, health health.HealthCheck, cache *cacheHelper.Helper
 type Service struct {
-	Cache       *cacheHelper.Helper
 	Config      *config.Config
-	Health      health.HealthCheck
 	HealthCheck HealthChecker
-	Renderer    *render.Render
 	Server      HTTPServer
 	ServiceList *ExternalServiceList
 }
@@ -46,8 +46,14 @@ func (svc *Service) Init(ctx context.Context, cfg *config.Config, serviceList *E
 	svc.Config = cfg
 	svc.ServiceList = serviceList
 
+	// Get health client for api router
+	routerHealthClient := serviceList.GetHealthClient("api-router", cfg.APIRouterURL)
+
 	// Initialise clients
-	clients := routes.Clients{}
+	clients := routes.Clients{
+		Renderer:    render.NewWithDefaultClient(assets.Asset, assets.AssetNames, cfg.PatternLibraryAssetsPath, cfg.SiteDomain),
+		FeedbackAPI: feedbackAPI.NewWithHealthClient(routerHealthClient),
+	}
 
 	// Get healthcheck with checkers
 	svc.HealthCheck, err = serviceList.GetHealthCheck(cfg, BuildTime, GitCommit, Version)
@@ -61,10 +67,34 @@ func (svc *Service) Init(ctx context.Context, cfg *config.Config, serviceList *E
 	}
 	clients.HealthCheckHandler = svc.HealthCheck.Handler
 
+	cacheConfig := cacheHelper.Config{
+		APIRouterURL:                cfg.APIRouterURL,
+		CacheUpdateInterval:         cfg.CacheUpdateInterval,
+		EnableNewNavBar:             cfg.EnableNewNavBar,
+		EnableCensusTopicSubsection: cfg.EnableCensusTopicSubsection,
+		CensusTopicID:               cfg.CensusTopicID,
+		IsPublishingMode:            cfg.IsPublishing,
+		Languages:                   cfg.SupportedLanguages,
+		ServiceAuthToken:            cfg.ServiceAuthToken,
+	}
+
+	// Create service initialiser and an error channel for service errors
+	svcErrors := make(chan error)
+
+	cacheService, _ := cacheHelper.Init(ctx, cacheConfig)
+	cacheService.RunUpdates(ctx, svcErrors)
+
 	// Initialise router
 	r := mux.NewRouter()
-	routes.Setup(ctx, r, cfg, svc.Renderer, svc.Health, svc.Cache)
-	svc.Server = serviceList.GetHTTPServer(cfg.BindAddr, r)
+	if cfg.OtelEnabled {
+		r.Use(otelmux.Middleware(cfg.OTServiceName))
+	}
+	middleware := []alice.Constructor{
+		renderror.Handler(clients.Renderer),
+	}
+	newAlice := alice.New(middleware...).Then(r)
+	routes.Setup(ctx, r, cfg, clients, cacheService)
+	svc.Server = serviceList.GetHTTPServer(cfg.BindAddr, newAlice)
 
 	return nil
 }
@@ -99,8 +129,6 @@ func (svc *Service) Close(ctx context.Context) error {
 		log.Info(ctx, "stop health checkers")
 		svc.HealthCheck.Stop()
 
-		// TODO: close any backing services here, e.g. client connections to databases
-
 		// stop any incoming requests
 		if err := svc.Server.Shutdown(ctx); err != nil {
 			log.Error(ctx, "failed to shutdown http server", err)
@@ -131,7 +159,10 @@ func (svc *Service) Close(ctx context.Context) error {
 func (svc *Service) registerCheckers(ctx context.Context, c routes.Clients) (err error) {
 	hasErrors := false
 
-	// TODO: Add health checks here
+	if err = svc.HealthCheck.AddCheck("Feedback API", c.FeedbackAPI.Checker); err != nil {
+		hasErrors = true
+		log.Error(ctx, "failed to add feedback API checker", err)
+	}
 
 	if hasErrors {
 		return errors.New("Error(s) registering checkers for healthcheck")
