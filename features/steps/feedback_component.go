@@ -61,6 +61,7 @@ func NewFeedbackComponent() (c *FeedbackComponent, err error) {
 
 	c.FakeAPIRouter.feedbackRequest = c.FakeAPIRouter.fakeHTTP.NewHandler().Get("/feedback")
 
+	c.FakeAPIRouter.navigationRequest = c.FakeAPIRouter.fakeHTTP.NewHandler().Get("/navigation")
 	return c, nil
 }
 
