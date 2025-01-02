@@ -165,7 +165,7 @@ func (svc *Service) registerCheckers(ctx context.Context, c routes.Clients) (err
 	}
 
 	if hasErrors {
-		return errors.New("Error(s) registering checkers for healthcheck")
+		return errors.New("error(s) registering checkers for healthcheck")
 	}
 
 	return nil

@@ -75,7 +75,10 @@ func (c *FeedbackComponent) InitAPIFeature() *componentTest.APIFeature {
 // Close server running component.
 func (c *FeedbackComponent) Close() error {
 	if c.svc != nil && c.ServiceRunning {
-		c.svc.Close(context.Background())
+		ctx := context.Background()
+		if err := c.svc.Close(ctx); err != nil {
+			log.Fatal(ctx, "fatal error when closing component", err)
+		}
 		c.ServiceRunning = false
 	}
 

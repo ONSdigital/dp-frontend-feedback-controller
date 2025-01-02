@@ -19,9 +19,9 @@ import (
 var (
 	ctx = context.Background()
 
-	errAddCheckFail = errors.New("Error(s) registering checkers for healthcheck")
+	errAddCheckFail = errors.New("error(s) registering checkers for healthcheck")
 	errHealthCheck  = errors.New("healthCheck error")
-	errServer       = errors.New("HTTP Server error")
+	errServer       = errors.New("http server error")
 
 	// Health Check Mock
 	hcMock = &mocks.HealthCheckerMock{
@@ -308,7 +308,7 @@ func TestCloseSuccess(t *testing.T) {
 			ListenAndServeFunc: func() error { return nil },
 			ShutdownFunc: func(ctx context.Context) error {
 				if !hcStopped {
-					return errors.New("Server stopped before healthcheck")
+					return errors.New("server stopped before healthcheck")
 				}
 				return nil
 			},
@@ -340,7 +340,7 @@ func TestCloseFailure(t *testing.T) {
 		failingServerCloseMock := &mocks.HTTPServerMock{
 			ListenAndServeFunc: func() error { return nil },
 			ShutdownFunc: func(ctx context.Context) error {
-				return errors.New("Failed to stop http server")
+				return errors.New("failed to stop http server")
 			},
 		}
 
@@ -387,7 +387,7 @@ func TestCloseFailure(t *testing.T) {
 		serverShutdownCloseMock := &mocks.HTTPServerMock{
 			ShutdownFunc: func(ctx context.Context) error {
 				if !hcStopped {
-					return errors.New("Server was stopped before healthcheck")
+					return errors.New("server was stopped before healthcheck")
 				}
 				return nil
 			},
