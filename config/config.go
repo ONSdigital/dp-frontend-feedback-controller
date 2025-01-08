@@ -22,9 +22,11 @@ type Config struct {
 	MailUser                    string         `envconfig:"MAIL_USER"`
 	MailPassword                string         `envconfig:"MAIL_PASSWORD" json:"-"`
 	MailPort                    string         `envconfig:"MAIL_PORT"`
+	MailEncrypted               bool           `envconfig:"MAIL_ENCRYPTION"`
 	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
 	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
 	IsPublishing                bool           `envconfig:"IS_PUBLISHING"`
+	EnableFeedbackAPI           bool           `envconfig:"ENABLE_FEEDBACK_API"`
 	PatternLibraryAssetsPath    string         `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
@@ -52,7 +54,7 @@ func Get() (*Config, error) {
 	if envCfg.Debug {
 		envCfg.PatternLibraryAssetsPath = "http://localhost:9002/dist/assets"
 	} else {
-		envCfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/e0a75c3"
+		envCfg.PatternLibraryAssetsPath = "//cdn.ons.gov.uk/dp-design-system/2c5185a"
 	}
 
 	cfg = envCfg
@@ -62,7 +64,7 @@ func Get() (*Config, error) {
 func get() (*Config, error) {
 	cfg := &Config{
 		APIRouterURL:                "http://localhost:23200/v1",
-		BindAddr:                    "localhost:25200",
+		BindAddr:                    ":25200",
 		CensusTopicID:               "4445",
 		Debug:                       false,
 		EnableCensusTopicSubsection: false,
@@ -74,8 +76,10 @@ func get() (*Config, error) {
 		MailPort:                    "1025",
 		MailUser:                    "",
 		MailPassword:                "",
+		MailEncrypted:               true,
 		FeedbackTo:                  "to@gmail.com",
 		FeedbackFrom:                "from@gmail.com",
+		EnableFeedbackAPI:           false,
 		IsPublishing:                false,
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",

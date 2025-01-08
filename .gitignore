@@ -1,5 +1,9 @@
 /build
 assets/data.go
+assets/dist
+
+# Exclude coverage file
+coverage.txt
 
 # Mac
 .DS_Store
@@ -9,3 +13,6 @@ assets/data.go
 .idea/
 *.iml
 *.iws
+
+# Go
+.go/

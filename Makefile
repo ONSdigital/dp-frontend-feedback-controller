@@ -4,8 +4,8 @@ BUILD_TIME=$(shell date +%s)
 GIT_COMMIT=$(shell git rev-parse HEAD)
 VERSION ?= $(shell git tag --points-at HEAD | grep ^v | head -n 1)
 LOCAL_DP_RENDERER_IN_USE = $(shell grep -c "github.com/ONSdigital/dp-renderer/v2 =" go.mod)
-
-LDFLAGS = -ldflags "-X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT) -X main.Version=$(VERSION)"
+SERVICE_PATH = github.com/ONSdigital/dp-frontend-feedback-controller/service
+LDFLAGS = -ldflags "-X $(SERVICE_PATH).BuildTime=$(BUILD_TIME) -X $(SERVICE_PATH).GitCommit=$(GIT_COMMIT) -X $(SERVICE_PATH).Version=$(VERSION)"
 
 .PHONY: all
 all: audit test build
@@ -19,7 +19,16 @@ build: generate-prod
 	go build -tags 'production' $(LDFLAGS) -o $(BINPATH)/dp-frontend-feedback-controller
 
 .PHONY: lint 
-lint:
+lint: ## Used in ci to run linters against Go code
+	cp assets/assets.go assets/assets.go.bak
+	echo 'func Asset(_ string) ([]byte, error) { return nil, nil }' >> assets/assets.go
+	echo 'func AssetNames() []string { return []string{} }' >> assets/assets.go
+	gofmt -w assets/assets.go
+	golangci-lint run ./... || { echo "Linting failed, restoring original assets.go"; mv assets/assets.go.bak assets/assets.go; exit 1; }
+	mv assets/assets.go.bak assets/assets.go
+
+.PHONY: lint-local
+lint-local: ## Use locally to run linters against Go code
 	golangci-lint run ./...
 
 .PHONY: debug
@@ -32,8 +41,8 @@ test: generate-prod
 	go test -race -cover -tags 'production' ./...
 
 .PHONY: test-component
-test-component:
-	exit
+test-component: generate-prod
+	go test -cover -tags 'production' -coverpkg=github.com/ONSdigital/dp-frontend-feedback-controller/... -component
 
 .PHONY: convey
 convey:
