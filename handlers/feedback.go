@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -12,7 +11,6 @@ import (
 	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
@@ -69,11 +67,11 @@ func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []co
 // AddFeedback handles a users feedback request
 func (f *Feedback) AddFeedback() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
-		addFeedback(w, req, f.Render, f.EmailSender, f.Config.FeedbackFrom, f.Config.FeedbackTo, lang, f.Config.SiteDomain, f.CacheService, f.Config)
+		addFeedback(w, req, f.Render, lang, f.Config.SiteDomain, f.CacheService, f.Config)
 	})
 }
 
-func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, emailSender email.Sender, from, to, lang, siteDomain string, cacheService *cacheHelper.Helper, cfg *config.Config) {
+func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, lang, siteDomain string, cacheService *cacheHelper.Helper, cfg *config.Config) {
 	ctx := req.Context()
 
 	if err := req.ParseForm(); err != nil {
@@ -98,46 +96,34 @@ func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Rende
 		return
 	}
 
-	if cfg.EnableFeedbackAPI {
-		feedbackAPIClient := feedbackAPI.New(cfg.APIRouterURL)
+	feedbackAPIClient := feedbackAPI.New(cfg.APIRouterURL)
 
-		isPageUsefulVal := false
-		var isGeneralFeedbackVal bool
+	isPageUsefulVal := false
+	var isGeneralFeedbackVal bool
 
-		if ff.Type == mapper.WholeSite {
-			isGeneralFeedbackVal = true
-		} else {
-			isGeneralFeedbackVal = false
-		}
-
-		f := &feedbackAPIModel.Feedback{
-			IsPageUseful:      &isPageUsefulVal,
-			IsGeneralFeedback: &isGeneralFeedbackVal,
-			OnsURL:            ff.URL,
-			Feedback:          ff.Description,
-			Name:              ff.Name,
-			EmailAddress:      ff.Email,
-		}
-
-		opts := feedbackAPI.Options{AuthToken: cfg.ServiceAuthToken}
-
-		err := feedbackAPIClient.PostFeedback(ctx, f, opts)
-
-		if err != nil {
-			statusCode := err.Status()
-			log.Error(ctx, "failed to provide feedback", err, log.Data{"code": statusCode})
-			return
-		}
+	if ff.Type == mapper.WholeSite {
+		isGeneralFeedbackVal = true
 	} else {
-		if err := emailSender.Send(
-			from,
-			[]string{to},
-			generateFeedbackMessage(ff, from, to),
-		); err != nil {
-			log.Error(ctx, "failed to send message", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		isGeneralFeedbackVal = false
+	}
+
+	f := &feedbackAPIModel.Feedback{
+		IsPageUseful:      &isPageUsefulVal,
+		IsGeneralFeedback: &isGeneralFeedbackVal,
+		OnsURL:            ff.URL,
+		Feedback:          ff.Description,
+		Name:              ff.Name,
+		EmailAddress:      ff.Email,
+	}
+
+	opts := feedbackAPI.Options{AuthToken: cfg.ServiceAuthToken}
+
+	err := feedbackAPIClient.PostFeedback(ctx, f, opts)
+
+	if err != nil {
+		statusCode := err.Status()
+		log.Error(ctx, "failed to send feedback", err, log.Data{"code": statusCode})
+		return
 	}
 
 	returnTo := ff.URL
@@ -213,29 +199,4 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 		}
 	}
 	return validationErrors
-}
-
-func generateFeedbackMessage(f model.FeedbackForm, from, to string) []byte {
-	var b bytes.Buffer
-
-	b.WriteString(fmt.Sprintf("From: %s\n", from))
-	b.WriteString(fmt.Sprintf("To: %s\n", to))
-	b.WriteString("Subject: Feedback received\n\n")
-
-	if f.Type != "" {
-		b.WriteString(fmt.Sprintf("Feedback Type: %s\n", f.Type))
-	}
-
-	b.WriteString(fmt.Sprintf("Page URL: %s\n", f.URL))
-	b.WriteString(fmt.Sprintf("Description: %s\n", f.Description))
-
-	if f.Name != "" {
-		b.WriteString(fmt.Sprintf("Name: %s\n", f.Name))
-	}
-
-	if f.Email != "" {
-		b.WriteString(fmt.Sprintf("Email address: %s\n", f.Email))
-	}
-
-	return b.Bytes()
 }
