@@ -2,11 +2,7 @@ package routes
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"net/smtp"
-
-	"github.com/ONSdigital/dp-frontend-feedback-controller/email"
 
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/handlers"
@@ -29,25 +25,7 @@ type Clients struct {
 
 // Setup registers routes for the service
 func Setup(ctx context.Context, r *mux.Router, cfg *config.Config, c Clients, cacheService *cacheHelper.Helper) {
-	var auth smtp.Auth
-	if cfg.MailEncrypted {
-		auth = smtp.PlainAuth(
-			"",
-			cfg.MailUser,
-			cfg.MailPassword,
-			cfg.MailHost,
-		)
-	} else {
-		auth = smtp.CRAMMD5Auth(cfg.MailUser, cfg.MailPassword)
-	}
-	mailAddr := fmt.Sprintf("%s:%s", cfg.MailHost, cfg.MailPort)
-
-	emailSender := email.SMTPSender{
-		Addr: mailAddr,
-		Auth: auth,
-	}
-
-	f := handlers.NewFeedback(c.Renderer, cacheService, cfg, emailSender)
+	f := handlers.NewFeedback(c.Renderer, cacheService, cfg)
 
 	log.Info(ctx, "adding routes")
 	r.StrictSlash(true).Path("/health").HandlerFunc(c.HealthCheckHandler)
