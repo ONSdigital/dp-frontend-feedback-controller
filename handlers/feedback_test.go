@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +13,6 @@ import (
 	cacheClient "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/client"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
-	"github.com/ONSdigital/dp-frontend-feedback-controller/email/emailtest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/interfaces/interfacestest"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mocks"
@@ -72,8 +70,6 @@ func Test_addFeedback(t *testing.T) {
 		req := httptest.NewRequest("POST", "http://localhost", body)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		w := httptest.NewRecorder()
-		from := ""
-		to := ""
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -82,11 +78,6 @@ func Test_addFeedback(t *testing.T) {
 			},
 		}
 
-		mockSender := &emailtest.SenderMock{
-			SendFunc: func(from string, to []string, msg []byte) error {
-				return nil
-			},
-		}
 		mockNagivationCache := &cacheHelper.Helper{
 			Clienter: &cacheClient.ClienterMock{
 				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
@@ -101,26 +92,20 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
+			addFeedback(w, req, mockRenderer, lang, siteDomain, mockNagivationCache, &config.Config{})
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
 			})
-			Convey("Then the email sender is called", func() {
-				So(len(mockSender.SendCalls()), ShouldEqual, 1)
-			})
-			Convey("Then a 301 response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusMovedPermanently)
+
+			Convey("Then a 200 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 	})
 
 	Convey("Given an error returned from the sender", t, func() {
-		body := strings.NewReader("description=testing1234&type=test")
-		req := httptest.NewRequest("POST", "http://localhost", body)
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req := httptest.NewRequest("POST", "http://localhost", http.NoBody)
 		w := httptest.NewRecorder()
-		from := ""
-		to := ""
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -129,11 +114,6 @@ func Test_addFeedback(t *testing.T) {
 			},
 		}
 
-		mockSender := &emailtest.SenderMock{
-			SendFunc: func(from string, to []string, msg []byte) error {
-				return errors.New("email is broken")
-			},
-		}
 		mockNagivationCache := &cacheHelper.Helper{
 			Clienter: &cacheClient.ClienterMock{
 				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
@@ -148,17 +128,13 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
-			Convey("Then the renderer is not called", func() {
-				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
+			addFeedback(w, req, mockRenderer, lang, siteDomain, mockNagivationCache, &config.Config{})
+			Convey("Then the renderer is called", func() {
+				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
 
-			Convey("Then the email sender is called", func() {
-				So(len(mockSender.SendCalls()), ShouldEqual, 1)
-			})
-
-			Convey("Then a 500 response is returned", func() {
-				So(w.Code, ShouldEqual, http.StatusInternalServerError)
+			Convey("Then a 200 response is returned", func() {
+				So(w.Code, ShouldEqual, http.StatusOK)
 			})
 		})
 	})
@@ -166,8 +142,6 @@ func Test_addFeedback(t *testing.T) {
 	Convey("Given a request with invalid form data", t, func() {
 		req := httptest.NewRequest("POST", "http://localhost?!@£$@$£%£$%^^&^&*", http.NoBody)
 		w := httptest.NewRecorder()
-		from := ""
-		to := ""
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -176,11 +150,6 @@ func Test_addFeedback(t *testing.T) {
 			},
 		}
 
-		mockSender := &emailtest.SenderMock{
-			SendFunc: func(from string, to []string, msg []byte) error {
-				return nil
-			},
-		}
 		mockNagivationCache := &cacheHelper.Helper{
 			Clienter: &cacheClient.ClienterMock{
 				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
@@ -195,13 +164,9 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
+			addFeedback(w, req, mockRenderer, lang, siteDomain, mockNagivationCache, &config.Config{})
 			Convey("Then the renderer is not called", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 0)
-			})
-
-			Convey("Then the email sender is not called", func() {
-				So(len(mockSender.SendCalls()), ShouldEqual, 0)
 			})
 
 			Convey("Then a 400 response is returned", func() {
@@ -215,8 +180,6 @@ func Test_addFeedback(t *testing.T) {
 		req := httptest.NewRequest("POST", "http://localhost?service=dev", body)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		w := httptest.NewRecorder()
-		from := ""
-		to := ""
 
 		mockRenderer := &interfacestest.RendererMock{
 			BuildPageFunc: func(w io.Writer, pageModel interface{}, templateName string) {},
@@ -225,11 +188,6 @@ func Test_addFeedback(t *testing.T) {
 			},
 		}
 
-		mockSender := &emailtest.SenderMock{
-			SendFunc: func(from string, to []string, msg []byte) error {
-				return nil
-			},
-		}
 		mockNagivationCache := &cacheHelper.Helper{
 			Clienter: &cacheClient.ClienterMock{
 				AddNavigationCacheFunc: func(ctx context.Context, updateInterval *time.Duration) error {
@@ -244,13 +202,11 @@ func Test_addFeedback(t *testing.T) {
 				},
 			}}
 		Convey("When addFeedback is called", func() {
-			addFeedback(w, req, mockRenderer, mockSender, from, to, lang, siteDomain, mockNagivationCache, &config.Config{})
+			addFeedback(w, req, mockRenderer, lang, siteDomain, mockNagivationCache, &config.Config{})
 			Convey("Then the renderer is called to render the feedback page", func() {
 				So(len(mockRenderer.BuildPageCalls()), ShouldEqual, 1)
 			})
-			Convey("Then the email sender is not called", func() {
-				So(len(mockSender.SendCalls()), ShouldEqual, 0)
-			})
+
 			Convey("Then a 200 response is returned", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
