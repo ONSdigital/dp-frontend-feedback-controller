@@ -79,6 +79,7 @@ Feature: Feedback
         And I click the "#whole-site" element
         When I fill in input element "#description-field" with value "good and useful website"
         When I click the ".ons-btn" element
+        And I wait 2 seconds
         Then I navigate to "/feedback/thanks"
         And the page should have the following content
         """
@@ -95,6 +96,7 @@ Feature: Feedback
         Then I fill in input element "#page-url-field" with value "http://localhost:25200/feedback/"
         Then I fill in input element "#description-field" with value "good and useful website"
         When I click the ".ons-btn" element
+        And I wait 2 seconds
         Then I navigate to "/feedback/thanks"
         And the page should have the following content
         """
