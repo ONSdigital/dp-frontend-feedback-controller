@@ -29,12 +29,17 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 
 	uiFeature := componenttest.NewUIFeature(url)
 
+	apiFeatue := component.InitAPIFeature()
+
 	uiFeature.RegisterSteps(ctx)
+
+	apiFeatue.RegisterSteps(ctx)
 
 	component.RegisterSteps(ctx)
 
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
 		uiFeature.Reset()
+		apiFeatue.Reset()
 		return ctx, nil
 	})
 
