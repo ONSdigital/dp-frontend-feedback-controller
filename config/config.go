@@ -18,15 +18,7 @@ type Config struct {
 	GracefulShutdownTimeout     time.Duration  `envconfig:"GRACEFUL_SHUTDOWN_TIMEOUT"`
 	HealthCheckInterval         time.Duration  `envconfig:"HEALTHCHECK_INTERVAL"`
 	HealthCheckCriticalTimeout  time.Duration  `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
-	MailHost                    string         `envconfig:"MAIL_HOST"`
-	MailUser                    string         `envconfig:"MAIL_USER"`
-	MailPassword                string         `envconfig:"MAIL_PASSWORD" json:"-"`
-	MailPort                    string         `envconfig:"MAIL_PORT"`
-	MailEncrypted               bool           `envconfig:"MAIL_ENCRYPTION"`
-	FeedbackTo                  string         `envconfig:"FEEDBACK_TO"`
-	FeedbackFrom                string         `envconfig:"FEEDBACK_FROM"`
 	IsPublishing                bool           `envconfig:"IS_PUBLISHING"`
-	EnableFeedbackAPI           bool           `envconfig:"ENABLE_FEEDBACK_API"`
 	PatternLibraryAssetsPath    string         `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ServiceAuthToken            string         `envconfig:"SERVICE_AUTH_TOKEN"   json:"-"`
 	SiteDomain                  string         `envconfig:"SITE_DOMAIN"`
@@ -72,14 +64,6 @@ func get() (*Config, error) {
 		GracefulShutdownTimeout:     5 * time.Second,
 		HealthCheckInterval:         30 * time.Second,
 		HealthCheckCriticalTimeout:  90 * time.Second,
-		MailHost:                    "localhost",
-		MailPort:                    "1025",
-		MailUser:                    "",
-		MailPassword:                "",
-		MailEncrypted:               true,
-		FeedbackTo:                  "to@gmail.com",
-		FeedbackFrom:                "from@gmail.com",
-		EnableFeedbackAPI:           false,
 		IsPublishing:                false,
 		ServiceAuthToken:            "",
 		SiteDomain:                  "localhost",
