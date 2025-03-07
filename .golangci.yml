@@ -68,7 +68,7 @@ linters:
     - govet
     - ineffassign
     - nakedret
-    - nakedret
+    - typecheck
     - unconvert
     - unused
     - whitespace
