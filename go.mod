@@ -1,8 +1,6 @@
 module github.com/ONSdigital/dp-frontend-feedback-controller
 
-go 1.23.0
-
-toolchain go1.24.1
+go 1.24
 
 require (
 	github.com/ONSdigital/dp-api-clients-go/v2 v2.262.0
@@ -109,4 +107,11 @@ require (
 	google.golang.org/grpc v1.68.1 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+// Upgrade to Go 1.24 tool directive from tools.go
+// Removes the need for workaround of adding tools as blank imports and leverage native support
+tool (
+	github.com/golang/glog
+	github.com/kevinburke/go-bindata
 )
