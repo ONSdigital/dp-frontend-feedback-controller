@@ -8,9 +8,9 @@ require (
 	github.com/ONSdigital/dp-feedback-api v0.3.1
 	github.com/ONSdigital/dp-frontend-cache-helper v0.4.0
 	github.com/ONSdigital/dp-healthcheck v1.6.3
-	github.com/ONSdigital/dp-net/v2 v2.12.0
+	github.com/ONSdigital/dp-net/v2 v2.13.0
 	github.com/ONSdigital/dp-otel-go v0.0.8
-	github.com/ONSdigital/dp-renderer/v2 v2.16.0
+	github.com/ONSdigital/dp-renderer/v2 v2.19.0
 	github.com/ONSdigital/dp-topic-api v0.25.0
 	github.com/ONSdigital/log.go/v2 v2.4.3
 	github.com/cucumber/godog v0.15.0
@@ -54,7 +54,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
-	github.com/gosimple/slug v1.14.0 // indirect
+	github.com/gosimple/slug v1.15.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.24.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
