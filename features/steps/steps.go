@@ -9,6 +9,7 @@ import (
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/cucumber/godog"
+	"github.com/stretchr/testify/assert"
 )
 
 // HealthCheckTest represents a test healthcheck struct that mimics the real healthcheck struct
@@ -32,6 +33,7 @@ type Check struct {
 
 func (c *FeedbackComponent) RegisterSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the feedback controller is running$`, c.theFeedbackControllerIsRunning)
+	ctx.Step(`^there is a feedback API that returns (\d+) response$`, c.thereIsAFeedbackAPIThatReturnsResponse)
 }
 
 func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
@@ -57,4 +59,12 @@ func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {
 	c.svc.Run(ctx, svcErrors)
 	c.ServiceRunning = true
 	return nil
+}
+
+func (c *FeedbackComponent) thereIsAFeedbackAPIThatReturnsResponse(expectedCode int) error {
+	actualCode := generateFeedbackResponse()
+
+	assert.Equal(&c.ErrorFeature, expectedCode, actualCode.StatusCode)
+
+	return c.ErrorFeature.StepError()
 }
