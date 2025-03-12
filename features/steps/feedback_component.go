@@ -64,6 +64,8 @@ func NewFeedbackComponent() (c *FeedbackComponent, err error) {
 	c.FakeAPIRouter.navigationRequest = c.FakeAPIRouter.fakeHTTP.NewHandler().Get("/navigation")
 
 	c.FakeAPIRouter.feedbackRequest = c.FakeAPIRouter.fakeHTTP.NewHandler().Post("/feedback")
+	c.FakeAPIRouter.feedbackRequest.Response = generateFeedbackResponse()
+
 	return c, nil
 }
 
@@ -135,4 +137,11 @@ func healthCheckStatusHandle(status int) httpfake.Responder {
 		defer rh.Unlock()
 		w.WriteHeader(status)
 	}
+}
+
+func generateFeedbackResponse() *httpfake.Response {
+	fakeAPIResponse := httpfake.NewResponse()
+	fakeAPIResponse.Status(201)
+
+	return fakeAPIResponse
 }
