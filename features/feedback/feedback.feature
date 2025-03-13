@@ -75,12 +75,12 @@ Feature: Feedback
 
     Scenario: When I submit the form selecting whole website with feedback
         Given the feedback controller is running
+        And there is a feedback API that returns 201 response
         When I navigate to "/feedback"
-        And I click the "#whole-site" element
-        When I fill in input element "#description-field" with value "good and useful website"
+        Then I click the "#whole-site" element
+        Then I fill in input element "#description-field" with value "good and useful website"
         When I click the ".ons-btn" element
-        And I wait 2 seconds
-        Then I navigate to "/feedback/thanks"
+        Then I should be redirected to "http://localhost:25200/feedback/thanks?returnTo=https://www.ons.gov.uk"
         And the page should have the following content
         """
             {
@@ -91,13 +91,13 @@ Feature: Feedback
     
     Scenario: When I submit the form selecting specific page with valid url and feedback
         Given the feedback controller is running
+        And there is a feedback API that returns 201 response
         When I navigate to "/feedback"
-        And I click the "#specific-page" element
+        Then I click the "#specific-page" element
         Then I fill in input element "#page-url-field" with value "http://localhost:25200/feedback/"
         Then I fill in input element "#description-field" with value "good and useful website"
         When I click the ".ons-btn" element
-        And I wait 2 seconds
-        Then I navigate to "/feedback/thanks"
+        Then I should be redirected to "http://localhost:25200/feedback/thanks?returnTo=http://localhost:25200/feedback/"
         And the page should have the following content
         """
             {
