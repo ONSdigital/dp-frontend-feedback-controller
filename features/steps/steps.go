@@ -33,7 +33,7 @@ type Check struct {
 
 func (c *FeedbackComponent) RegisterSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the feedback controller is running$`, c.theFeedbackControllerIsRunning)
-	ctx.Step(`^there is a feedback API that returns (\d+) response$`, c.thereIsAFeedbackAPIThatReturnsResponse)
+	ctx.Step(`^there is a feedback API that returns a (\d+) response$`, c.thereIsAFeedbackAPIThatReturnsResponse)
 }
 
 func (c *FeedbackComponent) theFeedbackControllerIsRunning() error {

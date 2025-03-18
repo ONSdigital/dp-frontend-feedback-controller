@@ -75,7 +75,7 @@ Feature: Feedback
 
     Scenario: When I submit the form selecting whole website with feedback
         Given the feedback controller is running
-        And there is a feedback API that returns 201 response
+        And there is a feedback API that returns a 201 response
         When I navigate to "/feedback"
         Then I click the "#whole-site" element
         Then I fill in input element "#description-field" with value "good and useful website"
@@ -91,7 +91,7 @@ Feature: Feedback
     
     Scenario: When I submit the form selecting specific page with valid url and feedback
         Given the feedback controller is running
-        And there is a feedback API that returns 201 response
+        And there is a feedback API that returns a 201 response
         When I navigate to "/feedback"
         Then I click the "#specific-page" element
         Then I fill in input element "#page-url-field" with value "http://localhost:25200/feedback/"
