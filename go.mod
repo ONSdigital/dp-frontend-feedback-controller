@@ -109,9 +109,9 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-// Upgrade to Go 1.24 tool directive from tools.go
-// Removes the need for workaround of adding tools as blank imports and leverage native support
 tool (
+	// This is required to remove vulnerability CVE-2024-45339
 	github.com/golang/glog
+	// This is required for front-end templating from /assets
 	github.com/kevinburke/go-bindata
 )
