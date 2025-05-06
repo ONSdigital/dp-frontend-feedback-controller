@@ -18,7 +18,7 @@ description = "Feedback"
 one = "Feedback"
 
 [FeedbackDesc]
-descriptions = "You can use the form below to ask a question, report a problem or suggest an improvement we can make to ONS.GOV.UK"
+description = "You can use the form below to ask a question, report a problem or suggest an improvement we can make to ONS.GOV.UK"
 one = "You can use the form below to ask a question, report a problem or suggest an improvement to the ONS.GOV.UK team."
 
 [FeedbackTitleWhat]
