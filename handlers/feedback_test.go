@@ -279,8 +279,8 @@ func Test_feedbackThanks(t *testing.T) {
 			feedbackThanks(w, req, url, mockRenderer, mockNagivationCache, lang, siteDomain, false)
 			Convey("Then the handler sanitises the request text to the referrer", func() {
 				dataSentToRender := mockRenderer.BuildPageCalls()[0].PageModel.(model.Feedback)
-				returnToUrl := dataSentToRender.ReturnTo
-				So(returnToUrl, ShouldEqual, url)
+				returnToURL := dataSentToRender.ReturnTo
+				So(returnToURL, ShouldEqual, url)
 			})
 		})
 	})

@@ -71,6 +71,8 @@ func (e *Init) DoGetHealthCheck(cfg *config.Config, buildTime, gitCommit, versio
 
 // NewMockHTTPClient mocks HTTP Client
 func NewMockHTTPClient(r *http.Response, err error) *dphttp.ClienterMock {
+	//nolint:revive // whilst this isn't a test it is a mock function and so
+	// unused parameters are useful to name here.
 	return &dphttp.ClienterMock{
 		SetPathsWithNoRetriesFunc: func(paths []string) {},
 		GetPathsWithNoRetriesFunc: func() []string { return []string{} },

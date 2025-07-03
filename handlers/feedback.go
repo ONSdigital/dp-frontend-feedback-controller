@@ -22,7 +22,7 @@ import (
 
 // FeedbackThanks loads the Feedback Thank you page
 func (f *Feedback) FeedbackThanks() http.HandlerFunc {
-	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, _, _ string) {
 		feedbackThanks(w, req, req.Referer(), f.Render, f.CacheService, lang, f.Config.SiteDomain, f.Config.EnableNewNavBar)
 	})
 }
@@ -44,7 +44,7 @@ func feedbackThanks(w http.ResponseWriter, req *http.Request, uri string, rend i
 
 // GetFeedback handles the loading of a feedback page
 func (f *Feedback) GetFeedback() http.HandlerFunc {
-	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, _, _ string) {
 		getFeedback(w, req, []core.ErrorItem{}, model.FeedbackForm{URL: req.Referer()}, lang, f.Render, f.CacheService, f.Config.EnableNewNavBar)
 	})
 }
@@ -66,7 +66,7 @@ func getFeedback(w http.ResponseWriter, req *http.Request, validationErrors []co
 
 // AddFeedback handles a users feedback request
 func (f *Feedback) AddFeedback() http.HandlerFunc {
-	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, collectionID, accessToken string) {
+	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, _, _ string) {
 		addFeedback(w, req, f.Render, lang, f.Config.SiteDomain, f.CacheService, f.Config)
 	})
 }
