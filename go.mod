@@ -3,7 +3,7 @@ module github.com/ONSdigital/dp-frontend-feedback-controller
 go 1.24
 
 require (
-	github.com/ONSdigital/dp-api-clients-go/v2 v2.266.0
+	github.com/ONSdigital/dp-api-clients-go/v2 v2.267.0
 	github.com/ONSdigital/dp-component-test v0.20.0
 	github.com/ONSdigital/dp-feedback-api v0.6.0
 	github.com/ONSdigital/dp-frontend-cache-helper v0.4.0
