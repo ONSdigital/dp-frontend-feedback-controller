@@ -1,5 +1,7 @@
 package interfaces
 
+//TODO: Refactor this package to ensure less generic names are used
+
 import (
 	"io"
 

@@ -74,6 +74,10 @@ linters:
           - revive
         text: unreachable-code
         source: "log.Fatal"
+      - linters:
+          - revive
+        path: interfaces/renderer.go
+        text: avoid meaningless package names 
 issues:
   new: false
 formatters:
