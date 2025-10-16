@@ -4,7 +4,8 @@ To allow users to provide feedback about the ONS website
 
 ## Getting started
 
-- Run `make debug`
+1. Run [`dis-design-system-go`](https://github.com/ONSdigital/dis-design-system-go) in a separate shell to generate static assets (css/js)
+1. To start the service use make, `make debug`
 
 Run service in feedback stack:
 
@@ -12,7 +13,6 @@ Run service in feedback stack:
 
 ## Dependencies
 
-- dp-design-system - Serves CSS and JS for the page
 - Run a local mail server to receive feedback if not running the feedback stack
 - No further dependencies other than those defined in `go.mod`
 
