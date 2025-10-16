@@ -4,9 +4,10 @@
 package handlers
 
 import (
-	core "github.com/ONSdigital/dp-renderer/v2/model"
 	"io"
 	"sync"
+
+	core "github.com/ONSdigital/dis-design-system-go/model"
 )
 
 // Ensure, that ClientErrorMock does implement ClientError.

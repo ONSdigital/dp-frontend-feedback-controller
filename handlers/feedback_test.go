@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ONSdigital/dis-design-system-go/helper"
+	coreModel "github.com/ONSdigital/dis-design-system-go/model"
 	cacheClient "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/client"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"
@@ -17,8 +19,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mocks"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
-	"github.com/ONSdigital/dp-renderer/v2/helper"
-	coreModel "github.com/ONSdigital/dp-renderer/v2/model"
 	topicModel "github.com/ONSdigital/dp-topic-api/models"
 
 	. "github.com/smartystreets/goconvey/convey"

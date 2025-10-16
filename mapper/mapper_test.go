@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/ONSdigital/dis-design-system-go/helper"
+	core "github.com/ONSdigital/dis-design-system-go/model"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mocks"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
-	"github.com/ONSdigital/dp-renderer/v2/helper"
-	core "github.com/ONSdigital/dp-renderer/v2/model"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

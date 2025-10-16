@@ -5,7 +5,7 @@ package interfaces
 import (
 	"io"
 
-	coreModel "github.com/ONSdigital/dp-renderer/v2/model"
+	coreModel "github.com/ONSdigital/dis-design-system-go/model"
 )
 
 //go:generate moq -out interfacestest/renderer.go -pkg interfacestest . Renderer

@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	core "github.com/ONSdigital/dis-design-system-go/model"
 	feedbackAPIModel "github.com/ONSdigital/dp-feedback-api/models"
 	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
@@ -15,7 +16,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-feedback-controller/mapper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/model"
 	dphandlers "github.com/ONSdigital/dp-net/v3/handlers"
-	core "github.com/ONSdigital/dp-renderer/v2/model"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/schema"
 )
