@@ -9,7 +9,7 @@ import (
 
 	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 
-	render "github.com/ONSdigital/dis-design-system-go"
+	render "github.com/ONSdigital/dis-design-system-go/v2"
 
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/log.go/v2/log"

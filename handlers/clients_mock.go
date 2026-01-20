@@ -7,7 +7,7 @@ import (
 	"io"
 	"sync"
 
-	core "github.com/ONSdigital/dis-design-system-go/model"
+	core "github.com/ONSdigital/dis-design-system-go/v2/model"
 )
 
 // Ensure, that ClientErrorMock does implement ClientError.

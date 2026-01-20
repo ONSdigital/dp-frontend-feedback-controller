@@ -1,6 +1,6 @@
 package model
 
-import "github.com/ONSdigital/dis-design-system-go/model"
+import "github.com/ONSdigital/dis-design-system-go/v2/model"
 
 // Page contains data reused for feedback model
 type Feedback struct {

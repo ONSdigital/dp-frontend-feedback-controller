@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	core "github.com/ONSdigital/dis-design-system-go/model"
+	core "github.com/ONSdigital/dis-design-system-go/v2/model"
 	feedbackAPIModel "github.com/ONSdigital/dp-feedback-api/models"
 	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ONSdigital/dis-design-system-go/helper"
-	coreModel "github.com/ONSdigital/dis-design-system-go/model"
+	"github.com/ONSdigital/dis-design-system-go/v2/helper"
+	coreModel "github.com/ONSdigital/dis-design-system-go/v2/model"
 	cacheClient "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/client"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/config"

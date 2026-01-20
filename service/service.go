@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	render "github.com/ONSdigital/dis-design-system-go"
-	"github.com/ONSdigital/dis-design-system-go/middleware/renderror"
+	render "github.com/ONSdigital/dis-design-system-go/v2"
+	"github.com/ONSdigital/dis-design-system-go/v2/middleware/renderror"
 	feedbackAPI "github.com/ONSdigital/dp-feedback-api/sdk"
 	cacheHelper "github.com/ONSdigital/dp-frontend-cache-helper/pkg/navigation/helper"
 	"github.com/ONSdigital/dp-frontend-feedback-controller/assets"
