@@ -38,6 +38,7 @@ We use v2 of golangci-lint, which you will [need to install](https://golangci-li
 | DEBUG                          | false                           | Enable debug mode                                                                                                  |
 | ENABLE_CENSUS_TOPIC_SUBSECTION | false                           | Enable census topic subsection                                                                                     |
 | ENABLE_NEW_NAVBAR              | false                           | Enable new navigation bar                                                                                          |
+| FEEDBACK_FORM_MAX_BYTES        | 64kb                            | Byte value for feedback form responses                                                                             |
 | GRACEFUL_SHUTDOWN_TIMEOUT      | 5s                              | The graceful shutdown timeout in seconds (`time.Duration` format)                                                  |
 | HEALTHCHECK_INTERVAL           | 30s                             | Time between self-healthchecks (`time.Duration` format)                                                            |
 | HEALTHCHECK_CRITICAL_TIMEOUT   | 90s                             | Time to wait until an unhealthy dependent propagates its state to make this app unhealthy (`time.Duration` format) |

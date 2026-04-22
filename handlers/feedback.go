@@ -74,6 +74,10 @@ func (f *Feedback) AddFeedback() http.HandlerFunc {
 func addFeedback(w http.ResponseWriter, req *http.Request, rend interfaces.Renderer, lang, siteDomain string, cacheService *cacheHelper.Helper, cfg *config.Config) {
 	ctx := req.Context()
 
+	if cfg.FeedbackFormMaxBytes > 0 {
+		req.Body = http.MaxBytesReader(w, req.Body, cfg.FeedbackFormMaxBytes)
+	}
+
 	if err := req.ParseForm(); err != nil {
 		log.Error(ctx, "unable to parse request form", err)
 		w.WriteHeader(http.StatusBadRequest)

@@ -16,6 +16,7 @@ type Config struct {
 	Debug                       bool           `envconfig:"DEBUG"`
 	EnableCensusTopicSubsection bool           `envconfig:"ENABLE_CENSUS_TOPIC_SUBSECTION"`
 	EnableNewNavBar             bool           `envconfig:"ENABLE_NEW_NAVBAR"`
+	FeedbackFormMaxBytes        int64          `envconfig:"FEEDBACK_FORM_MAX_BYTES"`
 	GracefulShutdownTimeout     time.Duration  `envconfig:"GRACEFUL_SHUTDOWN_TIMEOUT"`
 	HealthCheckInterval         time.Duration  `envconfig:"HEALTHCHECK_INTERVAL"`
 	HealthCheckCriticalTimeout  time.Duration  `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
@@ -63,6 +64,7 @@ func get() (*Config, error) {
 		Debug:                       false,
 		EnableCensusTopicSubsection: false,
 		EnableNewNavBar:             false,
+		FeedbackFormMaxBytes:        64 * 1024,
 		GracefulShutdownTimeout:     5 * time.Second,
 		HealthCheckInterval:         30 * time.Second,
 		HealthCheckCriticalTimeout:  90 * time.Second,
