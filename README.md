@@ -42,12 +42,6 @@ We use v2 of golangci-lint, which you will [need to install](https://golangci-li
 | GRACEFUL_SHUTDOWN_TIMEOUT      | 5s                              | The graceful shutdown timeout in seconds (`time.Duration` format)                                                  |
 | HEALTHCHECK_INTERVAL           | 30s                             | Time between self-healthchecks (`time.Duration` format)                                                            |
 | HEALTHCHECK_CRITICAL_TIMEOUT   | 90s                             | Time to wait until an unhealthy dependent propagates its state to make this app unhealthy (`time.Duration` format) |
-| MAIL_HOST                      | ""                              | The host for the mail server.                                                                                      |
-| MAIL_PORT                      | ""                              | The port for the mail server.                                                                                      |
-| MAIL_USER                      | ""                              | A user on the mail server.                                                                                         |
-| MAIL_PASSWORD                  | ""                              | The password for the mail server user.                                                                             |
-| FEEDBACK_TO                    | ""                              | Receiver email address for feedback.                                                                               |
-| FEEDBACK_FROM                  | ""                              | Sender email address for feedback.                                                                                 |
 | IS_PUBLISHING_MODE             | false                           |                                                                                                                    |
 | PATTERN_LIBRARY_ASSETS_PATH    | ""                              | Pattern library location                                                                                           |
 | SERVICE_AUTH_TOKEN             | ""                              | Service authorisation token                                                                                        |
