@@ -20,6 +20,12 @@ import (
 	"github.com/gorilla/schema"
 )
 
+const (
+	typeErrorURL     = "#type-error"
+	emailErrorURL    = "#email-error"
+	feedbackErrorURL = "#feedback-error"
+)
+
 // FeedbackThanks loads the Feedback Thank you page
 func (f *Feedback) FeedbackThanks() http.HandlerFunc {
 	return dphandlers.ControllerHandler(func(w http.ResponseWriter, req *http.Request, lang, _, _ string) {
@@ -148,7 +154,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 				LocaleKey: "FeedbackChooseType",
 				Plural:    1,
 			},
-			URL: "#type-error",
+			URL: typeErrorURL,
 		})
 		ff.IsTypeErr = true
 	}
@@ -161,7 +167,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 					LocaleKey: "FeedbackWhatEnterURL",
 					Plural:    1,
 				},
-				URL: "#type-error",
+				URL: typeErrorURL,
 			})
 			ff.IsURLErr = true
 		} else if !mapper.IsSiteDomainURL(ff.URL, siteDomain) {
@@ -170,7 +176,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 					LocaleKey: "FeedbackValidURL",
 					Plural:    1,
 				},
-				URL: "#type-error",
+				URL: typeErrorURL,
 			})
 			ff.IsURLErr = true
 		}
@@ -185,7 +191,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 				LocaleKey: "FeedbackAlertEntry",
 				Plural:    1,
 			},
-			URL: "#feedback-error",
+			URL: feedbackErrorURL,
 		})
 		ff.IsDescriptionErr = true
 	}
@@ -197,7 +203,7 @@ func validateForm(ff *model.FeedbackForm, siteDomain string) (validationErrors [
 					LocaleKey: "FeedbackAlertEmail",
 					Plural:    1,
 				},
-				URL: "#email-error",
+				URL: emailErrorURL,
 			})
 			ff.IsEmailErr = true
 		}

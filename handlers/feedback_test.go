@@ -542,21 +542,21 @@ func TestValidateForm(t *testing.T) {
 							LocaleKey: "FeedbackWhatEnterURL",
 							Plural:    1,
 						},
-						URL: "#type-error",
+						URL: typeErrorURL,
 					},
 					{
 						Description: coreModel.Localisation{
 							LocaleKey: "FeedbackAlertEntry",
 							Plural:    1,
 						},
-						URL: "#feedback-error",
+						URL: feedbackErrorURL,
 					},
 					{
 						Description: coreModel.Localisation{
 							LocaleKey: "FeedbackAlertEmail",
 							Plural:    1,
 						},
-						URL: "#email-error",
+						URL: emailErrorURL,
 					},
 				},
 			},
